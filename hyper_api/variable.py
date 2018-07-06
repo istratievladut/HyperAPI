@@ -169,6 +169,10 @@ class DiscreteVariable(Variable):
         return self.__json_returned['stats']['distribution']['X']
 
     @property
+    def modality_count(self):
+        return self.__json_returned['stats']['modalitiesCount']
+
+    @property
     def frequencies(self):
         return self.__json_returned['stats']['distribution']['Y']
 

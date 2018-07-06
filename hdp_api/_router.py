@@ -26,6 +26,7 @@ from hypercube_api.hdp_api.routes.rules import Rules
 from hypercube_api.hdp_api.routes.rulesetViz import RulesetViz
 from hypercube_api.hdp_api.routes.schedulerDashboard import SchedulerDashboard
 from hypercube_api.hdp_api.routes.simpleLift import SimpleLift
+from hypercube_api.hdp_api.routes.swpMatchmaking import SWPMatchmaking
 from hypercube_api.hdp_api.routes.system import System
 from hypercube_api.hdp_api.routes.tags import Tags
 from hypercube_api.hdp_api.routes.task import Task
@@ -73,6 +74,7 @@ class Router(object):
         RulesetViz,
         SchedulerDashboard,
         SimpleLift,
+        SWPMatchmaking,
         System,
         Tags,
         Task,
