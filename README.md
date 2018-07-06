@@ -2,4 +2,4 @@
 
 Let you access all your Data on HyperCube Data Platform 
 
-visit https://wwwhcube.io
+visit https://www.hcube.io
