@@ -322,9 +322,9 @@ class ModelFactory:
         if model is not None:
             return model
 
-        return self.create(dataset, name, target, purity_min, coverage_min, rule_complexity, quantiles, min_marginal_contribution,
-                           max_complexity, nb_minimizations, coverage_increment, split_ratio, nb_iterations, purity_tolerance,
-                           enable_custom_discretizations, save_all_rules)
+        return self.create_hypercube(dataset, name, target, purity_min, coverage_min, rule_complexity, quantiles, min_marginal_contribution,
+                                     max_complexity, nb_minimizations, coverage_increment, split_ratio, nb_iterations, purity_tolerance,
+                                     enable_custom_discretizations, save_all_rules)
 
 
 class Model(Base):
