@@ -13,30 +13,7 @@ class XrayFactory:
         self.__project_id = project_id
 
     @Helper.try_catch
-    def create(self, dataset, name, target,
-               quantiles=10, enable_custom_discretizations=True):
-        """
-        Args:
-            dataset (Dataset) : dataset on which Xray will be created
-            name (str): name of the Xray to create
-            target (Target or Description): target to generate the Xray
-            quantiles (int): Number of intervals the continuous variables are quantized in, default is 10
-            enable_custom_discretizations (boolean): use custom discretizations, eventually use "quantiles" parameter for remaining variables, default is True
-
-        Returns:
-            Xray
-        """
-        project_id = self.__project_id
-        dataset_id = dataset.dataset_id
-        dataset_name = dataset.name
-        dataset_sourceFileName = dataset.source_file_name
-        dataset_separator = dataset.separator
-
-        if enable_custom_discretizations is True:
-            discretizations = dataset._discretizations
-        else:
-            discretizations = {}
-
+    def __prepare_kpi_data(self, target):
         kpi_data = {
             "kpiName": target.name,
             "kpiType": target.indicator_type,
@@ -61,6 +38,41 @@ class XrayFactory:
         else:
             raise ApiException('Unexpected target Structure')
 
+        return kpi_data
+
+    @Helper.try_catch
+    def create(self, dataset, name, target=None, targets=None,
+               quantiles=10, enable_custom_discretizations=True):
+        """
+        Args:
+            dataset (Dataset) : dataset on which Xray will be created
+            name (str): name of the Xray to create
+            target (Target or Description): one target to generate the Xray
+            targets (Target or Description): array of targets to generate the Xray (ignored if 'target' parameter is defined)
+            quantiles (int): Number of intervals the continuous variables are quantized in, default is 10
+            enable_custom_discretizations (boolean): use custom discretizations, eventually use "quantiles" parameter for remaining variables, default is True
+
+        Returns:
+            Xray
+        """
+        project_id = self.__project_id
+        dataset_id = dataset.dataset_id
+        dataset_name = dataset.name
+        dataset_sourceFileName = dataset.source_file_name
+        dataset_separator = dataset.separator
+
+        if enable_custom_discretizations is True:
+            discretizations = dataset._discretizations
+        else:
+            discretizations = {}
+
+        if target is not None:
+            kpis = [self.__prepare_kpi_data(target)]
+        elif targets is not None:
+            kpis = [self.__prepare_kpi_data(target) for target in targets]
+        else:
+            raise ApiException('A target should be defined')
+
         data = {
             "projectId": project_id,
             "task": {
@@ -70,7 +82,7 @@ class XrayFactory:
                 "projectId": project_id,
                 "params": {
                     "source": dataset_sourceFileName,
-                    "kpis": [kpi_data],
+                    "kpis": kpis,
                     "name": name,
                     "quantileOrder": quantiles,
                     "separator": dataset_separator,
@@ -119,14 +131,15 @@ class XrayFactory:
         return None
 
     @Helper.try_catch
-    def get_or_create(self, dataset, name, target, quantiles=10, enable_custom_discretizations=True):
+    def get_or_create(self, dataset, name, target=None, targets=None, quantiles=10, enable_custom_discretizations=True):
         """
         find a Xray by name, or create it if not found
 
         Args:
             dataset (Dataset) : dataset on which Xray will be created
             name (str): name of the Xray to get or create
-            target (Target or Description): target to generate the Xray
+            target (Target or Description): one target to generate the Xray
+            targets (Target or Description): array of targets to generate the Xray (ignored if 'target' parameter is defined)
             quantiles (int): Number of intervals the continuous variables are quantized in, default is 10
             enable_custom_discretizations (boolean): use custom discretizations, eventually use "quantiles" parameter for remaining variables, default is True
 
@@ -138,7 +151,8 @@ class XrayFactory:
             if (xray.name == name) and (xray.dataset_id == dataset.dataset_id):
                 return xray
 
-        return self.create(dataset, name, target, quantiles, enable_custom_discretizations)
+        return self.create(dataset=dataset, name=name, target=target, targets=targets, quantiles=quantiles,
+                           enable_custom_discretizations=enable_custom_discretizations)
 
 
 class Xray(Base):

@@ -41,21 +41,24 @@ class XRayVariableFactory:
         return None
 
     @Helper.try_catch
-    def sort(self, attribute_key='contrast_rate_value', reverse=True):
+    def sort(self, contrast_rate=None, reverse=True):
         """
-            sort Xray variables (default is by decreasing constrast rate value)
+            sort Xray variables (default is by decreasing constrast rate on first target)
 
             Args:
-                attribute_key (str): key used to sort variables (default: 'contrast_rate_value')
+                contrast_rate: name of the variable on which sorting by contrast rate will be done
                 reverse (bool): order to reverse (default: True)
 
             Returns:
                 XRayVariable[]: list of variables in the current Xray
         """
         xray_variables = self.filter()
-        if len(xray_variables) == 0 or not hasattr(xray_variables[0], attribute_key) or getattr(xray_variables[0], attribute_key) is None:
+
+        if contrast_rate is None:
+            return sorted(xray_variables, key=lambda x: list(x.contrast_rates.values())[0], reverse=reverse)
+        if len(xray_variables) == 0 or not xray_variables[0].contrast_rates or xray_variables[0].contrast_rates.get(contrast_rate) is None:
             return xray_variables
-        return sorted(xray_variables, key=lambda x: getattr(x, attribute_key), reverse=reverse)
+        return sorted(xray_variables, key=lambda x: x.contrast_rates.get(contrast_rate), reverse=reverse)
 
 
 class XRayVariable(Base):
@@ -72,9 +75,9 @@ class XRayVariable(Base):
             self.__class__.__name__,
             self.name
         ) + ("\t<! This variable has been ignored>\n" if self.is_ignored else "") + \
-            """\t- Discrete : {}\n""".format(
+            """\t- Discrete: {}\n""".format(
             self.is_discrete
-        ) + ("""\t- Contrast rate : {:.2f}%\n""".format(self.contrast_rate_value * 100) if self.contrast_rate_value else "")
+        ) + ("""\t- Contrast rates: {}\n""".format(self.contrast_rates) if self.contrast_rates else "")
 
     @property
     def _json(self):
@@ -95,13 +98,6 @@ class XRayVariable(Base):
     @property
     def column_id(self):
         return self.__json_returned.get('column')
-
-    @property
-    def contrast_rate_value(self):
-        contrastRates = self.__json_returned.get('contrastRates')
-        if len(contrastRates.values()) > 0:
-            return list(contrastRates.values())[0]
-        return None
 
     @property
     def contrast_rates(self):
