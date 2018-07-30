@@ -55,12 +55,6 @@ class XrayFactory:
         Returns:
             Xray
         """
-        project_id = self.__project_id
-        dataset_id = dataset.dataset_id
-        dataset_name = dataset.name
-        dataset_sourceFileName = dataset.source_file_name
-        dataset_separator = dataset.separator
-
         if enable_custom_discretizations is True:
             discretizations = dataset._discretizations
         else:
@@ -74,18 +68,18 @@ class XrayFactory:
             raise ApiException('A target should be defined')
 
         data = {
-            "projectId": project_id,
+            "projectId": self.__project_id,
             "task": {
                 "type": "simplelift",
-                "datasetName": dataset_name,
-                "datasetId": dataset_id,
-                "projectId": project_id,
+                "datasetName": dataset.name,
+                "datasetId": dataset.dataset_id,
+                "projectId": self.__project_id,
                 "params": {
-                    "source": dataset_sourceFileName,
+                    "source": dataset.source_file_name,
                     "kpis": kpis,
                     "name": name,
                     "quantileOrder": quantiles,
-                    "separator": dataset_separator,
+                    "separator": dataset.separator,
                     "discretizations": discretizations
                 }
             }
@@ -93,7 +87,7 @@ class XrayFactory:
         creation_json = self.__api.SimpleLift.newsimplelift(project_ID=self.__project_id, json=data)
 
         try:
-            self.__api.handle_work_states(project_id, work_type='simplelift', work_id=creation_json.get('_id'))
+            self.__api.handle_work_states(self.__project_id, work_type='simplelift', work_id=creation_json.get('_id'))
         except Exception as E:
             raise ApiException('Unable to get the X-ray status', str(E))
 
