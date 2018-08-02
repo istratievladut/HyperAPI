@@ -16,7 +16,7 @@ class ProjectFactory:
     @Helper.try_catch
     def create(self, name, description='', type_id=None, wait=False):
         """
-        Create a HyperCube project
+        Create a HyperCube project.
 
         Args:
             name (str): The name of the project
@@ -41,7 +41,7 @@ class ProjectFactory:
     @Helper.try_catch
     def filter(self):
         """
-        Get all projects
+        Get all projects.
 
         Returns:
             list of Project
@@ -51,7 +51,13 @@ class ProjectFactory:
     @Helper.try_catch
     def get(self, name):
         """
-        Returns a project found by name or None if no match
+        Returns a project found by name or None if no match.
+
+        Args:
+            name (str): The name of the project
+
+        Returns:
+            Project or None
         """
         projects = list(filter(lambda x: x.name == name, self.filter()))
         if projects:
@@ -61,7 +67,13 @@ class ProjectFactory:
     @Helper.try_catch
     def get_by_id(self, project_id):
         """
-        Returns a project found by ID or None if no match
+        Returns a project found by ID or None if no match.
+
+        Args:
+            id (str): ID of the project
+
+        Returns:
+            Project or None
         """
         json = {'project_ID': project_id}
         json_returned = self.__api.Projects.getaproject(**json)
@@ -72,7 +84,10 @@ class ProjectFactory:
     @Helper.try_catch
     def get_default(self):
         """
-        Returns the default project
+        Returns the default project.
+
+        Returns:
+            Project
         """
         defaultProjectId = self.__api.Projects.projects().get('defaultProject')
         if defaultProjectId is None:
@@ -90,6 +105,15 @@ class ProjectFactory:
     def get_or_create(self, name, description='', type_id=None, wait=False):
         """
         Returns an existing project matching the given name. If no match, create a new project.
+
+        Args:
+            name (str): The name of the project
+            description (str): the description of the project, default is ''
+            type_id (str): id for a demo project (eg: 'TitanicDemoProject'), default is None, which is a blank project
+            wait (bool) : waits for the end of all works in the demo project specified by type_id, default is False
+
+        Returns:
+            Project
         """
         return self.get(name) or self.create(name, description, type_id, wait)
 
@@ -134,7 +158,7 @@ class Project(Base):
         Returns:
             An object of type TargetFactory
         """
-        return TargetFactory(self.__api, self)
+        return TargetFactory(self.__api, self.project_id)
 
     @property
     def Ruleset(self):
@@ -154,7 +178,7 @@ class Project(Base):
         Returns:
             An object of type ModelFactory
         """
-        return ModelFactory(self.__api, self)
+        return ModelFactory(self.__api, self.project_id)
 
     @property
     def Xray(self):
@@ -236,7 +260,7 @@ class Project(Base):
         return [t for t in self.Target.filter() if t.indicator_family == description_family]
 
     @property
-    def tags(self):
+    def _tags(self):
         return NotImplemented
 
     @property

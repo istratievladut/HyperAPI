@@ -17,6 +17,8 @@ class Rules(list):
 
     def tag(self, tags_name):
         """
+        Add new tags to the rules.
+
         Args:
             tags_name: Names of the new tag you want to add
 
@@ -36,6 +38,8 @@ class Rules(list):
 
 
 class Rule:
+    """
+    """
     def __init__(self, json, kpi_mapping):
         self.__json = json
         self.__constraints = [Constraint(cons) for cons in json.get('constraints')]
@@ -48,18 +52,30 @@ class Rule:
 
     @property
     def constraints(self):
+        """
+        Returns rules constraints.
+        """
         return self.__constraints
 
     @property
     def id(self):
+        """
+        Returns rules ID.
+        """
         return self.__json.get('_id')
 
     @property
     def tags(self):
+        """
+        Returns rules tags.
+        """
         return self.__json.get('tags')
 
     @property
     def scores(self):
+        """
+        Returns rules scores.
+        """
         scores = {}
         for key, value in self.__json.get('scores').items():
             scores[decode_id_to_kpiname(self.__mapping, key).capitalize()] = value

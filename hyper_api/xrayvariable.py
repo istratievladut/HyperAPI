@@ -47,7 +47,7 @@ class XRayVariableFactory:
 
             Args:
                 contrast_rate: name of the variable on which sorting by contrast rate will be done
-                reverse (bool): order to reverse (default: True)
+                reverse (bool): order to reverse (default: True => decreasing)
 
             Returns:
                 XRayVariable[]: list of variables in the current Xray

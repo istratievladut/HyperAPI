@@ -16,20 +16,20 @@ class ModelFactory:
     _LIFT = 'Lift'
     _HYPERCUBE_ALGO_TYPE = 'HyperCube'
 
-    def __init__(self, api, project):
+    def __init__(self, api, project_id):
         self.__api = api
         self.__algo_list = ['HyperCube', 'LogisticRegression', 'DecisionTree', 'RandomForest', 'GradientBoosting']
-        self.__dataset = project
+        self.__project_id = project_id
 
     @Helper.try_catch
     def filter(self):
         """
-        Get all models
+        Get all models.
 
         Returns:
-            The list of models
+            List of models
         """
-        project_id = self.__dataset.project_id
+        project_id = self.__project_id
 
         data = {
             'projectId': project_id,
@@ -45,7 +45,10 @@ class ModelFactory:
     @Helper.try_catch
     def get(self, name):
         """
-        Get a model matching the given name or None if there is no match
+        Get a model matching the given name or None if there is no match.
+
+        Args:
+            name (str): The name of the dataset
 
         Returns:
             The Model or None
@@ -58,7 +61,10 @@ class ModelFactory:
     @Helper.try_catch
     def get_by_id(self, id):
         """
-        Get the model matching the given ID or None if there is no match
+        Get the model matching the given ID or None if there is no match.
+
+        Args:
+            id (str): The id of the Model
 
         Returns:
             The Model or None
@@ -84,7 +90,7 @@ class ModelFactory:
                 default is 0.01
 
         Returns:
-            the Model
+            The Model
         """
         kpiData = []
         for _id, _type in zip(target.score_ids, target.scores):
@@ -114,8 +120,8 @@ class ModelFactory:
                            }
                 }
 
-        model = self.__api.Task.createtask(project_ID=self.__dataset.project_id, json=json)
-        self._api.handle_work_states(self.project_id, work_type='predictionRuleset', work_id=model.get('_id'))
+        model = self.__api.Task.createtask(project_ID=self.__project_id, json=json)
+        self.__api.handle_work_states(self.__project_id, work_type='predictionRuleset', work_id=model.get('_id'))
         return HyperCube(self.__api, model)
 
     @Helper.try_catch
@@ -374,6 +380,9 @@ class Model(Base):
 
     @property
     def name(self):
+        """
+        The model name.
+        """
         return self.__json_returned.get('modelName')
 
     @property
@@ -427,6 +436,9 @@ class Model(Base):
             random_line (dict): display options of random line. Default is a red dash line.
             legend (dict): legend options, ex: dict(orientation="h") or dict(x=-.1, y=1.2).
                 Default is at the right of the diagram. see https://plot.ly/python/legend/
+
+        Returns:
+            plot of the curve
         """
 
         try:
@@ -530,6 +542,7 @@ class HyperCube(Model):
             add_score_to_dataset (boolean): if set to True a new column containing the scores is added to the dataset.
                 Default is False.
             score_column_name (str): name of the score column, used only if add_score_to_dataset is set to True
+
         Returns:
             the applied Model
         """
