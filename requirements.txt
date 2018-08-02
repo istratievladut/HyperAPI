@@ -1,0 +1,7 @@
+Sphinx==1.7.6
+guzzle_sphinx_theme==0.7.11
+sphinxcontrib-napoleon==0.6.1
+sphinx_bootstrap_theme==0.6.5
+pyjwt==1.6.4
+requests_toolbelt==0.8.0
+pandas==0.23.2
