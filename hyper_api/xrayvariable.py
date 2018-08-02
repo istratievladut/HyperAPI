@@ -1,5 +1,5 @@
-from hypercube_api.util import Helper
-from hypercube_api.hyper_api.base import Base
+from HyperAPI.util import Helper
+from HyperAPI.hyper_api.base import Base
 
 
 class XRayVariableFactory:

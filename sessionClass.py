@@ -5,8 +5,8 @@ import jwt
 
 from os.path import join
 from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor
-from hypercube_api.util import get_hypercube_path
-from hypercube_api.config import get_config
+from HyperAPI.util import get_hypercube_path
+from HyperAPI.config import get_config
 
 
 class Session:
@@ -28,7 +28,7 @@ class Session:
                 prx_protocol = config['proxy']['protocol']
                 prx_address = config['proxy']['address']
                 prx_port = config['proxy']['port']
-                url = f'{prx_protocol}://{prx_address}:{prx_port}'
+                url = '{prx_protocol}://{prx_address}:{prx_port}'
                 # Get data folder
                 data_folder = os.path.realpath(join(get_hypercube_path(), config['storage']['dataDir']))
                 if os.path.exists(data_folder):

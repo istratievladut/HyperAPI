@@ -1,4 +1,4 @@
-from hypercube_api.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.routes import Resource, Route
 
 
 class TimeSeriesQuery(Resource):

@@ -1,7 +1,7 @@
 from json import loads
-from hypercube_api.util import Helper
-from hypercube_api.hyper_api.base import Base
-from hypercube_api.hyper_api.target import TargetFactory
+from HyperAPI.util import Helper
+from HyperAPI.hyper_api.base import Base
+from HyperAPI.hyper_api.target import TargetFactory
 
 
 class HyperCubeClassifierFactory:

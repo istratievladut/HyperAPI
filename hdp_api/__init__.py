@@ -1,1 +1,1 @@
-from hypercube_api.hdp_api._router import Router
+from HyperAPI.hdp_api._router import Router

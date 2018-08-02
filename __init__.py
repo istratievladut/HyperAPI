@@ -1,1 +1,1 @@
-from hypercube_api.hyper_api.api import Api
+from HyperAPI.hyper_api.api import Api

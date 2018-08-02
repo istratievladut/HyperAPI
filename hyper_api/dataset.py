@@ -2,12 +2,12 @@ from os.path import getsize, split
 import sys
 import uuid
 import io
-from hypercube_api.util import Helper
-from hypercube_api.utils.exceptions import ApiException
-from hypercube_api.hyper_api.base import Base
-from hypercube_api.hyper_api.variable import VariableFactory
-from hypercube_api.hyper_api.xray import XrayFactory
-from hypercube_api.hyper_api.ruleset import RulesetFactory
+from HyperAPI.util import Helper
+from HyperAPI.utils.exceptions import ApiException
+from HyperAPI.hyper_api.base import Base
+from HyperAPI.hyper_api.variable import VariableFactory
+from HyperAPI.hyper_api.xray import XrayFactory
+from HyperAPI.hyper_api.ruleset import RulesetFactory
 
 
 class DatasetFactory:

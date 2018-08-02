@@ -2,7 +2,7 @@ import random
 import sys
 import csv
 import posixpath
-from hypercube_api.utils.exceptions import ApiException
+from HyperAPI.utils.exceptions import ApiException
 
 
 class Helper:
