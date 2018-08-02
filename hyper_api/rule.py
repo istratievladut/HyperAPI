@@ -1,4 +1,4 @@
-from hypercube_api.hyper_api.constraint import Constraint
+from HyperAPI.hyper_api.constraint import Constraint
 
 
 class Rules(list):

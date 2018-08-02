@@ -1,7 +1,7 @@
-from hypercube_api.util import Helper
-from hypercube_api.util import get_random_color
-from hypercube_api.hyper_api.base import Base
-from hypercube_api.utils.exceptions import ApiException
+from HyperAPI.util import Helper
+from HyperAPI.util import get_random_color
+from HyperAPI.hyper_api.base import Base
+from HyperAPI.utils.exceptions import ApiException
 
 
 # our list here is expected to contain dictionaries, which are not hashable

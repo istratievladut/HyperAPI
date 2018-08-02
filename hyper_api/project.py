@@ -1,10 +1,10 @@
-from hypercube_api.hyper_api.dataset import DatasetFactory
-from hypercube_api.hyper_api.target import TargetFactory
-from hypercube_api.hyper_api.base import Base
-from hypercube_api.util import Helper
-from hypercube_api.hyper_api.model import ModelFactory
-from hypercube_api.hyper_api.ruleset import RulesetFactory
-from hypercube_api.hyper_api.xray import XrayFactory
+from HyperAPI.hyper_api.dataset import DatasetFactory
+from HyperAPI.hyper_api.target import TargetFactory
+from HyperAPI.hyper_api.base import Base
+from HyperAPI.util import Helper
+from HyperAPI.hyper_api.model import ModelFactory
+from HyperAPI.hyper_api.ruleset import RulesetFactory
+from HyperAPI.hyper_api.xray import XrayFactory
 
 
 class ProjectFactory:

@@ -1,8 +1,8 @@
-from hypercube_api.util import Helper
-from hypercube_api.hyper_api.base import Base
-from hypercube_api.utils.exceptions import ApiException
-from hypercube_api.hyper_api.xrayvariable import XRayVariableFactory
-from hypercube_api.hyper_api.target import TargetFactory, Target, Description
+from HyperAPI.util import Helper
+from HyperAPI.hyper_api.base import Base
+from HyperAPI.utils.exceptions import ApiException
+from HyperAPI.hyper_api.xrayvariable import XRayVariableFactory
+from HyperAPI.hyper_api.target import TargetFactory, Target, Description
 
 
 class XrayFactory:

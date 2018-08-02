@@ -1,9 +1,9 @@
-from hypercube_api.util import Helper
-from hypercube_api.hyper_api.target import Description
-from hypercube_api.hyper_api.base import Base
-from hypercube_api.hyper_api.model import ModelFactory
-from hypercube_api.hyper_api.rule import Rules, decode_kpiname_to_id
-from hypercube_api.utils.exceptions import ApiException
+from HyperAPI.util import Helper
+from HyperAPI.hyper_api.target import Description
+from HyperAPI.hyper_api.base import Base
+from HyperAPI.hyper_api.model import ModelFactory
+from HyperAPI.hyper_api.rule import Rules, decode_kpiname_to_id
+from HyperAPI.utils.exceptions import ApiException
 
 import urllib.parse
 
@@ -310,7 +310,7 @@ class RulesetFactory:
         Returns:
             List of ruleset
         """
-        from hypercube_api.hyper_api.dataset import DatasetFactory
+        from HyperAPI.hyper_api.dataset import DatasetFactory
         factory = DatasetFactory(self.__api, self.__project_id)
         ruleset_project = self.__api.Rules.getlearnings(project_ID=self.__project_id)
         return [Ruleset(self, self.__api, factory.get_by_id(ruleset.get('datasetId')), ruleset) for ruleset in ruleset_project]
