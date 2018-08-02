@@ -31,14 +31,14 @@ class TargetFactory:
     KPI_TYPE_DISCRETE = "Discrete variable"
     KPI_TYPE_CONTINUOUS = "Continuous variable"
 
-    def __init__(self, api, project):
+    def __init__(self, api, project_id):
         self.__api = api
-        self.__project = project
+        self.__project_id = project_id
 
     @Helper.try_catch
     def create(self, variable, modality=None, scoreTypes=None):
         """
-        Create one target for the given variable
+        Create one target for the given variable.
 
         Args:
             variable (Variable): the variable defining the target
@@ -46,7 +46,7 @@ class TargetFactory:
                 Default is most frequent modality.
             scoreTypes (list of str): score types to be defined for the target.
                 Default is [self.KPI_SCORE_PURITY, self.KPI_SCORE_COVERAGE] if variable is discrete and
-                [self.KPI_SCORE_AVERAGE_VALUE] is variable is continuous.
+                [self.KPI_SCORE_AVERAGE_VALUE] if variable is continuous.
 
         Returns:
             (Target): The new target
@@ -68,7 +68,7 @@ class TargetFactory:
 
         targetData = self.__get_target_data(variable, [kpiModality, ], kpiScoreTypes)
         data = {"kpis": targetData}
-        json = {'project_ID': self.__project.project_id, 'json': data}
+        json = {'project_ID': self.__project_id, 'json': data}
         returned_json = self.__api.Kpi.addkpi(**json)
         if variable.is_discrete:
             targets_returned_json = [kpi for kpi in returned_json['kpis'] if kpi['kpiFamily'] == 'target' and
@@ -84,7 +84,7 @@ class TargetFactory:
     @Helper.try_catch
     def create_targets(self, variable, modalities=None, scoreTypes=None):
         """
-        Create several targets for the given variable, one per modality
+        Create several targets for the given variable, one per modality.
 
         Args:
             variable (Variable): variable defining the target
@@ -92,7 +92,7 @@ class TargetFactory:
                 Default is all the modalities
             scoreTypes (list of str): score types to be defined for the targets.
                 Default is [self.KPI_SCORE_PURITY, self.KPI_SCORE_COVERAGE] if variable is discrete and
-                [self.KPI_SCORE_AVERAGE_VALUE] is variable is continuous.
+                [self.KPI_SCORE_AVERAGE_VALUE] if variable is continuous.
         Returns:
             (list of Target): The new target(s)
         """
@@ -106,7 +106,7 @@ class TargetFactory:
 
         targetData = self.__get_target_data(variable, kpiModalities, kpiScoreTypes)
         data = {"kpis": targetData}
-        json = {'project_ID': self.__project.project_id, 'json': data}
+        json = {'project_ID': self.__project_id, 'json': data}
         returned_json = self.__api.Kpi.addkpi(**json)
         targets_returned_json = [kpi for kpi in returned_json['kpis'] if kpi['kpiFamily'] == 'target' and
                                  kpi['variable'] == variable.name]
@@ -127,7 +127,7 @@ class TargetFactory:
                     targetData.append(
                         {
                             "color": color,
-                            "projectId": self.__project.project_id,
+                            "projectId": self.__project_id,
                             "kpiName": "{} ({})".format(variable.name, modality),
                             "kpiType": self.KPI_TYPE_DISCRETE_MODALITY,
                             "kpiFamily": self.KPI_FAMILY_TARGET,
@@ -140,7 +140,7 @@ class TargetFactory:
             for scoreType in kpiScoreTypes:
                 targetData.append(
                     {
-                        "projectId": self.__project.project_id,
+                        "projectId": self.__project_id,
                         "kpiName": "{} ({})".format(variable.name, modality) if variable.is_discrete else variable.name,
                         "kpiType": self.KPI_TYPE_CONTINUOUS,
                         "kpiFamily": self.KPI_FAMILY_TARGET,
@@ -152,7 +152,7 @@ class TargetFactory:
     @Helper.try_catch
     def create_description(self, variable):
         """
-        Create a description for the given variable
+        Create a description for the given variable.
 
         Args:
             variable (Variable): the variable defining the target
@@ -166,11 +166,11 @@ class TargetFactory:
             "kpiName": "{}_description".format(variable.name),
             "kpiType": self.KPI_TYPE_DISCRETE if variable.is_discrete else self.KPI_TYPE_CONTINUOUS,
             "output": variable.name,
-            "projectId": self.__project.project_id,
+            "projectId": self.__project_id,
             "scoreType": self.KPI_SCORE_DISCRETE if variable.is_discrete else self.KPI_SCORE_NUMERIC
         }]
         data = {"kpis": targetData}
-        json = {'project_ID': self.__project.project_id, 'json': data}
+        json = {'project_ID': self.__project_id, 'json': data}
         returned_json = self.__api.Kpi.addkpi(**json)
         targets_returned_json = [kpi for kpi in returned_json['kpis']
                                  if kpi['kpiFamily'] == 'description' and kpi['variable'] == variable.name]
@@ -184,6 +184,9 @@ class TargetFactory:
         """
         Get a target or description matching the given name
 
+        Args:
+            name (str): The name of the target or description
+
         Returns:
             (KeyIndicator): The target, description or None
         """
@@ -196,6 +199,9 @@ class TargetFactory:
     def get_by_id(self, id):
         """
         Get a target or description matching the given ID
+
+        Args:
+            id (str): The ID of the target or description
 
         Returns:
             (KeyIndicator): The target, description or None
@@ -215,9 +221,7 @@ class TargetFactory:
         Returns:
             (list of KeyIndicator): The targets and descriptions
         """
-        project_id = self.__project.project_id
-
-        json = {'project_ID': project_id}
+        json = {'project_ID': self.__project_id}
         return list(map(lambda x: Target(self.__api, json, x)
                         if x['kpiFamily'] == self.KPI_FAMILY_TARGET
                         else Description(self.__api, json, x),
@@ -247,6 +251,9 @@ class KeyIndicator(Base):
 
     @property
     def name(self):
+        """
+        Returns the name of the target
+        """
         return self.__json_returned.get('name')
 
     @property
@@ -256,20 +263,23 @@ class KeyIndicator(Base):
     @property
     def indicator_type(self):
         """
-        Get the type of this indicator : Target.KPI_TYPE_DISCRETE, Target.KPI_TYPE_CONTINUOUS
-        or Target.KPI_TYPE_DISCRETE_MODALITY
+        Get the type of this indicator (Target.KPI_TYPE_DISCRETE or Target.KPI_TYPE_CONTINUOUS
+        or Target.KPI_TYPE_DISCRETE_MODALITY)
         """
         return self.__json_returned.get('type')
 
     @property
     def indicator_family(self):
         """
-        Get the family of this indicator : Target.KPI_FAMILY_TARGET or Target.KPI_FAMILY_DESCRIPTION
+        Get the family of this indicator (Target.KPI_FAMILY_TARGET or Target.KPI_FAMILY_DESCRIPTION)
         """
         return self.__json_returned.get('kpiFamily')
 
     @property
     def variable_name(self):
+        """
+        Returns the name of the variable
+        """
         return self.__json_returned.get('variable')
 
 
@@ -288,6 +298,9 @@ class Target(KeyIndicator):
 
     @property
     def color_code(self):
+        """
+        Returns the color code of the target
+        """
         return self.__json_returned.get('color')
 
     @property
@@ -307,6 +320,9 @@ class Target(KeyIndicator):
 
     @Helper.try_catch
     def delete(self):
+        """
+        Delete the target
+        """
         if not self._is_deleted:
             data = {'kpis': self.score_ids}
             json = {'project_ID': self.__json_returned.get('projectId'), 'json': data}
@@ -345,6 +361,9 @@ class Description(KeyIndicator):
 
     @Helper.try_catch
     def delete(self):
+        """
+        Delete the Description
+        """
         if not self._is_deleted:
             data = {'kpis': [self.score_id]}
             json = {'project_ID': self.__json_returned.get('projectId'), 'json': data}

@@ -9,7 +9,6 @@ import urllib.parse
 
 
 class KeyIndicatorOption:
-    """Creation of a key indicator"""
     def __init__(self, target, purity_min=None, purity_max=None, coverage_min=None, coverage_max=None,
                  lift_min=None, lift_max=None, zscore_min=None, zscore_max=None,
                  average_value_min=None, average_value_max=None, standard_deviation_min=None, standard_deviation_max=None,
@@ -50,6 +49,8 @@ class KeyIndicatorOption:
 
 
 class RulesetFactory:
+    """
+    """
     _PURITY = 'Purity'
     _COVERAGE = 'Coverage'
     _LIFT = 'Lift'
@@ -72,6 +73,7 @@ class RulesetFactory:
                           shift_min=None, shift_max=None):
         """
         Create an additional key indicator
+
         Args:
             target (Target): Target to generate the key indicator
             purity_min (float):  Minimum value for purity score
@@ -88,6 +90,7 @@ class RulesetFactory:
             standard_deviation_max (float):  Maximum value for standard deviation score
             shift_min (float):  Minimum value for shift score
             shift_max (float):  Maximum value for shift score
+
         Returns:
             key indicator
         """
@@ -123,14 +126,15 @@ class RulesetFactory:
             min_marginal_contribution (float): a new rule R', created by adding a new constraint to an existing rule R (and thus increasing its complexity),
                 is added to the ruleset if and only if it increases the original purity of R by the minimum marginal contribution or more. Default is 0.1
             compute_other_key_indicators (list of KeyIndicatorOption): Compute other Key Indicators.
-            locally_increase_complexity (bool): Enable the locally increase complexity when set as true.
-            max_complexity (int): Maximum numbers of features per rule.
-            nb_minimizations (int):Interate the minimization process.
+            locally_increase_complexity (bool): Enable the locally increase complexity when set as true. Default is False
+            max_complexity (int): Maximum numbers of features per rule. Default is 3
+            nb_minimizations (int):Interate the minimization process. Default is 1
             coverage_increment (float): Percentage increment of target samples that a new rule must bring to be added to the minimization ruleset.
-            validate_stability (bool): Enable to split your dataset, add iteration and set a purity tolerance when set as true.
-            split_ratio (float): The percentage for the split (Between 0 and 1).
-            nb_iterations (int): Number of iterations wanted.
-            purity_tolerance (float): Purity tolerence allowed (Between 0 and 1).
+                Default is 0.01
+            validate_stability (bool): Enable to split your dataset, add iteration and set a purity tolerance when set as true. Default is False
+            split_ratio (float): The percentage for the split (Between 0 and 1). Default is 0.7
+            nb_iterations (int): Number of iterations wanted. Default is 1
+            purity_tolerance (float): Purity tolerence allowed (Between 0 and 1). Default is 0.1
 
         Returns:
             Ruleset
@@ -301,7 +305,7 @@ class RulesetFactory:
     @Helper.try_catch
     def filter(self):
         """
-        Get all the rulesets of the project
+        Get all the rulesets of the project.
 
         Returns:
             List of ruleset
@@ -314,13 +318,13 @@ class RulesetFactory:
     @Helper.try_catch
     def minimize(self, ruleset, minimization_name, score_to_minimize='Purity', increment_threshold=0.01):
         """
-        Perform a minimzation on a give ruleset
+        Perform a minimzation on a given ruleset.
 
         Args:
             ruleset (Ruleset): Ruleset to minimize
             minimization_name (str): Name of the new ruleset
-            score_to_minimize (str): Score to apply the minimization, default is purity
-            increment_threshold (float): Percentage increment of target samples that a new rule must bring to be added to the minimized ruleset.
+            score_to_minimize (str): Score to apply the minimization, default is 'Purity'
+            increment_threshold (float): Percentage increment of target samples that a new rule must bring to be added to the minimized ruleset, default is 0.01
 
         Return:
             Ruleset
@@ -362,6 +366,9 @@ class RulesetFactory:
         """
         Get the ruleset matching the given ID or None if there is no match
 
+        Args:
+            id (str): ID of the ruleset
+
         Returns:
             The Ruleset or None
         """
@@ -379,7 +386,8 @@ class RulesetFactory:
         Get or create a ruleset, if the ruleset exists, only the name is mandatory
 
         Args:
-            name (str): Name of the ruleset
+            dataset (Dataset): Dataset used to generate the ruleset
+            name (str): Name of the new ruleset
             target (Target): Target to generate the ruleset
             purity_min (float): Minimum purity of rules, default is the entire dataset purity (discrete target only)
             coverage_min (int): Minimum coverage of the target population for each rule, default is 10 (discrete target only)
@@ -388,20 +396,21 @@ class RulesetFactory:
             average_value_min (float): Minimum average value, default is average value of the target on the whole dataset (continuous target only)
             standard_deviation_max (float) : Maximum standard deviation, default is None (continuous target only)
             shift_min (float): Minimum shift, default is None (continuous target only)
-            rule_complexity (int): Number of features considered for generating the association rules
-            quantiles (int): Number of intervals the continuous variables are quantized in
+            rule_complexity (int): Maximum number of variables in rules, default is 2
+            quantiles (int): Number of intervals the continuous variables are quantized in, default is 10
             enable_custom_discretizations (boolean): use custom discretizations, eventually use "quantiles" parameter for remaining variables, default is True
             min_marginal_contribution (float): a new rule R', created by adding a new constraint to an existing rule R (and thus increasing its complexity),
                 is added to the ruleset if and only if it increases the original purity of R by the minimum marginal contribution or more. Default is 0.1
             compute_other_key_indicators (list of KeyIndicatorOption): Compute other Key Indicators.
-            locally_increase_complexity (bool): Enable the locally increase complexity when set as true.
-            max_complexity (int): Maximum numbers of features per rule.
-            nb_minimizations (int):Interate the minimization process.
-            coverage_increment (float): Percetage increment of target samples that a new rule must bring to be added to the minimization ruleset.
-            validate_stability (bool): Enable to split your dataset, add iteration and set a purity tolerance when set as true.
-            split_ratio (float): The percentage for the split (Between 0 and 1).
-            nb_iterations (int): Number of iterations wanted.
-            purity_tolerance (float): Purity tolerence allowed (Between 0 and 1).
+            locally_increase_complexity (bool): Enable the locally increase complexity when set as true. Default is False
+            max_complexity (int): Maximum numbers of features per rule. Default is 3
+            nb_minimizations (int):Interate the minimization process. Default is 1
+            coverage_increment (float): Percentage increment of target samples that a new rule must bring to be added to the minimization ruleset.
+                Default is 0.01
+            validate_stability (bool): Enable to split your dataset, add iteration and set a purity tolerance when set as true. Default is False
+            split_ratio (float): The percentage for the split (Between 0 and 1). Default is 0.7
+            nb_iterations (int): Number of iterations wanted. Default is 1
+            purity_tolerance (float): Purity tolerence allowed (Between 0 and 1). Default is 0.1
 
         Returns:
             Ruleset
@@ -418,6 +427,8 @@ class RulesetFactory:
 
 
 class Ruleset(Base):
+    """
+    """
     def __init__(self, factory, api, dataset, json_return):
         self.__api = api
         self.__factory = factory
@@ -447,6 +458,9 @@ class Ruleset(Base):
 
     @property
     def name(self):
+        """
+        Returns the ruleset name.
+        """
         return self.__json_returned.get('tag', {}).get('tagName')
 
     @property
@@ -455,6 +469,9 @@ class Ruleset(Base):
 
     @property
     def rules_count(self):
+        """
+        Returns the number of rules in the ruleset.
+        """
         return self.__json_returned.get('rulesCount')
 
     @property
@@ -471,16 +488,19 @@ class Ruleset(Base):
 
     @property
     def id(self):
+        """
+        Returns the ruleset ID.
+        """
         return self.__json_returned.get('_id')
 
     # Method part
     @Helper.try_catch
-    def get_params(self):
+    def _get_params(self):
         if not self._is_deleted:
             return NotImplemented
 
     @Helper.try_catch
-    def export(self):
+    def _export(self):
         if not self._is_deleted:
             return NotImplemented
 
@@ -507,7 +527,7 @@ class Ruleset(Base):
         Args:
             minimization_name (str): Name of the new ruleset
             score_to_minimize (str): Score to apply the minimization, default is purity
-            increment_threshold (float): Percentage increment of target samples that a new rule must bring to be added to the minimized ruleset.
+            increment_threshold (float): Percentage increment of target samples that a new rule must bring to be added to the minimized ruleset. Default is 0.01
 
         Returns:
             Ruleset

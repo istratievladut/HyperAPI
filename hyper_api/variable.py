@@ -15,6 +15,8 @@ class VariableFactory:
     @Helper.try_catch
     def filter(self):
         """
+        Get all variables on the dataset.
+
         Returns:
             Variable[]: list of variables on the dataset
         """
@@ -27,6 +29,11 @@ class VariableFactory:
     @Helper.try_catch
     def get(self, name):
         """
+        Get a variable matching the given name
+
+        Args:
+            name (str): The name of the variable
+
         Returns:
             Variable: variable found by name
         """
@@ -38,6 +45,8 @@ class VariableFactory:
     @Helper.try_catch
     def ignore(self, *args):
         """
+        Variables you don't want to keep.
+
         Args:
             args (str): list of variable names to ignore
 
@@ -57,6 +66,8 @@ class VariableFactory:
     @Helper.try_catch
     def keep(self, *args):
         """
+        Variables you want to keep.
+
         Args:
             args (str): list of variable names to keep
 

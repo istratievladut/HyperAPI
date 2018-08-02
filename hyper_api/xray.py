@@ -96,8 +96,10 @@ class XrayFactory:
     @Helper.try_catch
     def filter(self):
         """
+        Get all xrays.
+
         Returns:
-            list of Xrays on the current dataset
+            list of Xrays on the current project
         """
         json = {'project_ID': self.__project_id}
         return [Xray(self.__api, x) for x in self.__api.SimpleLift.getsimplelifts(**json)]
@@ -105,6 +107,11 @@ class XrayFactory:
     @Helper.try_catch
     def get(self, name):
         """
+        Get an xray matching the given name on the current project
+
+        Args:
+            name (str): The name of the Xray
+
         Returns:
             Xray found by name
         """
@@ -116,6 +123,11 @@ class XrayFactory:
     @Helper.try_catch
     def get_by_id(self, id):
         """
+        Get an xray matching the given ID on the current project
+
+        Args:
+            id (str): The ID of the Xray
+
         Rreturns:
             Xray found by id
         """
@@ -171,8 +183,10 @@ class Xray(Base):
     @property
     def Variable(self):
         """
+        This object includes utilities for retrieving variables on this Xray.
+
         Returns:
-            factory to interact with Xray results (XRayVariableFactory)
+            XRayVariableFactory: Factory to interact with Xray results
         """
         if not self._is_deleted:
             return XRayVariableFactory(self.__api, self)
