@@ -2,11 +2,14 @@ import sys
 import os
 import requests
 import jwt
+import urllib3
 
 from os.path import join
 from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor
 from HyperAPI.util import get_hypercube_path
 from HyperAPI.config import get_config
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class Session:
