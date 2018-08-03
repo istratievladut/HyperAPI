@@ -60,14 +60,25 @@ Each of these examples is built upon the previous ones so they should be execute
 Authentication
 ---------------
 * Copy the API token from your Settings in HyperCube
-* In a new Notebook on HyperCube, paste the token to initialize the Api::
+* From a Notebook inside HyperCube, paste the token to initialize the Api::
 
 	API_TOKEN = 'PASTE YOUR TOKEN HERE'
-	from hypercube_api import Api
+	from HyperAPI import Api
 	api = Api(token=API_TOKEN)
 
+* From a Notebook outside HyperCube (e.g.: Jupyter Notebook), you need to 
+* fork the git repo https://github.com/HyperCube/HyperAPI
+* clone the fork locally
+* paste the token to initialize the Api::
 
-    
+	import sys
+	sys.path.append('PARENT FOLDER OF YOUR LOCAL FORK')
+	API_TOKEN = 'PASTE YOUR TOKEN HERE'
+	from HyperAPI import Api
+	H3_URL = 'https://h34a.hcube.io'
+	api = Api(token=API_TOKEN, url=H3_URL)
+
+
 Project
 -------
 * Create a project: get_or_create, create
@@ -108,11 +119,15 @@ Dataset
 	# Upload data file on HyperCube platform:
 	# In the Notebook interface, click 'Upload Files' button and select the data file
 	# This is 'Titanic.csv' in our example
+	# The root path where files are stored on the platform is '/mnt/notebookfs'
 	
 	# Define Dataset Name and Path
 	DS_NAME = "Demo_API_Dataset"
 	import os
+	# on platform:
 	DS_PATH = os.path.join(os.getcwd(), 'Titanic.csv')
+	# locally:
+	# DS_PATH = os.path.join(r'LOCAL FILE PATH', 'LOCAL FILE NAME')
 	
 	# Create
 	dataset = project.Dataset.get_or_create(DS_NAME, DS_PATH, delimiter=';')
@@ -145,7 +160,7 @@ Variable
 
 	# List variables
 	print(dataset.Variable.filter())
-	#print(dataset.variables)
+	# print(dataset.variables)
 	
 	# Retrieve a variable
 	variable = dataset.Variable.get('Survival_Status')
@@ -175,7 +190,7 @@ Target
 	
 	# List targets
 	print(project.Target.filter())
-	#print(project.targets)
+	# print(project.targets)
 	
 	# Get a target or description
 	TARGET_NAME = variable.name + '_description'
@@ -205,14 +220,14 @@ Xray
 	
 	# List Xrays
 	print(project.Xray.filter())   # lists on the project
-	#print(dataset.xrays)          # lists on the dataset
+	# print(dataset.xrays)          # lists on the dataset
 	
 	# Get Xray
 	xray = project.Xray.get(XRAY_NAME)
 	
 	# List Xray variables
 	print(xray.Variable.filter())   # unsorted
-	#print(xray.variables)          # sorted on contrast rate if possible
+	# print(xray.variables)          # sorted on contrast rate if possible
 	
 	# Sort Xray variables by contrast rate
 	print(xray.Variable.sort(description.variable_name, reverse=True))
@@ -249,7 +264,7 @@ Ruleset
 	
 	# List Rulesets
 	print(project.Ruleset.filter())   # lists on the project
-	#print(dataset.rulesets)          # lists on the dataset
+	# print(dataset.rulesets)          # lists on the dataset
 	
 	# Retrieve a Ruleset
 	ruleset = project.Ruleset.get(RULESET_NAME)
