@@ -1,0 +1,30 @@
+version: 0.2
+
+env:
+  variables:
+    DOCUUID: "9b44d175-2300-4a7c-aa09-b3803a601122"
+
+phases:
+  install:
+    commands:
+      # Setting up Docker
+      - echo "Starting the Docker daemon"
+      - nohup /usr/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay&
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
+  pre_build:
+    commands:
+      - echo "Logging into Amazon ECR..."
+      - $(aws ecr get-login --no-include-email --region eu-central-1)
+  build:
+    commands:
+      - export GIT_SOURCE_VERSION=$(git rev-parse HEAD)
+      - echo "Building HyperAPI source tarball"
+      - rm -rf $CODEBUILD_SRC_DIR/.git $CODEBUILD_SRC_DIR/.gitignore
+      - cd ..
+      - tar -czvf HyperAPI-$GIT_SOURCE_VERSION.tar.gz -C $CODEBUILD_SRC_DIR .
+      - aws s3 cp HyperAPI-$GIT_SOURCE_VERSION.tar.gz s3://hc-jenkins-ci/HyperAPI/HyperAPI-$GIT_SOURCE_VERSION.tar.gz
+      - echo "Installing HyperAPI's environment"
+      - pip install -r $CODEBUILD_SRC_DIR/requirements.txt
+      - echo "Generating HyperAPI documentation sources"
+      - cd $CODEBUILD_SRC_DIR/docs; chmod +x generate_doc.sh; ./generate_doc.sh $CODEBUILD_SRC_DIR/hyper_api $DOCUUID
+      - python $CODEBUILD_SRC_DIR/scripts/deploy.py -p $CODEBUILD_SRC_DIR/docs/$DOCUUID
