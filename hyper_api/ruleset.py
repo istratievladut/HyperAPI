@@ -435,6 +435,7 @@ class Ruleset(Base):
         self.__json_returned = json_return
         self.__dataset = dataset
         self._is_deleted = False
+        self._is_in_error = self.__json_returned.get('status', '').lower() == "error"
 
     def __repr__(self):
         return """\n{} : {} <{}>\n""".format(
@@ -442,6 +443,7 @@ class Ruleset(Base):
             self.name,
             self.id
         ) + ("\t<! This ruleset has been deleted>\n" if self._is_deleted else "") + \
+            ("\t<! This ruleset is in error>\n" if self._is_in_error else "") + \
             """\t- Dataset : {}\n\t- Rules count : {}\n\t- Created on : {}\n""".format(
             self.dataset_name,
             self.rules_count,
@@ -461,18 +463,25 @@ class Ruleset(Base):
         """
         Returns the ruleset name.
         """
+        if self._is_in_error:
+            return self.__json_returned.get('tag')
         return self.__json_returned.get('tag', {}).get('tagName')
 
     @property
     def kpis(self):
+        """
+        Returns the kpis of the ruleset or None if Ruleset is in error
+        """
+        if self._is_in_error:
+            return None
         return self.__json_returned.get('tag').get('kpis')
 
     @property
     def rules_count(self):
         """
-        Returns the number of rules in the ruleset.
+        Returns the number of rules in the ruleset or None if Ruleset is in error
         """
-        return self.__json_returned.get('rulesCount')
+        return self.__json_returned.get('rulesCount', None)
 
     @property
     def dataset_id(self):
@@ -484,7 +493,11 @@ class Ruleset(Base):
 
     @property
     def created(self):
-        return self.str2date(self.__json_returned.get('lastChangeAt'), '%Y-%m-%dT%H:%M:%S.%fZ')
+        if self._is_in_error:
+            createdDate = self.__json_returned.get('createdAt')
+        else:
+            createdDate = self.__json_returned.get('lastChangeAt')
+        return self.str2date(createdDate, '%Y-%m-%dT%H:%M:%S.%fZ')
 
     @property
     def id(self):
@@ -512,11 +525,12 @@ class Ruleset(Base):
         if not self._is_deleted:
             json = {
                 '_id': self.id,
-                'status': 'done',
+                'status': self.__json_returned.get('status', 'done').lower(),
                 'tagName': self.name
             }
-            self.__api.Rules.removealearning(project_ID=self.project_id, dataset_ID=self.dataset_id, json=json)
-            self._is_deleted = True
+            result = self.__api.Rules.removealearning(project_ID=self.project_id, dataset_ID=self.dataset_id, json=json)
+            if result == b"task removed":
+                self._is_deleted = True
         return self
 
     @Helper.try_catch
@@ -530,10 +544,11 @@ class Ruleset(Base):
             increment_threshold (float): Percentage increment of target samples that a new rule must bring to be added to the minimized ruleset. Default is 0.01
 
         Returns:
-            Ruleset
+            Ruleset or None if Ruleset is deleted / in error
         """
-        if not self._is_deleted:
+        if not self._is_deleted and not self._is_in_error:
             return self.__factory.minimize(self, minimization_name, score_to_minimize, increment_threshold)
+        return None
 
     @Helper.try_catch
     def get_rules(self, limit=100, sort=None, min_scores=None, max_scores=None, include_variables=None, exclude_variables=None):
@@ -547,9 +562,9 @@ class Ruleset(Base):
             exclude_variables (str): Variables to exclude
 
         Returns:
-            List of rules
+            List of rules or None if Ruleset is deleted / in error
         """
-        if not self._is_deleted:
+        if not self._is_deleted and not self._is_in_error:
             json = {'skip': 0,
                     'limit': limit,
                     'tagsfilter': self.name
@@ -596,6 +611,7 @@ class Ruleset(Base):
 
             json_returned = self.__api.Rules.getrules(project_ID=self.project_id, dataset_ID=self.dataset_id, params=json).get('rules')
             return Rules(self.__api, json_returned, self.kpis, self.project_id, self.dataset_id)
+        return None
 
     def predict(self, dataset, name, target, nb_minimizations=1, coverage_increment=0.01):
         """
@@ -610,8 +626,9 @@ class Ruleset(Base):
                 default is 0.01
 
         Returns:
-            Model
+            Model or None if Ruleset is deleted / in error
         """
-        if not self._is_deleted:
+        if not self._is_deleted and not self._is_in_error:
             return ModelFactory(self.__api, self.project_id).predict_from_ruleset(self.__dataset, dataset, self.name, name, target,
                                                                                   nb_minimizations, coverage_increment)
+        return None
