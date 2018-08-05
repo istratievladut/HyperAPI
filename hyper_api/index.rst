@@ -57,6 +57,14 @@ Examples
 
 Each of these examples is built upon the previous ones so they should be executed in order.
 
+Package installation
+---------------
+* Install and uninstall Python packages::
+
+	!pip install --user <packageName>
+	!pip uninstall -y <packageName>
+
+
 Authentication
 ---------------
 * Copy the API token from your Settings in HyperCube
@@ -248,7 +256,7 @@ Ruleset
 * Retrieve a Ruleset: get
 * Retrieve rules on the Ruleset: get_rules
 * Minmize the Ruleset : minimize
-* Create a Model from the Ruleset: predict_from_ruleset
+* Create a Model from the Ruleset: predict
 * Delete a ruleset::
 
 	# Create Ruleset
@@ -276,7 +284,7 @@ Ruleset
 	minimized_ruleset = ruleset.minimize('Demo_API_Minimized_Ruleset')
 	
 	# Create a Model from the Ruleset
-	model = ruleset.predict_from_ruleset()
+	model = ruleset.predict(dataset, 'Demo_API_Model_from_Ruleset', target)
 	print(model)
 
 

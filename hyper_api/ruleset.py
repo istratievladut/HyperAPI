@@ -463,9 +463,13 @@ class Ruleset(Base):
         """
         Returns the ruleset name.
         """
-        if self._is_in_error:
-            return self.__json_returned.get('tag')
-        return self.__json_returned.get('tag', {}).get('tagName')
+        if self.__json_returned.get('tag') is not None:
+            if type(self.__json_returned.get('tag')) == str:
+                return self.__json_returned.get('tag')
+            else:
+                return self.__json_returned.get('tag').get('tagName', '')
+        else:
+            return ''
 
     @property
     def kpis(self):
@@ -493,11 +497,7 @@ class Ruleset(Base):
 
     @property
     def created(self):
-        if self._is_in_error:
-            createdDate = self.__json_returned.get('createdAt')
-        else:
-            createdDate = self.__json_returned.get('lastChangeAt')
-        return self.str2date(createdDate, '%Y-%m-%dT%H:%M:%S.%fZ')
+        return self.str2date(self.__json_returned.get('lastChangeAt', self.__json_returned.get('createdAt')), '%Y-%m-%dT%H:%M:%S.%fZ')
 
     @property
     def id(self):
@@ -525,11 +525,13 @@ class Ruleset(Base):
         if not self._is_deleted:
             json = {
                 '_id': self.id,
-                'status': self.__json_returned.get('status', 'done').lower(),
+                'status': self.__json_returned.get('status', 'done').lower() if
+                type(self.__json_returned.get('tag')) == str else 'done',
                 'tagName': self.name
             }
             result = self.__api.Rules.removealearning(project_ID=self.project_id, dataset_ID=self.dataset_id, json=json)
-            if result == b"task removed":
+            if (result == b"task removed" and type(self.__json_returned.get('tag')) == str) or \
+               (result == b"OK" and type(self.__json_returned.get('tag')) == dict):
                 self._is_deleted = True
         return self
 
