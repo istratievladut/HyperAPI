@@ -19,7 +19,7 @@ class DatasetFactory:
 
     @Helper.try_catch
     def create(self, name, file_path, decimal='.',
-               delimiter='', encoding='UTF-8', selectedSheet=1,
+               delimiter=';', encoding='UTF-8', selectedSheet=1,
                description='', modalities=2, continuous_threshold=0.95, missing_threshold=0.95):
         """
         Create a Dataset from a file (csv, Excel)
@@ -246,7 +246,7 @@ class DatasetFactory:
         return None
 
     @Helper.try_catch
-    def get_or_create(self, name, file_path, decimal='.', delimiter='', encoding='UTF-8', selectedSheet=1,
+    def get_or_create(self, name, file_path, decimal='.', delimiter=';', encoding='UTF-8', selectedSheet=1,
                       description='', modalities=2, continuous_threshold=0.95, missing_threshold=0.95):
         """
         Returns an existing dataset matching the given name. If no match, create a new dataset from a file (csv, Excel).
