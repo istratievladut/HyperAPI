@@ -59,11 +59,15 @@ Each of these examples is built upon the previous ones so they should be execute
 
 Package installation
 ---------------
-* Install and uninstall Python packages::
+* Install Python package in a Notebook inside HyperCube::
 
 	!pip install --user <packageName>
-	!pip uninstall -y <packageName>
+	# restart the kernel
 
+* Uninstall Python package in a Notebook::
+
+	!pip uninstall -y <packageName>
+	# restart the kernel
 
 Authentication
 ---------------
