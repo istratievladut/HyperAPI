@@ -128,7 +128,7 @@ class XrayFactory:
         Args:
             id (str): The ID of the Xray
 
-        Rreturns:
+        Returns:
             Xray found by id
         """
         xrays = list(filter(lambda x: x.id == id, self.filter()))

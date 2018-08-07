@@ -19,7 +19,7 @@ class DatasetFactory:
 
     @Helper.try_catch
     def create(self, name, file_path, decimal='.',
-               delimiter='', encoding='UTF-8', selectedSheet=1,
+               delimiter=';', encoding='UTF-8', selectedSheet=1,
                description='', modalities=2, continuous_threshold=0.95, missing_threshold=0.95):
         """
         Create a Dataset from a file (csv, Excel)
@@ -28,7 +28,7 @@ class DatasetFactory:
             name (str): The name of the dataset
             file_path (str): The origin path of the file
             decimal (str): Decimal separator - csv files only, default is '.'
-            delimiter (str): The csv field delimiter - csv files only, default is '' for auto-detection
+            delimiter (str): The csv field delimiter - csv files only, default is ';'
             encoding (str): The file encoding - csv files only, default is 'UTF-8'
             selectedSheet (int): The worksheet to use (starts at 1 like in Hypercube User Interface) - Excel files only, default is 1
             description (str): The dataset description, default is ''
@@ -246,7 +246,7 @@ class DatasetFactory:
         return None
 
     @Helper.try_catch
-    def get_or_create(self, name, file_path, decimal='.', delimiter='', encoding='UTF-8', selectedSheet=1,
+    def get_or_create(self, name, file_path, decimal='.', delimiter=';', encoding='UTF-8', selectedSheet=1,
                       description='', modalities=2, continuous_threshold=0.95, missing_threshold=0.95):
         """
         Returns an existing dataset matching the given name. If no match, create a new dataset from a file (csv, Excel).
@@ -255,7 +255,7 @@ class DatasetFactory:
             name (str): The name of the dataset
             file_path (str): The origin path of the file
             decimal (str): Decimal separator - csv files only, default is '.'
-            delimiter (str): The csv field delimiter - csv files only, default is '' for auto-detection
+            delimiter (str): The csv field delimiter - csv files only, default is ';'
             encoding (str): The file encoding - csv files only, default is 'UTF-8'
             selectedSheet (int): The worksheet to use (starts at 1 like in Hypercube User Interface) - Excel files only, default is 1
             description (str): The dataset description, default is ''
