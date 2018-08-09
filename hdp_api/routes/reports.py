@@ -3,6 +3,14 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class Reports(Resource):
     name = "Reports"
+    
+    class _exportProjectReports(Route):
+        name = "exportProjectReports"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/reports"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+        }
 
     class _exportDatasetReports(Route):
         name = "exportDatasetReports"
