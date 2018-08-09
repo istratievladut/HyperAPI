@@ -144,3 +144,12 @@ class DatasetReshapes(Resource):
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
+
+    class _proposeAlterations(Route):
+        name = "proposeAlterations"
+        httpMethod = Route.POST
+        path = "/projects/{project_ID}/datasets/{dataset_ID}/reshapes/proposeAlterations"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID,
+        }
