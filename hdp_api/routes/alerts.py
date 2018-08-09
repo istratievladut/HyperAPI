@@ -12,16 +12,7 @@ class Alerts(Resource):
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
-
-    class _getAlertsAggregate(Route):
-        name = "getAlertsAggregate"
-        httpMethod = Route.GET
-        path = "/projects/{project_ID}/datasets/{dataset_ID}/alerts/aggregate"
-        _path_keys = {
-            'project_ID': Route.VALIDATOR_OBJECTID,
-            'dataset_ID': Route.VALIDATOR_OBJECTID,
-        }
-
+        
     class _getAlert(Route):
         name = "getAlert"
         httpMethod = Route.GET
