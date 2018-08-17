@@ -31,7 +31,7 @@ class Session:
                 prx_protocol = config['proxy']['protocol']
                 prx_address = config['proxy']['address']
                 prx_port = config['proxy']['port']
-                url = '{prx_protocol}://{prx_address}:{prx_port}'
+                url = f'{prx_protocol}://{prx_address}:{prx_port}'
                 # Get data folder
                 data_folder = os.path.realpath(join(get_hypercube_path(), config['storage']['dataDir']))
                 if os.path.exists(data_folder):
