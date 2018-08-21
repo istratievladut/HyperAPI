@@ -8,6 +8,7 @@ from HyperAPI.hdp_api.routes.correlations import Correlations
 from HyperAPI.hdp_api.routes.dashboards import Dashboards
 from HyperAPI.hdp_api.routes.datasets import Datasets
 from HyperAPI.hdp_api.routes.datasetReshapes import DatasetReshapes
+from HyperAPI.hdp_api.routes.datasetResources import DatasetResources
 from HyperAPI.hdp_api.routes.docapi import DocApi
 from HyperAPI.hdp_api.routes.exports import Exports
 from HyperAPI.hdp_api.routes.hyperEngines import HyperEngines
@@ -55,6 +56,7 @@ class Router(object):
         Dashboards,
         Datasets,
         DatasetReshapes,
+        DatasetResources,
         DocApi,
         Exports,
         HyperEngines,
