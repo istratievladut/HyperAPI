@@ -27,6 +27,7 @@ from HyperAPI.hdp_api.routes.rules import Rules
 from HyperAPI.hdp_api.routes.rulesetViz import RulesetViz
 from HyperAPI.hdp_api.routes.schedulerDashboard import SchedulerDashboard
 from HyperAPI.hdp_api.routes.simpleLift import SimpleLift
+from HyperAPI.hdp_api.routes.smartViz import SmartDataViz
 from HyperAPI.hdp_api.routes.swpMatchmaking import SWPMatchmaking
 from HyperAPI.hdp_api.routes.system import System
 from HyperAPI.hdp_api.routes.tags import Tags
@@ -76,6 +77,7 @@ class Router(object):
         RulesetViz,
         SchedulerDashboard,
         SimpleLift,
+        SmartDataViz,
         SWPMatchmaking,
         System,
         Tags,
