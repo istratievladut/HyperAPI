@@ -34,6 +34,7 @@ from HyperAPI.hdp_api.routes.tags import Tags
 from HyperAPI.hdp_api.routes.task import Task
 from HyperAPI.hdp_api.routes.tempData import TempData
 from HyperAPI.hdp_api.routes.textProcessing import TextProcessing
+from HyperAPI.hdp_api.routes.timeSeriesAnalysis import TimeSeriesAnalysis
 from HyperAPI.hdp_api.routes.timeSeriesQuery import TimeSeriesQuery
 from HyperAPI.hdp_api.routes.timeSeriesViz import TimeSeriesViz
 from HyperAPI.hdp_api.routes.identities import Identities
@@ -84,6 +85,7 @@ class Router(object):
         Task,
         TempData,
         TextProcessing,
+        TimeSeriesAnalysis,
         TimeSeriesQuery,
         TimeSeriesViz,
         Identities,
