@@ -94,7 +94,7 @@ class Nitro(Resource):
 
     class _exportForecastTunes(Route):
         name = "exportForecastTunes"
-        httpMethod = Route.POST
+        httpMethod = Route.GET
         path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/export"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
