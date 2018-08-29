@@ -12,3 +12,4 @@ sklearn
 scipy
 boto3
 coverage
+xgboost
