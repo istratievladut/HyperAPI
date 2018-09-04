@@ -1,4 +1,5 @@
 from HyperAPI.sessionClass import Session
+from HyperAPI.utils.version import Version
 
 from HyperAPI.hdp_api.routes.alerts import Alerts
 from HyperAPI.hdp_api.routes.analytics import Analytics
@@ -45,7 +46,7 @@ from HyperAPI.hdp_api.routes.workflows import Workflows
 from HyperAPI.hdp_api.routes.settings import Settings
 from HyperAPI.hdp_api.routes.monitoring import Monitoring
 from HyperAPI.hdp_api.routes.authentication import Authentication
-from HyperAPI.hdp_api._timeoutSettings import TimeOutSettings
+from HyperAPI.utils.timeoutSettings import TimeOutSettings
 
 
 class Router(object):
@@ -100,7 +101,12 @@ class Router(object):
     def __init__(self, username=None, password=None, url=None, token=None, watcher=None):
         # Initiate session with HyperCube server
         self.session = Session(username=username, password=password, token=token, url=url)
+        # We must fetch the System version BEFORE creating route, so this call is hard coded
+        _system_details = self.session.request('GET', '/system/about')
+        _version = _system_details.get('version')
+        self.session.version = Version(_version)
 
+        # Creating Resources
         for resourceCls in self._resources:
             self.__setattr__(resourceCls.__name__, resourceCls(self.session, watcher=watcher))
         self._default_timeout_settings = TimeOutSettings()
