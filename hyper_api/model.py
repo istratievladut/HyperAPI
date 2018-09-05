@@ -377,9 +377,10 @@ class ModelFactory:
                                      max_complexity, nb_minimizations, coverage_increment, split_ratio, nb_iterations, purity_tolerance,
                                      enable_custom_discretizations, save_all_rules)
 
-    def create_otherModel(self, dataset, target, params):
+    @Helper.try_catch
+    def __create_skModel(self, dataset, target, params):
         """
-        Create a classifier or regressor model
+        Private method. Create a classifier or regressor Scikit-learn model
 
         Args:
             dataset (Dataset): Dataset the model is fitted on
@@ -500,7 +501,7 @@ class ModelFactory:
             'enable_custom_discretizations': enable_custom_discretizations,
             'discretizations': discretizations,
         }
-        return self.create_otherModel(dataset, target, params)
+        return self.__create_skModel(dataset, target, params)
 
     @Helper.try_catch
     def create_LogisticRegression(self, dataset, name, target, penalty='l2', C=1, solver='liblinear', split_ratio=0.7, enable_custom_discretizations=True,
@@ -540,7 +541,7 @@ class ModelFactory:
             'enable_custom_discretizations': enable_custom_discretizations,
             'discretizations': discretizations,
         }
-        return self.create_otherModel(dataset, target, params)
+        return self.__create_skModel(dataset, target, params)
 
     @Helper.try_catch
     def create_RandomForest(self, dataset, name, target, n_estimators=100, max_depth=2, criterion='gini', split_ratio=0.7, enable_custom_discretizations=True,
@@ -579,7 +580,7 @@ class ModelFactory:
             'enable_custom_discretizations': enable_custom_discretizations,
             'discretizations': discretizations,
         }
-        return self.create_otherModel(dataset, target, params)
+        return self.__create_skModel(dataset, target, params)
 
     @Helper.try_catch
     def create_GradientBoosting(self, dataset, name, target, loss='deviance', n_estimators=100, maxdepth=3, split_ratio=0.7,
@@ -618,7 +619,7 @@ class ModelFactory:
             'enable_custom_discretizations': enable_custom_discretizations,
             'discretizations': discretizations,
         }
-        return self.create_otherModel(dataset, target, params)
+        return self.__create_skModel(dataset, target, params)
 
     @Helper.try_catch
     def create_GradientBoostingRegressor(self, dataset, name, target, n_estimators=100, maxdepth=3, split_ratio=0.7, enable_custom_discretizations=True,
@@ -655,7 +656,7 @@ class ModelFactory:
             'enable_custom_discretizations': enable_custom_discretizations,
             'discretizations': discretizations,
         }
-        return self.create_otherModel(dataset, target, params)
+        return self.__create_skModel(dataset, target, params)
 
     @Helper.try_catch
     def create_XGBRegressor(self, dataset, name, target, n_estimators=100, maxdepth=3, split_ratio=0.7, enable_custom_discretizations=True,
@@ -691,7 +692,7 @@ class ModelFactory:
             'enable_custom_discretizations': enable_custom_discretizations,
             'discretizations': discretizations,
         }
-        return self.create_otherModel(dataset, target, params)
+        return self.__create_skModel(dataset, target, params)
 
 
 class Model(Base):
@@ -766,7 +767,7 @@ class ClassifierModel(Model):
         self.__api = api
         self.__json_returned = json_return
         self.__json_confusion_matrix = None
-        self.curves = Curves()
+        self.__curves = Curves()
         super().__init__(api, json_return)
 
     @Helper.try_catch
@@ -903,7 +904,7 @@ class ClassifierModel(Model):
 
         self.__load_confusion_matrix()
         index = self.__get_index(top_score_ratio)
-        values = self.__json_confusion_matrix[self.curves.Lift][index]
+        values = self.__json_confusion_matrix[self.__curves.Lift][index]
         return ConfusionMatrix(true_positives=values['TP'], false_positives=values['FP'],
                                true_negatives=values['TN'], false_negatives=values['FN'])
 
@@ -911,37 +912,37 @@ class ClassifierModel(Model):
         if top_score_ratio == 0:
             return 0
         else:
-            length = len(self.__json_confusion_matrix[self.curves.Lift])
+            length = len(self.__json_confusion_matrix[self.__curves.Lift])
             return max(0, round(length * top_score_ratio) - 1)
 
     @property
     @Helper.try_catch
     def area_under_roc(self):
         self.__load_confusion_matrix()
-        return self.__json_confusion_matrix[self.curves.ROC][-1]['auc']
+        return self.__json_confusion_matrix[self.__curves.ROC][-1]['auc']
 
     def __get_x_y_info(self, curve):
-        if curve == self.curves.ROC:
+        if curve == self.__curves.ROC:
             x = [point['FPR'] for point in self.__json_confusion_matrix[curve]]
             y = [point['Sensitivity'] for point in self.__json_confusion_matrix[curve]]
             x_name = 'False Positive Rate'
             y_name = 'True Positive Rate'
-        elif curve == self.curves.Gain:
+        elif curve == self.__curves.Gain:
             x = [point['TopScore'] for point in self.__json_confusion_matrix[curve]]
             y = [point['Sensitivity'] for point in self.__json_confusion_matrix[curve]]
             x_name = 'Top score percentages'
             y_name = 'Recall'
-        elif curve == self.curves.Lift:
+        elif curve == self.__curves.Lift:
             x = [point['TopScore'] for point in self.__json_confusion_matrix[curve]]
             y = [point['Lift'] for point in self.__json_confusion_matrix[curve]]
             x_name = 'Top score percentages'
             y_name = 'Target lift'
-        elif curve == self.curves.Purity:
+        elif curve == self.__curves.Purity:
             x = [point['TopScore'] for point in self.__json_confusion_matrix[curve]]
             y = [point['Purity'] for point in self.__json_confusion_matrix[curve]]
             x_name = 'Top score percentages'
             y_name = 'Precision'
-        elif curve == self.curves.PrecisionRecall:
+        elif curve == self.__curves.PrecisionRecall:
             x = [point['Sensitivity'] for point in self.__json_confusion_matrix[curve]]
             y = [point['Purity'] for point in self.__json_confusion_matrix[curve]]
             x_name = 'Recall'
@@ -975,9 +976,9 @@ class ClassifierModel(Model):
             raise ApiException('Plotly external package is required for this operation, please execute "!pip install plotly" and restart the kernel', str(E))
 
         if curve is None:
-            curve = self.curves.ROC
-        elif curve not in self.curves.List:
-            print('Unexpected curve type : {}, valid options are : {}'.format(curve, ', '.join(self.curves.List)))
+            curve = self.__curves.ROC
+        elif curve not in self.__curves.List:
+            print('Unexpected curve type : {}, valid options are : {}'.format(curve, ', '.join(self.__curves.List)))
             return
 
         self.__load_confusion_matrix()
@@ -992,9 +993,9 @@ class ClassifierModel(Model):
 
         data = [roc]
         random_line_arg = random_line or dict(color=('rgb(205, 12, 24)'), dash='dash', width=1)
-        if curve == self.curves.ROC or curve == self.curves.Gain:
+        if curve == self.__curves.ROC or curve == self.__curves.Gain:
             random = go.Scatter(x=[0, 1], y=[0, 1], name='Random', mode='lines', line=random_line_arg)
-        elif curve == self.curves.Lift:
+        elif curve == self.__curves.Lift:
             random = go.Scatter(x=[0, 1], y=[1, 1], name='Random', mode='lines', line=random_line_arg)
         else:
             random = None
@@ -1003,7 +1004,7 @@ class ClassifierModel(Model):
             data.append(random)
 
         default_title = '{} of {}'.format(curve, self.name)
-        if curve == self.curves.ROC or curve == self.curves.PrecisionRecall:
+        if curve == self.__curves.ROC or curve == self.__curves.PrecisionRecall:
             default_title = '{} (AUC = {:0.2f})'.format(default_title,
                                                         self.__json_confusion_matrix[curve][-1]['auc'])
         curve_title = title or default_title
