@@ -81,7 +81,7 @@ class ModelFactory:
         }
         json = {'project_ID': project_id, 'json': data}
         json_returned = self.__api.Task.task(**json)
-        return [HyperCube(self.__api, model_json) if model_json.get('algoType') == AlgoTypes().HYPERCUBE
+        return [HyperCube(self.__api, model_json) if model_json.get('algoType') == AlgoTypes.HYPERCUBE
                 else Model(self.__api, model_json) for model_json in json_returned]
 
     @Helper.try_catch
@@ -387,8 +387,8 @@ class ModelFactory:
             the created model
         """
 
-        if params['algoType'] not in AlgoTypes().LIST:
-            print('Unexpected algorithm type : {}, valid options are : {}'.format(params['algoType'], ', '.join(AlgoTypes().LIST)))
+        if params['algoType'] not in AlgoTypes.LIST:
+            print('Unexpected algorithm type : {}, valid options are : {}'.format(params['algoType'], ', '.join(AlgoTypes.LIST)))
             return
 
         if target.indicator_type == self._INDICATOR_DISCRETE_WITH_MODALITY:
@@ -436,7 +436,7 @@ class ModelFactory:
         params['target'] = scores
         data = {
             'algo': params['algoType'],
-            'algolist': AlgoTypes().LIST,
+            'algolist': AlgoTypes.LIST,
             'datasetId': dataset.dataset_id,
             'datasetName': dataset.name,
             'kpisel': kpisel,
@@ -493,7 +493,7 @@ class ModelFactory:
             'nbMinObservation': nbMinObservation,
             'replaceMissingValues': replaceMissingValues,
             'paramsSk': str(hyperParameters).replace("'", '"'),
-            'algoType': AlgoTypes().DECISIONTREE,
+            'algoType': AlgoTypes.DECISIONTREE,
             'modelName': name,
             'enable_custom_discretizations': enable_custom_discretizations,
             'discretizations': discretizations,
@@ -533,7 +533,7 @@ class ModelFactory:
             'nbMinObservation': nbMinObservation,
             'replaceMissingValues': replaceMissingValues,
             'paramsSk': str(hyperParameters).replace("'", '"'),
-            'algoType': AlgoTypes().LOGISTICREGRESSION,
+            'algoType': AlgoTypes.LOGISTICREGRESSION,
             'modelName': name,
             'enable_custom_discretizations': enable_custom_discretizations,
             'discretizations': discretizations,
@@ -572,7 +572,7 @@ class ModelFactory:
             'nbMinObservation': nbMinObservation,
             'replaceMissingValues': replaceMissingValues,
             'paramsSk': str(hyperParameters).replace("'", '"'),
-            'algoType': AlgoTypes().RANDOMFOREST,
+            'algoType': AlgoTypes.RANDOMFOREST,
             'modelName': name,
             'enable_custom_discretizations': enable_custom_discretizations,
             'discretizations': discretizations,
@@ -611,7 +611,7 @@ class ModelFactory:
             'nbMinObservation': nbMinObservation,
             'replaceMissingValues': replaceMissingValues,
             'paramsSk': str(hyperParameters).replace("'", '"'),
-            'algoType': AlgoTypes().GRADIENTBOOSTING,
+            'algoType': AlgoTypes.GRADIENTBOOSTING,
             'modelName': name,
             'enable_custom_discretizations': enable_custom_discretizations,
             'discretizations': discretizations,
@@ -648,7 +648,7 @@ class ModelFactory:
             'nbMinObservation': nbMinObservation,
             'replaceMissingValues': replaceMissingValues,
             'paramsSk': str(hyperParameters).replace("'", '"'),
-            'algoType': AlgoTypes().GRADIENTBOOSTINGREGRESSOR,
+            'algoType': AlgoTypes.GRADIENTBOOSTINGREGRESSOR,
             'modelName': name,
             'enable_custom_discretizations': enable_custom_discretizations,
             'discretizations': discretizations,
@@ -684,7 +684,7 @@ class ModelFactory:
             'nbMinObservation': nbMinObservation,
             'replaceMissingValues': 'Median',
             'paramsSk': str(hyperParameters).replace("'", '"'),
-            'algoType': AlgoTypes().XGBREGRESSOR,
+            'algoType': AlgoTypes.XGBREGRESSOR,
             'modelName': name,
             'enable_custom_discretizations': enable_custom_discretizations,
             'discretizations': discretizations,
@@ -900,7 +900,7 @@ class ClassifierModel(Model):
 
         self.__load_confusion_matrix()
         index = self.__get_index(top_score_ratio)
-        values = self.__json_confusion_matrix[Curves().LIFT][index]
+        values = self.__json_confusion_matrix[Curves.LIFT][index]
         return ConfusionMatrix(true_positives=values['TP'], false_positives=values['FP'],
                                true_negatives=values['TN'], false_negatives=values['FN'])
 
@@ -908,37 +908,37 @@ class ClassifierModel(Model):
         if top_score_ratio == 0:
             return 0
         else:
-            length = len(self.__json_confusion_matrix[Curves().LIFT])
+            length = len(self.__json_confusion_matrix[Curves.LIFT])
             return max(0, round(length * top_score_ratio) - 1)
 
     @property
     @Helper.try_catch
     def area_under_roc(self):
         self.__load_confusion_matrix()
-        return self.__json_confusion_matrix[Curves().ROC][-1]['auc']
+        return self.__json_confusion_matrix[Curves.ROC][-1]['auc']
 
     def __get_x_y_info(self, curve):
-        if curve == Curves().ROC:
+        if curve == Curves.ROC:
             x = [point['FPR'] for point in self.__json_confusion_matrix[curve]]
             y = [point['Sensitivity'] for point in self.__json_confusion_matrix[curve]]
             x_name = 'False Positive Rate'
             y_name = 'True Positive Rate'
-        elif curve == Curves().GAIN:
+        elif curve == Curves.GAIN:
             x = [point['TopScore'] for point in self.__json_confusion_matrix[curve]]
             y = [point['Sensitivity'] for point in self.__json_confusion_matrix[curve]]
             x_name = 'Top score percentages'
             y_name = 'Recall'
-        elif curve == Curves().LIFT:
+        elif curve == Curves.LIFT:
             x = [point['TopScore'] for point in self.__json_confusion_matrix[curve]]
             y = [point['Lift'] for point in self.__json_confusion_matrix[curve]]
             x_name = 'Top score percentages'
             y_name = 'Target lift'
-        elif curve == Curves().PURITY:
+        elif curve == Curves.PURITY:
             x = [point['TopScore'] for point in self.__json_confusion_matrix[curve]]
             y = [point['Purity'] for point in self.__json_confusion_matrix[curve]]
             x_name = 'Top score percentages'
             y_name = 'Precision'
-        elif curve == Curves().PRECISIONRECALL:
+        elif curve == Curves.PRECISIONRECALL:
             x = [point['Sensitivity'] for point in self.__json_confusion_matrix[curve]]
             y = [point['Purity'] for point in self.__json_confusion_matrix[curve]]
             x_name = 'Recall'
@@ -946,7 +946,7 @@ class ClassifierModel(Model):
         return x, y, x_name, y_name
 
     @Helper.try_catch
-    def display_curve(self, curve=Curves().ROC, title=None, model_line=None, random_line=None, legend=None):
+    def display_curve(self, curve=Curves.ROC, title=None, model_line=None, random_line=None, legend=None):
         """
         Plot the selected curve of this model
 
@@ -972,9 +972,9 @@ class ClassifierModel(Model):
             raise ApiException('Plotly external package is required for this operation, please execute "!pip install plotly" and restart the kernel', str(E))
 
         if curve is None:
-            curve = Curves().ROC
-        elif curve not in Curves().LIST:
-            print('Unexpected curve type : {}, valid options are : {}'.format(curve, ', '.join(Curves().LIST)))
+            curve = Curves.ROC
+        elif curve not in Curves.LIST:
+            print('Unexpected curve type : {}, valid options are : {}'.format(curve, ', '.join(Curves.LIST)))
             return
 
         self.__load_confusion_matrix()
@@ -989,9 +989,9 @@ class ClassifierModel(Model):
 
         data = [roc]
         random_line_arg = random_line or dict(color=('rgb(205, 12, 24)'), dash='dash', width=1)
-        if curve == Curves().ROC or curve == Curves().GAIN:
+        if curve == Curves.ROC or curve == Curves.GAIN:
             random = go.Scatter(x=[0, 1], y=[0, 1], name='Random', mode='lines', line=random_line_arg)
-        elif curve == Curves().LIFT:
+        elif curve == Curves.LIFT:
             random = go.Scatter(x=[0, 1], y=[1, 1], name='Random', mode='lines', line=random_line_arg)
         else:
             random = None
@@ -1000,7 +1000,7 @@ class ClassifierModel(Model):
             data.append(random)
 
         default_title = '{} of {}'.format(curve, self.name)
-        if curve == Curves().ROC or curve == Curves().PRECISIONRECALL:
+        if curve == Curves.ROC or curve == Curves.PRECISIONRECALL:
             default_title = '{} (AUC = {:0.2f})'.format(default_title,
                                                         self.__json_confusion_matrix[curve][-1]['auc'])
         curve_title = title or default_title
@@ -1023,7 +1023,7 @@ class HyperCube(ClassifierModel):
         super().__init__(api, json_return)
 
     @Helper.try_catch
-    def export_model(self, path, format=ExportFormats().PYTHON):
+    def export_model(self, path, format=ExportFormats.PYTHON):
         """
         Export this model in a local file
 
@@ -1033,9 +1033,9 @@ class HyperCube(ClassifierModel):
                 If None, the format is 'Python'. Default is 'Python'
         """
         if format is None:
-            format = ExportFormats().PYTHON
-        elif format not in ExportFormats().LIST:
-            print('Unexpected export format : {}, valid options are : {}'.format(format, ', '.join(ExportFormats().LIST)))
+            format = ExportFormats.PYTHON
+        elif format not in ExportFormats.LIST:
+            print('Unexpected export format : {}, valid options are : {}'.format(format, ', '.join(ExportFormats.LIST)))
             return
 
         URL_PREFIX = 'api/v1/'
