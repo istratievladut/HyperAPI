@@ -8,17 +8,59 @@ from io import StringIO
 from json import dump
 
 
+class AlgoTypes:
+    '''
+    '''
+    HYPERCUBE = 'HyperCube'
+    LOGISTICREGRESSION = 'LogisticRegression'
+    DECISIONTREE = 'DecisionTree'
+    RANDOMFOREST = 'RandomForest'
+    GRADIENTBOOSTING = 'GradientBoosting'
+    GRADIENTBOOSTINGREGRESSOR = 'GradientBoostingRegressor'
+    XGBREGRESSOR = 'XGBRegressor'
+    LIST = [HYPERCUBE, LOGISTICREGRESSION, DECISIONTREE, RANDOMFOREST,
+            GRADIENTBOOSTING, GRADIENTBOOSTINGREGRESSOR, XGBREGRESSOR]
+    REGRESSORLIST = [GRADIENTBOOSTINGREGRESSOR, XGBREGRESSOR]
+
+
+class Curves:
+    '''
+    '''
+    ROC = "ROC curve"
+    GAIN = "Gain curve"
+    LIFT = "Lift curve"
+    PURITY = "Purity curve"
+    PRECISIONRECALL = "Precision Recall"
+    LIST = [ROC, GAIN, LIFT, PURITY, PRECISIONRECALL]
+
+
+class ExportFormats:
+    '''
+    '''
+    PYTHON = "Python"
+    CSV = "csv"
+    JSON = "JSON"
+    R = "R"
+    SCALA = "Scala"
+    JAVA = "Java"
+    JAVASCRIPT = "JavaScript"
+    MYSQL = "MySQL"
+    PLSQL = "PLSQL"
+    TSQL = "TSQL"
+    LIST = [PYTHON, CSV, JSON, R, SCALA, JAVA, JAVASCRIPT, MYSQL, TSQL]
+
+
 class ModelFactory:
     """
     """
     _PURITY = 'Purity'
     _COVERAGE = 'Coverage'
     _LIFT = 'Lift'
-    _HYPERCUBE_ALGO_TYPE = 'HyperCube'
+
+    _INDICATOR_DISCRETE_WITH_MODALITY = "Discrete variable with a modality"
 
     def __init__(self, api, project_id):
         self.__api = api
-        self.__algo_list = ['HyperCube', 'LogisticRegression', 'DecisionTree', 'RandomForest', 'GradientBoosting']
         self.__project_id = project_id
 
     @Helper.try_catch
@@ -39,7 +81,7 @@ class ModelFactory:
         }
         json = {'project_ID': project_id, 'json': data}
         json_returned = self.__api.Task.task(**json)
-        return [HyperCube(self.__api, model_json) if model_json.get('algoType') == self._HYPERCUBE_ALGO_TYPE
+        return [HyperCube(self.__api, model_json) if model_json.get('algoType') == AlgoTypes.HYPERCUBE
                 else Model(self.__api, model_json) for model_json in json_returned]
 
     @Helper.try_catch
@@ -295,7 +337,7 @@ class ModelFactory:
                                 min_marginal_contribution=None, max_complexity=3, nb_minimizations=1, coverage_increment=0.01, split_ratio=0.7,
                                 nb_iterations=1, purity_tolerance=0.1, enable_custom_discretizations=True, save_all_rules=False):
         """
-        Get or Create a HyperCube classifier model
+        Get or Create a classifier or regressor model
 
         Args:
             dataset (Dataset): Dataset the model is fitted on
@@ -332,6 +374,323 @@ class ModelFactory:
                                      max_complexity, nb_minimizations, coverage_increment, split_ratio, nb_iterations, purity_tolerance,
                                      enable_custom_discretizations, save_all_rules)
 
+    @Helper.try_catch
+    def __create_skModel(self, dataset, target, params):
+        """
+        Private method. Create a classifier or regressor Scikit-learn model
+
+        Args:
+            dataset (Dataset): Dataset the model is fitted on
+            target (Target): Target used to generate the model
+            params (dict): parameters used by the HyperWorker
+        Returns:
+            the created model
+        """
+
+        if params['algoType'] not in AlgoTypes.LIST:
+            print('Unexpected algorithm type : {}, valid options are : {}'.format(params['algoType'], ', '.join(AlgoTypes.LIST)))
+            return
+
+        if target.indicator_type == self._INDICATOR_DISCRETE_WITH_MODALITY:
+            variable = next(variable for variable in dataset.variables if variable.name == target.variable_name)
+            index = variable.modalities.index(target.modality)
+            datasetPurity = variable.purities[index]
+            score_purity_min = round(datasetPurity, 3)
+            coverage_min = 10 if (variable.frequencies[index] < 1000) else 0.01
+        scores = []
+        for score_id, score_type in zip(target.score_ids, target.scores):
+            score = {
+                'deleted': False,
+                'kpiFamily': target.indicator_family,
+                'kpiName': target.name,
+                'kpiType': target.indicator_type,
+                'output': target.variable_name,
+                'projectId': target.project_id,
+                'scoreType': score_type,
+                '_id': score_id
+            }
+            if target.indicator_type == self._INDICATOR_DISCRETE_WITH_MODALITY:
+                score['omodality'] = target.modality
+                if score_type == self._PURITY:
+                    score['minValue'] = score_purity_min
+                elif score_type == self._COVERAGE:
+                    score['minValue'] = coverage_min
+                elif score_type == self._LIFT:
+                    score['minValue'] = 1
+                scores.append(score)
+                scores = [score for score in scores if score['scoreType'] == self._PURITY or score['scoreType'] == self._COVERAGE]
+            else:
+                scores.append(score)
+
+            kpisel = {
+                'kpiFamily': target.indicator_family,
+                'kpiName': target.name,
+                'kpiType': target.indicator_type,
+                'projectId': target.project_id,
+                'selectedBy': 'target'
+            }
+            if target.indicator_type == self._INDICATOR_DISCRETE_WITH_MODALITY:
+                kpisel['datasetPurity'] = datasetPurity
+
+        params['sourceFileName'] = dataset.source_file_name
+        params['target'] = scores
+        data = {
+            'algo': params['algoType'],
+            'algolist': AlgoTypes.LIST,
+            'datasetId': dataset.dataset_id,
+            'datasetName': dataset.name,
+            'kpisel': kpisel,
+            'modelName': params['modelName'],
+            'params': params,
+            'projectId': dataset.project_id,
+            'selectedDataset': dataset._json,
+            'type': 'otherPrediction',
+            'validTarget': True,
+        }
+
+        json = {'project_ID': dataset.project_id, 'json': data}
+        json_returned = self.__api.Task.createtask(**json)
+
+        try:
+            self.__api.handle_work_states(dataset.project_id, work_type=json_returned.get('type'), work_id=json_returned.get('_id'))
+        except Exception as E:
+            raise ApiException('Unable to create the model ' + params.modelName, str(E))
+
+        if params['algoType'] in AlgoTypes.REGRESSORLIST:
+            return RegressorModel(self.__api, json_returned)
+        else:
+            return ClassifierModel(self.__api, json_returned)
+
+    @Helper.try_catch
+    def create_DecisionTree(self, dataset, name, target, max_depth=4, criterion='gini', split_ratio=0.7, enable_custom_discretizations=True,
+                            nbMaxModality=50, nbMinObservation=10, replaceMissingValues='Median'):
+        """
+        Create a decision tree classifier model
+
+        Args:
+            dataset (Dataset): Dataset the model is fitted on
+            name (str): Name of the new model
+            target (Target): Target used to generate the model
+            max_depth (int): The maximum depth of the tree. Default is 4
+            criterion (str): The function to measure the quality of a split. Supported criteria are “gini” for the Gini impurity and “entropy” for the
+                information gain.Default is 'gini'
+            split_ratio (float): the first step in the model generation is the random split of the original dataset into a learning (or train) dataset
+                representing by default 70% of the original dataset, and a validation (or test) dataset containing the remaining 30%. Default is 0.7
+            enable_custom_discretizations (boolean): when ticked use the custom discretization(s) link to the selected dataset. Default is True
+            nbMaxModality (int): Maximum number of modalities per variable. Default is 50
+            nbMinObservation (int): Modalities with a number of observations lower will be ignored. Default is 10
+            replaceMissingValues (str): Method to replace missing values. Available methods are 'Median', 'Mean' and 'Delete'. Default is 'Median'
+        Returns:
+            the created model
+        """
+        hyperParameters = {'max_depth': max_depth, 'criterion': criterion}
+
+        discretizations = {}
+        if enable_custom_discretizations is True:
+            discretizations = dataset._discretizations
+        params = {
+            'nbMaxModality': nbMaxModality,
+            'nbMinObservation': nbMinObservation,
+            'replaceMissingValues': replaceMissingValues,
+            'paramsSk': str(hyperParameters).replace("'", '"'),
+            'algoType': AlgoTypes.DECISIONTREE,
+            'modelName': name,
+            'enable_custom_discretizations': enable_custom_discretizations,
+            'discretizations': discretizations,
+        }
+        return self.__create_skModel(dataset, target, params)
+
+    @Helper.try_catch
+    def create_LogisticRegression(self, dataset, name, target, penalty='l2', C=1, solver='liblinear', split_ratio=0.7, enable_custom_discretizations=True,
+                                  nbMaxModality=50, nbMinObservation=10, replaceMissingValues='Delete'):
+        """
+        Create a logistic regression model
+
+        Args:
+            dataset (Dataset): Dataset the model is fitted on
+            name (str): Name of the new model
+            target (Target): Target used to generate the model
+            penalty (str): Nnorm used in the penalization. Supported penalties are 'l1' and 'l2'. The ‘newton-cg’, ‘sag’ and ‘lbfgs’ solvers support
+                only l2 penalties. Default is 'l2'
+            C (float): Inverse of regularization strength; must be a positive float. Like in support vector machines, smaller values specify stronger
+                regularization. Greater or equal to 1. Default is 1.
+            solver (str): Compatible solvers are 'newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga'. Default is 'liblinear'
+            split_ratio (float): the first step in the model generation is the random split of the original dataset into a learning (or train) dataset
+                representing by default 70% of the original dataset, and a validation (or test) dataset containing the remaining 30%. Default is 0.7
+            enable_custom_discretizations (boolean): when ticked use the custom discretization(s) link to the selected dataset. Default is True
+            nbMaxModality (int): Maximum number of modalities per variable. Default is 50
+            nbMinObservation (int): Modalities with a number of observations lower will be ignored. Default is 10
+            replaceMissingValues (str): Method to replace missing values. Available methods are 'Median', 'Mean' and 'Delete'. Default is 'Delete'
+        Returns:
+            the created model
+        """
+        hyperParameters = {'penalty': penalty, 'C': C, 'solver': solver}
+        discretizations = {}
+        if enable_custom_discretizations is True:
+            discretizations = dataset._discretizations
+        params = {
+            'nbMaxModality': nbMaxModality,
+            'nbMinObservation': nbMinObservation,
+            'replaceMissingValues': replaceMissingValues,
+            'paramsSk': str(hyperParameters).replace("'", '"'),
+            'algoType': AlgoTypes.LOGISTICREGRESSION,
+            'modelName': name,
+            'enable_custom_discretizations': enable_custom_discretizations,
+            'discretizations': discretizations,
+        }
+        return self.__create_skModel(dataset, target, params)
+
+    @Helper.try_catch
+    def create_RandomForest(self, dataset, name, target, n_estimators=100, max_depth=2, criterion='gini', split_ratio=0.7, enable_custom_discretizations=True,
+                            nbMaxModality=50, nbMinObservation=10, replaceMissingValues='Median'):
+        """
+        Create a random forest model
+
+        Args:
+            dataset (Dataset): Dataset the model is fitted on
+            name (str): Name of the new model
+            target (Target): Target used to generate the model
+            n_estimators (int): Tnumber of trees in the forest. Default is 100
+            max_depth (int): The maximum depth of the tree. Default is 2
+            criterion (str): The function to measure the quality of a split. Supported criteria are “gini” for the Gini impurity and “entropy” for the
+                information gain.Default is 'gini'
+            split_ratio (float): the first step in the model generation is the random split of the original dataset into a learning (or train) dataset
+                representing by default 70% of the original dataset, and a validation (or test) dataset containing the remaining 30%. Default is 0.7
+            enable_custom_discretizations (boolean): when ticked use the custom discretization(s) link to the selected dataset. Default is True
+            nbMaxModality (int): Maximum number of modalities per variable. Default is 50
+            nbMinObservation (int): Modalities with a number of observations lower will be ignored. Default is 10
+            replaceMissingValues (str): Method to replace missing values. Available methods are 'Median', 'Mean' and 'Delete'. Default is 'Median'
+        Returns:
+            the created model
+        """
+        hyperParameters = {'n_estimators': n_estimators, 'max_depth': max_depth, 'criterion': criterion}
+        discretizations = {}
+        if enable_custom_discretizations is True:
+            discretizations = dataset._discretizations
+        params = {
+            'nbMaxModality': nbMaxModality,
+            'nbMinObservation': nbMinObservation,
+            'replaceMissingValues': replaceMissingValues,
+            'paramsSk': str(hyperParameters).replace("'", '"'),
+            'algoType': AlgoTypes.RANDOMFOREST,
+            'modelName': name,
+            'enable_custom_discretizations': enable_custom_discretizations,
+            'discretizations': discretizations,
+        }
+        return self.__create_skModel(dataset, target, params)
+
+    @Helper.try_catch
+    def create_GradientBoosting(self, dataset, name, target, loss='deviance', n_estimators=100, maxdepth=3, split_ratio=0.7,
+                                enable_custom_discretizations=True, nbMaxModality=50, nbMinObservation=10, replaceMissingValues='Median'):
+        """
+        Create a Gradient Boosting classifier
+
+        Args:
+            dataset (Dataset): Dataset the model is fitted on
+            name (str): Name of the new model
+            target (Target): Target used to generate the model
+            loss (str): loss function to be optimized. 'deviance' refers to deviance (= logistic regression) for classification with probabilistic
+                outputs. For loss 'exponential' gradient boosting recovers the AdaBoost algorithm.Dafault is 'deviance')
+            n_estimators (int): The number  of boosting stages to perform. Default is 100
+            max_depth (int): The maximum depth of the individual regression estimators. Default is 3
+            split_ratio (float): the first step in the model generation is the random split of the original dataset into a learning (or train) dataset
+                representing by default 70% of the original dataset, and a validation (or test) dataset containing the remaining 30%. Default is 0.7
+            enable_custom_discretizations (boolean): when ticked use the custom discretization(s) link to the selected dataset. Default is True
+            nbMaxModality (int): Maximum number of modalities per variable. Default is 50
+            nbMinObservation (int): Modalities with a number of observations lower will be ignored. Default is 10
+            replaceMissingValues (str): Method to replace missing values. Available methods are 'Median', 'Mean' and 'Delete'. Default is 'Median'
+        Returns:
+            the created model
+        """
+        hyperParameters = {'loss': loss, 'learning_rate': 0.1, 'n_estimators': n_estimators, 'max_depth': maxdepth}
+        discretizations = {}
+        if enable_custom_discretizations is True:
+            discretizations = dataset._discretizations
+        params = {
+            'nbMaxModality': nbMaxModality,
+            'nbMinObservation': nbMinObservation,
+            'replaceMissingValues': replaceMissingValues,
+            'paramsSk': str(hyperParameters).replace("'", '"'),
+            'algoType': AlgoTypes.GRADIENTBOOSTING,
+            'modelName': name,
+            'enable_custom_discretizations': enable_custom_discretizations,
+            'discretizations': discretizations,
+        }
+        return self.__create_skModel(dataset, target, params)
+
+    @Helper.try_catch
+    def create_GradientBoostingRegressor(self, dataset, name, target, n_estimators=100, maxdepth=3, split_ratio=0.7, enable_custom_discretizations=True,
+                                         nbMaxModality=50, nbMinObservation=10, replaceMissingValues='Median'):
+        """
+        Create a Gradient Boosting regressor
+
+        Args:
+            dataset (Dataset): Dataset the model is fitted on
+            name (str): Name of the new model
+            target (Target): Target used to generate the model
+            n_estimators (int): The number  of boosting stages to perform. Default is 100
+            max_depth (int): The maximum depth of the individual regression estimators. Default is 3
+            split_ratio (float): the first step in the model generation is the random split of the original dataset into a learning (or train) dataset
+                representing by default 70% of the original dataset, and a validation (or test) dataset containing the remaining 30%. Default is 0.7
+            enable_custom_discretizations (boolean): when ticked use the custom discretization(s) link to the selected dataset. Default is True
+            nbMaxModality (int): Maximum number of modalities per variable. Default is 50
+            nbMinObservation (int): Modalities with a number of observations lower will be ignored. Default is 10
+            replaceMissingValues (str): Method to replace missing values. Available methods are 'Median', 'Mean' and 'Delete'. Default is 'Median'
+        Returns:
+            the created model
+        """
+        hyperParameters = {'learning_rate': 0.1, 'n_estimators': n_estimators, 'max_depth': maxdepth}
+        discretizations = {}
+        if enable_custom_discretizations is True:
+            discretizations = dataset._discretizations
+        params = {
+            'nbMaxModality': nbMaxModality,
+            'nbMinObservation': nbMinObservation,
+            'replaceMissingValues': replaceMissingValues,
+            'paramsSk': str(hyperParameters).replace("'", '"'),
+            'algoType': AlgoTypes.GRADIENTBOOSTINGREGRESSOR,
+            'modelName': name,
+            'enable_custom_discretizations': enable_custom_discretizations,
+            'discretizations': discretizations,
+        }
+        return self.__create_skModel(dataset, target, params)
+
+    @Helper.try_catch
+    def create_XGBRegressor(self, dataset, name, target, n_estimators=100, maxdepth=3, split_ratio=0.7, enable_custom_discretizations=True,
+                            nbMaxModality=50, nbMinObservation=10):
+        """
+        Create a eXtreme Gradient Boosting (XGBoost) regressor
+
+        Args:
+            dataset (Dataset): Dataset the model is fitted on
+            name (str): Name of the new model
+            target (Target): Target used to generate the model
+            n_estimators (int): The number  of boosting stages to perform. Default is 100
+            max_depth (int): The maximum depth of the individual regression estimators. Default is 3
+            split_ratio (float): the first step in the model generation is the random split of the original dataset into a learning (or train) dataset
+                representing by default 70% of the original dataset, and a validation (or test) dataset containing the remaining 30%. Default is 0.7
+            enable_custom_discretizations (boolean): when ticked use the custom discretization(s) link to the selected dataset. Default is True
+            nbMaxModality (int): Maximum number of modalities per variable. Default is 50
+            nbMinObservation (int): Modalities with a number of observations lower will be ignored. Default is 10
+        Returns:
+            the created model
+        """
+        hyperParameters = {'n_estimators': n_estimators, 'learning_rate': 0.1, 'max_depth': maxdepth, 'learning_rate': 0.1}
+        discretizations = {}
+        if enable_custom_discretizations is True:
+            discretizations = dataset._discretizations
+        params = {
+            'nbMaxModality': nbMaxModality,
+            'nbMinObservation': nbMinObservation,
+            'replaceMissingValues': 'Median',
+            'paramsSk': str(hyperParameters).replace("'", '"'),
+            'algoType': AlgoTypes.XGBREGRESSOR,
+            'modelName': name,
+            'enable_custom_discretizations': enable_custom_discretizations,
+            'discretizations': discretizations,
+        }
+        return self.__create_skModel(dataset, target, params)
+
 
 class Model(Base):
     """
@@ -340,7 +699,6 @@ class Model(Base):
         self.__api = api
         self.__json_returned = json_return
         self._is_deleted = False
-        self.__json_confusion_matrix = None
 
     def __repr__(self):
         return """\n{} : {} <{}>\n""".format(
@@ -398,143 +756,20 @@ class Model(Base):
             self._is_deleted = True
         return self
 
-    @property
-    @Helper.try_catch
-    def area_under_roc(self):
-        self.__load_confusion_matrix()
-        return self.__json_confusion_matrix['ROC curve'][-1]['auc']
 
-    @Helper.try_catch
-    def get_confusion_matrix(self, top_score_ratio):
-        if not 0 <= top_score_ratio <= 1:
-            raise ApiException('top_score_ratio must be greater or equal to 0 and lower or equal to 1')
-
-        self.__load_confusion_matrix()
-        index = self.__get_index(top_score_ratio)
-        values = self.__json_confusion_matrix['Lift curve'][index]
-        return ConfusionMatrix(true_positives=values['TP'], false_positives=values['FP'],
-                               true_negatives=values['TN'], false_negatives=values['FN'])
-
-    def __get_index(self, top_score_ratio):
-        if top_score_ratio == 0:
-            return 0
-        else:
-            length = len(self.__json_confusion_matrix['Lift curve'])
-            return max(0, round(length * top_score_ratio) - 1)
-
-    @Helper.try_catch
-    def display_curve(self, curve='ROC curve', title=None, model_line=None, random_line=None, legend=None):
-        """
-        Plot the selected curve of this model
-
-        Args:
-            curve (str): curve to be diplayed, options are 'ROC curve', 'Gain curve', 'Lift curve', 'Purity curve' and
-                'Precision Recall'. Default is 'ROC curve'.
-            title (str): Title of the diagram. Default is a custom model name
-            model_line (dict): display options of model line, ex: dict(color=('rgb(205, 12, 24)'), dash='dash', width=1).
-                Default is a blue line. see https://plot.ly/python/line-and-scatter/
-            random_line (dict): display options of random line. Default is a red dash line.
-            legend (dict): legend options, ex: dict(orientation="h") or dict(x=-.1, y=1.2).
-                Default is at the right of the diagram. see https://plot.ly/python/legend/
-
-        Returns:
-            plot of the curve
-        """
-
-        try:
-            import plotly.graph_objs as go
-            import plotly.offline as py
-            from plotly.offline import init_notebook_mode
-        except ImportError as E:
-            raise ApiException('Plotly external package is required for this operation, please execute "!pip install plotly" and restart the kernel', str(E))
-
-        if curve not in ['ROC curve', 'Gain curve', 'Lift curve', 'Purity curve', 'Precision Recall']:
-            print('Unexpected curve type : {}, valid options are : {}'.format(curve,
-                  "'ROC curve', 'Gain curve', 'Lift curve', 'Purity curve', 'Precision Recall'"))
-            return
-
-        self.__load_confusion_matrix()
-
-        x, y, x_name, y_name = self.__get_x_y_info(curve)
-
-        init_notebook_mode(connected=False)
-        if model_line:
-            roc = go.Scatter(x=x, y=y, name='{}'.format(self.name), mode='lines', line=model_line)
-        else:
-            roc = go.Scatter(x=x, y=y, name='{}'.format(self.name), mode='lines')
-
-        data = [roc]
-        random_line_arg = random_line or dict(color=('rgb(205, 12, 24)'), dash='dash', width=1)
-        if curve == 'ROC curve' or curve == 'Gain curve':
-            random = go.Scatter(x=[0, 1], y=[0, 1], name='Random', mode='lines', line=random_line_arg)
-        elif curve == 'Lift curve':
-            random = go.Scatter(x=[0, 1], y=[1, 1], name='Random', mode='lines', line=random_line_arg)
-        else:
-            random = None
-
-        if random:
-            data.append(random)
-
-        default_title = '{} of {}'.format(curve, self.name)
-        if curve == 'ROC curve' or curve == 'Precision Recall':
-            default_title = '{} (AUC = {:0.2f})'.format(default_title,
-                                                        self.__json_confusion_matrix[curve][-1]['auc'])
-        curve_title = title or default_title
-
-        layout = dict(title=curve_title, xaxis=dict(title=x_name, range=[0, 1]),
-                      yaxis=dict(title=y_name, range=[0, max(y) + 0.05]),)
-        if legend:
-            layout['legend'] = legend
-
-        fig = dict(data=data, layout=layout)
-        py.iplot(fig, validate=False)
-
-    def __get_x_y_info(self, curve):
-        if curve == 'ROC curve':
-            x = [point['FPR'] for point in self.__json_confusion_matrix[curve]]
-            y = [point['Sensitivity'] for point in self.__json_confusion_matrix[curve]]
-            x_name = 'False Positive Rate'
-            y_name = 'True Positive Rate'
-        elif curve == 'Gain curve':
-            x = [point['TopScore'] for point in self.__json_confusion_matrix[curve]]
-            y = [point['Sensitivity'] for point in self.__json_confusion_matrix[curve]]
-            x_name = 'Top score percentages'
-            y_name = 'Recall'
-        elif curve == 'Lift curve':
-            x = [point['TopScore'] for point in self.__json_confusion_matrix[curve]]
-            y = [point['Lift'] for point in self.__json_confusion_matrix[curve]]
-            x_name = 'Top score percentages'
-            y_name = 'Target lift'
-        elif curve == 'Purity curve':
-            x = [point['TopScore'] for point in self.__json_confusion_matrix[curve]]
-            y = [point['Purity'] for point in self.__json_confusion_matrix[curve]]
-            x_name = 'Top score percentages'
-            y_name = 'Precision'
-        elif curve == 'Precision Recall':
-            x = [point['Sensitivity'] for point in self.__json_confusion_matrix[curve]]
-            y = [point['Purity'] for point in self.__json_confusion_matrix[curve]]
-            x_name = 'Recall'
-            y_name = 'Precision'
-        return x, y, x_name, y_name
-
-    def __load_confusion_matrix(self):
-        if not self.__json_confusion_matrix:
-            json = {'project_ID': self.project_id, 'model_ID': self.id, 'dataset_ID': self.__json_returned.get('datasetId')}
-            self.__json_confusion_matrix = self.__api.Prediction.getconfusionmatrix(**json)
-
-
-class HyperCube(Model):
+class ClassifierModel(Model):
     """
     """
     def __init__(self, api, json_return):
         self.__api = api
         self.__json_returned = json_return
+        self.__json_confusion_matrix = None
         super().__init__(api, json_return)
 
     @Helper.try_catch
     def apply(self, dataset, applied_model_name, add_score_to_dataset=False, score_column_name=None):
         """
-        Apply the HyperCube classifier model on a selected data set
+        Apply the classifier model on a selected data set
 
         Args:
             dataset (Dataset): Dataset the model is applied on
@@ -569,9 +804,11 @@ class HyperCube(Model):
         try:
             self.__api.handle_work_states(dataset.project_id, work_type=json_returned.get('type'), work_id=json_returned.get('_id'))
         except Exception as E:
-            raise ApiException('Unable to create the applied HyperCube model ' + applied_model_name, str(E))
+            raise ApiException('Unable to create the applied model ' + applied_model_name, str(E))
 
-        return HyperCube(self.__api, json_returned)
+        if self.algoType == 'HyperCube':
+            return HyperCube(self.__api, json_returned)
+        return ClassifierModel(self.__api, json_returned)
 
     @Helper.try_catch
     def export_scores(self, path, variables=None):
@@ -611,7 +848,7 @@ class HyperCube(Model):
 
         Args:
             dataset (Dataset): the dataset containing the input samples.
-            keep_applied_model (boolean): A HyperCube applied model is temporarily created to compute these scores,
+            keep_applied_model (boolean): An applied model is temporarily created to compute these scores,
                 set this parameter to True if you want this model to be persisted. Default is False.
 
         Returns:
@@ -639,7 +876,10 @@ class HyperCube(Model):
         scoreIO = StringIO(scores.decode('utf-8'))
 
         try:
-            df = read_csv(scoreIO, sep=';', skiprows=1, usecols=[1])
+            if self.algoType == 'HyperCube':
+                df = read_csv(scoreIO, sep=';', skiprows=1, usecols=[1])
+            else:
+                df = read_csv(scoreIO, sep=';', usecols=[1])
         except Exception as E:
             raise ApiException('Unable to read the model scores for {}'.format(self.name), str(E))
 
@@ -648,15 +888,156 @@ class HyperCube(Model):
 
         return reshape(df.values, (df.values.shape[0]))
 
+    def __load_confusion_matrix(self):
+        if not self.__json_confusion_matrix:
+            json = {'project_ID': self.project_id, 'model_ID': self.id, 'dataset_ID': self.__json_returned.get('datasetId')}
+            self.__json_confusion_matrix = self.__api.Prediction.getconfusionmatrix(**json)
+
     @Helper.try_catch
-    def export_model(self, path, format='Python'):
+    def get_confusion_matrix(self, top_score_ratio):
+        if not 0 <= top_score_ratio <= 1:
+            raise ApiException('top_score_ratio must be greater or equal to 0 and lower or equal to 1')
+
+        self.__load_confusion_matrix()
+        index = self.__get_index(top_score_ratio)
+        values = self.__json_confusion_matrix[Curves.LIFT][index]
+        return ConfusionMatrix(true_positives=values['TP'], false_positives=values['FP'],
+                               true_negatives=values['TN'], false_negatives=values['FN'])
+
+    def __get_index(self, top_score_ratio):
+        if top_score_ratio == 0:
+            return 0
+        else:
+            length = len(self.__json_confusion_matrix[Curves.LIFT])
+            return max(0, round(length * top_score_ratio) - 1)
+
+    @property
+    @Helper.try_catch
+    def area_under_roc(self):
+        self.__load_confusion_matrix()
+        return self.__json_confusion_matrix[Curves.ROC][-1]['auc']
+
+    def __get_x_y_info(self, curve):
+        if curve == Curves.ROC:
+            x = [point['FPR'] for point in self.__json_confusion_matrix[curve]]
+            y = [point['Sensitivity'] for point in self.__json_confusion_matrix[curve]]
+            x_name = 'False Positive Rate'
+            y_name = 'True Positive Rate'
+        elif curve == Curves.GAIN:
+            x = [point['TopScore'] for point in self.__json_confusion_matrix[curve]]
+            y = [point['Sensitivity'] for point in self.__json_confusion_matrix[curve]]
+            x_name = 'Top score percentages'
+            y_name = 'Recall'
+        elif curve == Curves.LIFT:
+            x = [point['TopScore'] for point in self.__json_confusion_matrix[curve]]
+            y = [point['Lift'] for point in self.__json_confusion_matrix[curve]]
+            x_name = 'Top score percentages'
+            y_name = 'Target lift'
+        elif curve == Curves.PURITY:
+            x = [point['TopScore'] for point in self.__json_confusion_matrix[curve]]
+            y = [point['Purity'] for point in self.__json_confusion_matrix[curve]]
+            x_name = 'Top score percentages'
+            y_name = 'Precision'
+        elif curve == Curves.PRECISIONRECALL:
+            x = [point['Sensitivity'] for point in self.__json_confusion_matrix[curve]]
+            y = [point['Purity'] for point in self.__json_confusion_matrix[curve]]
+            x_name = 'Recall'
+            y_name = 'Precision'
+        return x, y, x_name, y_name
+
+    @Helper.try_catch
+    def display_curve(self, curve=Curves.ROC, title=None, model_line=None, random_line=None, legend=None):
+        """
+        Plot the selected curve of this model
+
+        Args:
+            curve (str or None): curve to be diplayed, options are 'ROC curve', 'Gain curve', 'Lift curve', 'Purity curve' and
+                'Precision Recall'. If None is provided, ROC curve will be displayed. Default is ROC curve.
+            title (str): Title of the diagram. Default is a custom model name
+            model_line (dict): display options of model line, ex: dict(color=('rgb(205, 12, 24)'), dash='dash', width=1).
+                Default is a blue line. see https://plot.ly/python/line-and-scatter/
+            random_line (dict): display options of random line. Default is a red dash line.
+            legend (dict): legend options, ex: dict(orientation="h") or dict(x=-.1, y=1.2).
+                Default is at the right of the diagram. see https://plot.ly/python/legend/
+
+        Returns:
+            plot of the curve
+        """
+
+        try:
+            import plotly.graph_objs as go
+            import plotly.offline as py
+            from plotly.offline import init_notebook_mode
+        except ImportError as E:
+            raise ApiException('Plotly external package is required for this operation, please execute "!pip install plotly" and restart the kernel', str(E))
+
+        if curve is None:
+            curve = Curves.ROC
+        elif curve not in Curves.LIST:
+            print('Unexpected curve type : {}, valid options are : {}'.format(curve, ', '.join(Curves.LIST)))
+            return
+
+        self.__load_confusion_matrix()
+
+        x, y, x_name, y_name = self.__get_x_y_info(curve)
+
+        init_notebook_mode(connected=False)
+        if model_line:
+            roc = go.Scatter(x=x, y=y, name='{}'.format(self.name), mode='lines', line=model_line)
+        else:
+            roc = go.Scatter(x=x, y=y, name='{}'.format(self.name), mode='lines')
+
+        data = [roc]
+        random_line_arg = random_line or dict(color=('rgb(205, 12, 24)'), dash='dash', width=1)
+        if curve == Curves.ROC or curve == Curves.GAIN:
+            random = go.Scatter(x=[0, 1], y=[0, 1], name='Random', mode='lines', line=random_line_arg)
+        elif curve == Curves.LIFT:
+            random = go.Scatter(x=[0, 1], y=[1, 1], name='Random', mode='lines', line=random_line_arg)
+        else:
+            random = None
+
+        if random:
+            data.append(random)
+
+        default_title = '{} of {}'.format(curve, self.name)
+        if curve == Curves.ROC or curve == Curves.PRECISIONRECALL:
+            default_title = '{} (AUC = {:0.2f})'.format(default_title,
+                                                        self.__json_confusion_matrix[curve][-1]['auc'])
+        curve_title = title or default_title
+
+        layout = dict(title=curve_title, xaxis=dict(title=x_name, range=[0, 1]),
+                      yaxis=dict(title=y_name, range=[0, max(y) + 0.05]),)
+        if legend:
+            layout['legend'] = legend
+
+        fig = dict(data=data, layout=layout)
+        py.iplot(fig, validate=False)
+
+
+class HyperCube(ClassifierModel):
+    """
+    """
+    def __init__(self, api, json_return):
+        self.__api = api
+        self.__json_returned = json_return
+        super().__init__(api, json_return)
+
+    @Helper.try_catch
+    def export_model(self, path, format=ExportFormats.PYTHON):
         """
         Export this model in a local file
 
         Args:
             path (str): the destination path for the exported model
-            format (str): {'Python', 'csv', 'JSON', 'R', 'Scala', 'Java', 'JavaScript', 'MySQL', 'PLSQL', 'TSQL'}. Default is 'Python'
+            format (str or None): {'Python', 'csv', 'JSON', 'R', 'Scala', 'Java', 'JavaScript', 'MySQL', 'PLSQL', 'TSQL'}.
+                If None, the format is 'Python'. Default is 'Python'
         """
+        if format is None:
+            format = ExportFormats.PYTHON
+        elif format not in ExportFormats.LIST:
+            print('Unexpected export format : {}, valid options are : {}'.format(format, ', '.join(ExportFormats.LIST)))
+            return
+
         URL_PREFIX = 'api/v1/'
         data = {
             'format': format
@@ -671,6 +1052,126 @@ class HyperCube(Model):
         else:
             with open(path, 'w') as FILE_OUT:
                 dump(to_export, FILE_OUT)
+
+
+class RegressorModel(Model):
+    """
+    """
+    def __init__(self, api, json_return):
+        self.__api = api
+        self.__json_returned = json_return
+        super().__init__(api, json_return)
+
+    @Helper.try_catch
+    def apply(self, dataset, applied_model_name, add_pred_to_dataset=False, pred_column_name=None):
+        """
+        Apply the model on a selected data set
+
+        Args:
+            dataset (Dataset): Dataset the model is applied on
+            applied_model_name (str): Name of the new applied model
+
+        Returns:
+            the applied Model
+        """
+
+        params = dict(self.__json_returned)
+        params['modelName'] = applied_model_name
+
+        data = {
+            'datasetId': dataset.dataset_id,
+            'datasetName': dataset.name,
+            'fromDatasetId': self.__json_returned.get('datasetId'),
+            'modelId': self.__json_returned.get('_id'),
+            'params': params,
+            'projectId': dataset.project_id,
+            'spark': False,
+            'type': 'applyPrediction'
+        }
+
+        json = {'project_ID': dataset.project_id, 'json': data}
+        json_returned = self.__api.Task.createtask(**json)
+        try:
+            self.__api.handle_work_states(dataset.project_id, work_type=json_returned.get('type'), work_id=json_returned.get('_id'))
+        except Exception as E:
+            raise ApiException('Unable to create the applied model ' + applied_model_name, str(E))
+
+        return RegressorModel(self.__api, json_returned)
+
+    @Helper.try_catch
+    def export_prediction(self, path, variables=None):
+        """
+        Export prediction of this model in a csv file
+
+        Args:
+            path (str): the destination path for the exported prediction
+            variables (list of Variable): the variables of the dataset to add in the file. Default is None
+        """
+        data = {
+            'datasetId': self.__json_returned.get('datasetId'),
+            'columns': [variable.name for variable in variables] if variables else []
+        }
+        json = {'project_ID': self.project_id, 'model_ID': self.id, 'json': data}
+        json_returned = self.__api.Prediction.postexportscores(**json)
+
+        try:
+            self.__api.handle_work_states(self.project_id, work_type=json_returned.get('type'), work_id=json_returned.get('_id'))
+        except Exception as E:
+            raise ApiException('Unable to export the model scores for ' + self.name, str(E))
+
+        outputFile = json_returned.get('workParams').get('outputFile').split("_")[1]
+        data = {
+            'outputFile': outputFile
+        }
+        json = {'project_ID': self.project_id, 'model_ID': self.id, 'params': data}
+        to_export = self.__api.Prediction.getexportscores(**json)
+
+        with open(path, 'wb') as FILE_OUT:
+            FILE_OUT.write(to_export)
+
+    @Helper.try_catch
+    def predict(self, dataset, keep_applied_model=False):
+        """
+        Target prediction for input dataset
+
+        Args:
+            dataset (Dataset): the dataset containing the input samples.
+            keep_applied_model (boolean): An applied model is temporarily created to compute these scores,
+                set this parameter to True if you want this model to be persisted. Default is False.
+
+        Returns:
+            a NumPy array of shape [n_samples,] where n_samples is the number of samples in the input dataset
+        """
+        applied_model = self.apply(dataset, '{}_applied_{}'.format(self.name, datetime.now().strftime("%Y-%m-%d_%H-%M-%S")))
+        data = {
+            'datasetId': dataset.dataset_id,
+            'columns': []
+        }
+        json = {'project_ID': applied_model.project_id, 'model_ID': applied_model.id, 'json': data}
+        json_returned = self.__api.Prediction.postexportscores(**json)
+
+        try:
+            self.__api.handle_work_states(applied_model.project_id, work_type=json_returned.get('type'), work_id=json_returned.get('_id'))
+        except Exception as E:
+            raise ApiException('Unable to get the model scores for {}'.format(self.name), str(E))
+
+        outputFile = json_returned.get('workParams').get('outputFile').split("_")[1]
+        data = {
+            'outputFile': outputFile
+        }
+        json = {'project_ID': applied_model.project_id, 'model_ID': applied_model.id, 'params': data}
+        scores = self.__api.Prediction.getexportscores(**json)
+        scoreIO = StringIO(scores.decode('utf-8'))
+
+        try:
+            df = read_csv(scoreIO, sep=';', usecols=[1])
+        except Exception as E:
+            raise ApiException('Unable to read the model scores for {}'.format(self.name), str(E))
+
+        if not keep_applied_model:
+            applied_model.delete()
+
+        return reshape(df.values, (df.values.shape[0]))
 
 
 class ConfusionMatrix:
