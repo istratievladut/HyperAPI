@@ -99,7 +99,10 @@ class Session:
         params = params or {}
         json = json or {}
         data = data or {}
-        url = '{}{}'.format(self.api_entry_point, url)
+        if self.api_entry_point.endswith('/') and url.startswith('/'):
+            url = '{}{}'.format(self.api_entry_point, url[1:])
+        else:
+            url = '{}{}'.format(self.api_entry_point, url)
         method = method.upper()
         if method not in ['GET', 'POST']:
             raise ValueError("method should be in ['GET', 'POST']")
@@ -108,11 +111,7 @@ class Session:
             # Create new data with encoder
             encoder = MultipartEncoder(fields=data)
 
-            def callback(monitor):
-                msg = '{} bytes uploaded '.format(monitor.bytes_read)
-                print(msg, flush=True, end='\r')
-
-            multi_data = MultipartEncoderMonitor(encoder, callback)
+            multi_data = MultipartEncoderMonitor(encoder, None)
 
             headers = self.session.headers.copy()
             headers['Content-Type'] = multi_data.content_type
