@@ -101,9 +101,12 @@ class Router(object):
     def __init__(self, username=None, password=None, url=None, token=None, watcher=None):
         # Initiate session with HyperCube server
         self.session = Session(username=username, password=password, token=token, url=url)
-        # We must fetch the System version BEFORE creating route, so this call is hard coded
-        _system_details = self.session.request('GET', '/system/about')
-        _version = _system_details.get('version')
+        try:
+            # We must fetch the System version BEFORE creating route, so this call is hard coded
+            _system_details = self.session.request('GET', System._About.path)
+            _version = _system_details.get('version')
+        except Exception:
+            _version = Version('unknown')
         self.session.version = Version(_version)
 
         # Creating Resources

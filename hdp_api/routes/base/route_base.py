@@ -16,6 +16,7 @@ class Route(object):
     VALIDATOR_INT = ValidatorInt()
 
     deprecated_since = None
+    available_since = None
 
     @classmethod
     def get_route_name(cls):
