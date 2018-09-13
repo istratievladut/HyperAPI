@@ -4,8 +4,7 @@ import re
 class Version(object):
 
     def __init__(self, version_label: str):
-        pattern_version = re.compile('([0-9]*)\.([0-9]*)(-([0-9a-f]{40}))?', re.IGNORECASE)
-        result = pattern_version.search(version_label)
+        result = re.search('([\.0-9a-z]*)(-([0-9a-f]{40}))?', version_label, re.IGNORECASE)
         if result is None:
             self.major = None
             self.minor = None
@@ -13,10 +12,17 @@ class Version(object):
             self.is_dev = True
         else:
             _parts = result.groups()
-            self.major = int(_parts[0])
-            self.minor = int(_parts[1])
-            self.build = _parts[3]
-            self.is_dev = False
+            version_result = re.fullmatch('v?([0-9]*)\.([0-9]*)', _parts[0], re.IGNORECASE)
+            if version_result is not None:
+                _version_parts = version_result.groups()
+                self.major = int(_version_parts[0])
+                self.minor = int(_version_parts[1])
+                self.is_dev = False
+            else:
+                self.major = None
+                self.minor = None
+                self.is_dev = True
+            self.build = _parts[2]
 
     def __str__(self):
         if self.is_dev:
