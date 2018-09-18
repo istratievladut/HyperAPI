@@ -20,6 +20,7 @@ from HyperAPI.hdp_api.routes.nitro import Nitro
 from HyperAPI.hdp_api.routes.notebooks import Notebooks
 from HyperAPI.hdp_api.routes.optimProcess import OptimProcess
 from HyperAPI.hdp_api.routes.prediction import Prediction
+from HyperAPI.hdp_api.routes.product import Product
 from HyperAPI.hdp_api.routes.projects import Projects
 from HyperAPI.hdp_api.routes.projectResources import ProjectResources
 from HyperAPI.hdp_api.routes.query import Query
@@ -71,6 +72,7 @@ class Router(object):
         Notebooks,
         OptimProcess,
         Prediction,
+        Product,
         Projects,
         ProjectResources,
         Query,
