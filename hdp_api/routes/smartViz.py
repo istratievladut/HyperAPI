@@ -26,10 +26,9 @@ class SmartDataViz(Resource):
     class _getSmartDataVizs(Route):
         name = "getSmartDataVizs"
         httpMethod = Route.GET
-        path = "/projects/{project_ID}/datasets/{dataset_ID}/smartDataViz/"
+        path = "/projects/{project_ID}/smartDataViz/"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
-            'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
     class _deleteSmartDataViz(Route):
