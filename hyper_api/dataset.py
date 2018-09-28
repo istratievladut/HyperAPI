@@ -604,33 +604,6 @@ class Dataset(Base):
         return _exported
 
     @Helper.try_catch
-    def _export_preprocessed_data(self):
-        json = {
-            "format": "csv",
-            "useFileStream": True,
-            "projectId": self.project_id,
-            "datasetId": self.dataset_id,
-            "limit": -1,
-            "reload": True,
-            "rawData": True,
-            "returnHeaders": True,
-            "params": {},
-            "refilter": 0,
-            "filename": self.name,
-        }
-        _filter_task = self.__api.Datasets.filteredgrid(project_ID=self.project_id,
-                                                        dataset_ID=self.dataset_id,
-                                                        json=json)
-        _task_id = _filter_task.get('_id')
-        self.__api.handle_work_states(self.project_id, work_type='dataGrid', work_id=_task_id)
-
-        _exported = io.StringIO()
-        _exported = self.__api.Datasets.exportcsv(project_ID=self.project_id,
-                                                  dataset_ID=self.dataset_id,
-                                                  params={"task_id": _task_id})
-        return _exported
-
-    @Helper.try_catch
     def export_csv(self, path):
         """
         Export the dataset to a csv file
