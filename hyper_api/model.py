@@ -82,7 +82,8 @@ class ModelFactory:
         json = {'project_ID': project_id, 'json': data}
         json_returned = self.__api.Task.task(**json)
         return [HyperCube(self.__api, model_json) if model_json.get('algoType') == AlgoTypes.HYPERCUBE
-                else Model(self.__api, model_json) for model_json in json_returned]
+                else RegressorModel(self.__api, model_json) if model_json.get('algoType') in AlgoTypes.REGRESSORLIST
+                else ClassifierModel(self.__api, model_json) for model_json in json_returned]
 
     @Helper.try_catch
     def get(self, name):
@@ -299,7 +300,7 @@ class ModelFactory:
 
         data = {
             'algo': 'HyperCube',
-            'algolist': ['HyperCube', 'LogisticRegression', 'DecisionTree', 'RandomForest', 'GradientBoosting'],
+            'algolist': AlgoTypes.LIST,
             'datasetId': dataset.dataset_id,
             'datasetName': dataset.name,
             'dtcr': 'gini',
@@ -450,7 +451,6 @@ class ModelFactory:
 
         json = {'project_ID': dataset.project_id, 'json': data}
         json_returned = self.__api.Task.createtask(**json)
-
         try:
             self.__api.handle_work_states(dataset.project_id, work_type=json_returned.get('type'), work_id=json_returned.get('_id'))
         except Exception as E:
@@ -725,6 +725,10 @@ class Model(Base):
         return self.__json_returned.get('datasetName')
 
     @property
+    def dataset_id(self):
+        return self.__json_returned.get('datasetId')
+
+    @property
     def id(self):
         return self.__json_returned.get('_id')
 
@@ -781,7 +785,6 @@ class ClassifierModel(Model):
         Returns:
             the applied Model
         """
-
         params = dict(self.__json_returned)
         params['modelName'] = applied_model_name
 
@@ -805,10 +808,26 @@ class ClassifierModel(Model):
             self.__api.handle_work_states(dataset.project_id, work_type=json_returned.get('type'), work_id=json_returned.get('_id'))
         except Exception as E:
             raise ApiException('Unable to create the applied model ' + applied_model_name, str(E))
+        return HyperCube(self.__api, json_returned) if self.algoType == AlgoTypes.HYPERCUBE else ClassifierModel(self.__api, json_returned)
 
-        if self.algoType == 'HyperCube':
-            return HyperCube(self.__api, json_returned)
-        return ClassifierModel(self.__api, json_returned)
+    @Helper.try_catch
+    def preprocess_data(self, dataset):
+        """
+        Return a preprocessed dataframe for Scikit-learn models
+
+        Args:
+            dataset (Dataset): Dataset the model is applied on
+
+        Returns:
+            preprocessed dataframe
+        """
+        if self.algoType == AlgoTypes.HYPERCUBE:
+            raise ApiException('Preprocessing is not available for Hypercube models')
+        applied_model = self.apply(dataset, self.name + '_applied')
+        json = {'project_ID': self.project_id, 'model_ID': applied_model.id}
+        url = self.__api.Prediction.exportpreprocesseddata(**json)
+        df = read_csv(StringIO(url.decode('utf-8')))
+        return df
 
     @Helper.try_catch
     def export_scores(self, path, variables=None):
@@ -876,10 +895,7 @@ class ClassifierModel(Model):
         scoreIO = StringIO(scores.decode('utf-8'))
 
         try:
-            if self.algoType == 'HyperCube':
-                df = read_csv(scoreIO, sep=';', skiprows=1, usecols=[1])
-            else:
-                df = read_csv(scoreIO, sep=';', usecols=[1])
+            df = read_csv(scoreIO, sep=';', usecols=[1])
         except Exception as E:
             raise ApiException('Unable to read the model scores for {}'.format(self.name), str(E))
 
@@ -1013,6 +1029,24 @@ class ClassifierModel(Model):
         fig = dict(data=data, layout=layout)
         py.iplot(fig, validate=False)
 
+    @Helper.try_catch
+    def export_model(self, path):
+        """
+        Export this model in a local file
+
+        Args:
+            path (str): the destination path for the exported model (zipped Pickle)
+        """
+        json = {'project_ID': self.project_id, 'dataset_ID': self.dataset_id, 'model_ID': self.id}
+        res = self.__api.Prediction.exportscikit(**json)
+
+        if isinstance(res, bytes):
+            with open(path, 'wb') as FILE_OUT:
+                FILE_OUT.write(res)
+        else:
+            with open(path, 'w') as FILE_OUT:
+                dump(res, FILE_OUT)
+
 
 class HyperCube(ClassifierModel):
     """
@@ -1020,6 +1054,7 @@ class HyperCube(ClassifierModel):
     def __init__(self, api, json_return):
         self.__api = api
         self.__json_returned = json_return
+        self.__export_formats = ExportFormats()
         super().__init__(api, json_return)
 
     @Helper.try_catch
@@ -1063,7 +1098,7 @@ class RegressorModel(Model):
         super().__init__(api, json_return)
 
     @Helper.try_catch
-    def apply(self, dataset, applied_model_name, add_pred_to_dataset=False, pred_column_name=None):
+    def apply(self, dataset, applied_model_name):
         """
         Apply the model on a selected data set
 
@@ -1074,7 +1109,6 @@ class RegressorModel(Model):
         Returns:
             the applied Model
         """
-
         params = dict(self.__json_returned)
         params['modelName'] = applied_model_name
 
@@ -1097,6 +1131,23 @@ class RegressorModel(Model):
             raise ApiException('Unable to create the applied model ' + applied_model_name, str(E))
 
         return RegressorModel(self.__api, json_returned)
+
+    @Helper.try_catch
+    def preprocess_data(self, dataset):
+        """
+        Return a preprocessed dataframe for Scikit-learn models
+
+        Args:
+            dataset (Dataset): Dataset the model is applied on
+
+        Returns:
+            preprocessed dataframe
+        """
+        applied_model = self.apply(dataset, self.name + '_applied')
+        json = {'project_ID': self.project_id, 'model_ID': applied_model.id}
+        url = self.__api.Prediction.exportpreprocesseddata(**json)
+        df = read_csv(StringIO(url.decode('utf-8')))
+        return df
 
     @Helper.try_catch
     def export_prediction(self, path, variables=None):
@@ -1172,6 +1223,24 @@ class RegressorModel(Model):
             applied_model.delete()
 
         return reshape(df.values, (df.values.shape[0]))
+
+    @Helper.try_catch
+    def export_model(self, path):
+        """
+        Export this model in a local file
+
+        Args:
+            path (str): the destination path for the exported model (zipped Pickle)
+        """
+        json = {'project_ID': self.project_id, 'dataset_ID': self.dataset_id, 'model_ID': self.id}
+        res = self.__api.Prediction.exportscikit(**json)
+
+        if isinstance(res, bytes):
+            with open(path, 'wb') as FILE_OUT:
+                FILE_OUT.write(res)
+        else:
+            with open(path, 'w') as FILE_OUT:
+                dump(res, FILE_OUT)
 
 
 class ConfusionMatrix:
