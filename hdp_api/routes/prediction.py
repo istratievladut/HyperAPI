@@ -175,21 +175,3 @@ class Prediction(Resource):
             'project_ID': Route.VALIDATOR_OBJECTID,
             'model_ID': Route.VALIDATOR_OBJECTID,
         }
-
-    class _exportMetadata(Route):
-        name = "readMetadata"
-        httpMethod = Route.GET
-        path = "/projects/{project_ID}/models/{model_ID}/readMetadata"
-        _path_keys = {
-            'project_ID': Route.VALIDATOR_OBJECTID,
-            'model_ID': Route.VALIDATOR_OBJECTID,
-        }
-
-    class _exportDiscreteDict(Route):
-        name = "readDiscreteDict"
-        httpMethod = Route.GET
-        path = "/projects/{project_ID}/models/{model_ID}/readDiscreteDict"
-        _path_keys = {
-            'project_ID': Route.VALIDATOR_OBJECTID,
-            'model_ID': Route.VALIDATOR_OBJECTID,
-        }

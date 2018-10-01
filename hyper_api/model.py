@@ -827,6 +827,7 @@ class ClassifierModel(Model):
         json = {'project_ID': self.project_id, 'model_ID': applied_model.id}
         url = self.__api.Prediction.exportpreprocesseddata(**json)
         df = read_csv(StringIO(url.decode('utf-8')))
+        applied_model.delete()
         return df
 
     @Helper.try_catch
@@ -1039,7 +1040,10 @@ class ClassifierModel(Model):
         """
         json = {'project_ID': self.project_id, 'dataset_ID': self.dataset_id, 'model_ID': self.id}
         res = self.__api.Prediction.exportscikit(**json)
-
+        if not path.split('.'):
+            path = path + '.zip'
+        elif path.split('.')[-1] != 'zip':
+            path = path.split('.')[:-1] + '.zip'
         if isinstance(res, bytes):
             with open(path, 'wb') as FILE_OUT:
                 FILE_OUT.write(res)
@@ -1147,6 +1151,7 @@ class RegressorModel(Model):
         json = {'project_ID': self.project_id, 'model_ID': applied_model.id}
         url = self.__api.Prediction.exportpreprocesseddata(**json)
         df = read_csv(StringIO(url.decode('utf-8')))
+        applied_model.delete()
         return df
 
     @Helper.try_catch
@@ -1234,6 +1239,10 @@ class RegressorModel(Model):
         """
         json = {'project_ID': self.project_id, 'dataset_ID': self.dataset_id, 'model_ID': self.id}
         res = self.__api.Prediction.exportscikit(**json)
+        if not path.split('.'):
+            path = path + '.zip'
+        elif path.split('.')[-1] != 'zip':
+            path = path.split('.')[:-1] + '.zip'
 
         if isinstance(res, bytes):
             with open(path, 'wb') as FILE_OUT:
