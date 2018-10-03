@@ -18,5 +18,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=requirements,
-    include_package_data=True
+    include_package_data=True,
+    licence="MIT",
 )
