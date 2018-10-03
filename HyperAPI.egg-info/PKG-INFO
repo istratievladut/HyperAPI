@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: HyperAPI
+Version: 1
+Summary: HyperCube API for Nitro
+Home-page: https://github.com/HyperCube/HyperAPI
+Author: HyperCube
+Author-email: support@hypercube-research.com
+License: UNKNOWN
+Description: HyperCube API for Nitro
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
