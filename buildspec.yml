@@ -28,3 +28,8 @@ phases:
       - echo "Generating HyperAPI documentation sources"
       - cd $CODEBUILD_SRC_DIR/docs; chmod +x generate_doc.sh; ./generate_doc.sh $CODEBUILD_SRC_DIR/hyper_api $DOCUUID
       - python $CODEBUILD_SRC_DIR/scripts/deploy.py -p $CODEBUILD_SRC_DIR/docs/$DOCUUID
+      - echo "Building HyperAPI Docker image"
+      - cd $CODEBUILD_SRC_DIR/dist
+      - docker build -t hypercube/hyperapi . --build-arg hyperapi_version=$GIT_SOURCE_VERSION
+      - docker tag hypercube/hyperapi:latest 021798317095.dkr.ecr.eu-central-1.amazonaws.com/hypercube/hyperapi:$GIT_SOURCE_VERSION
+      - docker push 021798317095.dkr.ecr.eu-central-1.amazonaws.com/hypercube/hyperapi:$GIT_SOURCE_VERSION

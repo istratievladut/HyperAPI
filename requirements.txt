@@ -1,4 +1,5 @@
 Sphinx==1.7.6
+numpy==1.14.5
 guzzle_sphinx_theme==0.7.11
 sphinxcontrib-napoleon==0.6.1
 sphinx_bootstrap_theme==0.6.5
@@ -8,8 +9,5 @@ pandas==0.23.2
 xmlrunner
 requests
 IPython
-sklearn
-scipy
-boto3
+boto3==1.7.4
 coverage
-xgboost
