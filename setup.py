@@ -5,7 +5,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name="HyperAPI-Nitro",
-    version="1",
+    version="0",
     author="HyperCube",
     author_email="support@hypercube-research.com",
     description="HyperCube API for Nitro",
@@ -19,5 +19,5 @@ setuptools.setup(
     ],
     install_requires=requirements,
     include_package_data=True,
-    licence="MIT",
+    license="BSD-3-Clause",
 )
