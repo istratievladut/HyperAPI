@@ -22,9 +22,9 @@ phases:
       - python setup.py sdist bdist_wheel
       - aws s3 cp dist/HyperAPI_Nitro-0-py3-none-any.whl s3://pypi.hcube.cool/HyperAPI-Nitro/HyperAPI_Nitro-0-py3-none-any.whl
       - echo "Installing HyperAPI's environment"
-      - pip install -r $CODEBUILD_SRC_DIR/requirements.txt
+      - pip install dist/HyperAPI_Nitro-0-py3-none-any.whl
       - echo "Generating HyperAPI documentation sources"
-      - cd $CODEBUILD_SRC_DIR/docs; chmod +x generate_doc.sh; ./generate_doc.sh $CODEBUILD_SRC_DIR/hyper_api $DOCUUID
+      - cd $CODEBUILD_SRC_DIR/docs; chmod +x generate_doc.sh; ./generate_doc.sh $CODEBUILD_SRC_DIR/HyperAPI/hyper_api $DOCUUID
       - python $CODEBUILD_SRC_DIR/scripts/deploy.py -p $CODEBUILD_SRC_DIR/docs/$DOCUUID
       - echo "Building HyperAPI Docker image"
       - cd $CODEBUILD_SRC_DIR/dist
