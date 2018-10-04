@@ -18,18 +18,16 @@ phases:
   build:
     commands:
       - export GIT_SOURCE_VERSION=$(git rev-parse HEAD)
-      - echo "Building HyperAPI source tarball"
-      - rm -rf $CODEBUILD_SRC_DIR/.git $CODEBUILD_SRC_DIR/.gitignore
-      - cd ..
-      - tar -czvf HyperAPI-$GIT_SOURCE_VERSION.tar.gz -C $CODEBUILD_SRC_DIR .
-      - aws s3 cp HyperAPI-$GIT_SOURCE_VERSION.tar.gz s3://hc-jenkins-ci/HyperAPI/HyperAPI-$GIT_SOURCE_VERSION.tar.gz
+      - echo "Building HyperAPI Wheel"
+      - python setup.py sdist bdist_wheel
+      - aws s3 cp dist/HyperAPI_Nitro-0-py3-none-any.whl s3://pypi.hcube.cool/HyperAPI-Nitro/HyperAPI_Nitro-0-py3-none-any.whl
       - echo "Installing HyperAPI's environment"
-      - pip install -r $CODEBUILD_SRC_DIR/requirements.txt
+      - pip install dist/HyperAPI_Nitro-0-py3-none-any.whl
       - echo "Generating HyperAPI documentation sources"
-      - cd $CODEBUILD_SRC_DIR/docs; chmod +x generate_doc.sh; ./generate_doc.sh $CODEBUILD_SRC_DIR/hyper_api $DOCUUID
+      - cd $CODEBUILD_SRC_DIR/docs; chmod +x generate_doc.sh; ./generate_doc.sh $CODEBUILD_SRC_DIR/HyperAPI/hyper_api $DOCUUID
       - python $CODEBUILD_SRC_DIR/scripts/deploy.py -p $CODEBUILD_SRC_DIR/docs/$DOCUUID
       - echo "Building HyperAPI Docker image"
       - cd $CODEBUILD_SRC_DIR/dist
-      - docker build -t hypercube/hyperapi . --build-arg hyperapi_version=$GIT_SOURCE_VERSION
+      - docker build -t hypercube/hyperapi . --build-arg hyperapiversion=0
       - docker tag hypercube/hyperapi:latest 021798317095.dkr.ecr.eu-central-1.amazonaws.com/hypercube/hyperapi:$GIT_SOURCE_VERSION
       - docker push 021798317095.dkr.ecr.eu-central-1.amazonaws.com/hypercube/hyperapi:$GIT_SOURCE_VERSION

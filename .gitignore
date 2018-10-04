@@ -3,3 +3,7 @@
 __pycache__
 __pycache__/
 docs/build
+build/
+dist/*.tar.gz
+dist/*.whl
+HyperAPI_Nitro.egg-info/
