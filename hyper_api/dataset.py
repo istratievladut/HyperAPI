@@ -20,7 +20,8 @@ class DatasetFactory:
     @Helper.try_catch
     def create(self, name, file_path, decimal='.',
                delimiter=';', encoding='UTF-8', selectedSheet=1,
-               description='', modalities=2, continuous_threshold=0.95, missing_threshold=0.95):
+               description='', modalities=2, continuous_threshold=0.95, missing_threshold=0.95,
+               metadata_file_path=None, discreteDict_file_path=None):
         """
         Create a Dataset from a file (csv, Excel)
 
@@ -42,6 +43,14 @@ class DatasetFactory:
 
         project_id = self.__project_id
         dataset_path, file_name = split(file_path)
+        if metadata_file_path:
+            metadata_path, metadata_file_name = split(metadata_file_path)
+        else:
+            metadata_file_name = None
+        if discreteDict_file_path:
+            discreteDict_path, discreteDict_file_name = split(discreteDict_file_path)
+        else:
+            discreteDict_file_name = None
         selectedSheet = max(1, selectedSheet)
 
         data = {
@@ -62,30 +71,73 @@ class DatasetFactory:
             'percentageMissingThreshold': str(missing_threshold)
         }
 
-        with open(file_path, 'rb') as FILE:
-            data['file[0]'] = (
-                file_name,
-                FILE,
-                'application/vnd.ms-excel',
-            )
-            json = {'project_ID': project_id, 'data': data, 'streaming': True}
+        def apihandle():
+                json = {'project_ID': project_id, 'data': data, 'streaming': True}
 
-            creation_json = self.__api.Datasets.uploaddatasets(**json)
-            print('\n')
+                creation_json = self.__api.Datasets.uploaddatasets(**json)
+                print('\n')
 
-            try:
-                self.__api.handle_work_states(project_id, work_type='datasetValidation', query={"datasetId": creation_json.get('_id')})
-                self.__api.handle_work_states(project_id, work_type='datasetDescription', query={"datasetId": creation_json.get('_id')})
-            except Exception as E:
-                raise ApiException('Unable to get the dataset status', str(E))
+                try:
+                    self.__api.handle_work_states(project_id, work_type='datasetValidation', query={"datasetId": creation_json.get('_id')})
+                    self.__api.handle_work_states(project_id, work_type='datasetDescription', query={"datasetId": creation_json.get('_id')})
+                except Exception as E:
+                    raise ApiException('Unable to get the dataset status', str(E))
 
-            returned_json = self.__api.Datasets.getadataset(project_ID=project_id, dataset_ID=creation_json.get('_id'))
+                returned_json = self.__api.Datasets.getadataset(project_ID=project_id, dataset_ID=creation_json.get('_id'))
+                return json, returned_json
+
+        if metadata_file_name and discreteDict_file_name:
+            data['metadataFileName'] = metadata_file_name,
+            data['discreteDictFileName'] = discreteDict_file_name,
+            with open(file_path, 'rb') as FILE:
+                with open(metadata_file_path, 'rb') as METADATA:
+                    with open(discreteDict_file_path, 'rb') as DISCRETEDICT:
+                        data['file[0]'] = (
+                            file_name,
+                            FILE,
+                            'application/vnd.ms-excel',
+                        )
+                        data['file[1]'] = (
+                            metadata_file_name,
+                            METADATA,
+                            'application/json',
+                        )
+                        data['file[2]'] = (
+                            discreteDict_file_name,
+                            DISCRETEDICT,
+                            'application/json',
+                        )
+                        json, returned_json = apihandle()
+        elif metadata_file_name:
+            data['metadataFileName'] = metadata_file_name,
+            with open(file_path, 'rb') as FILE:
+                with open(metadata_file_path, 'rb') as METADATA:
+                    data['file[0]'] = (
+                        file_name,
+                        FILE,
+                        'application/vnd.ms-excel',
+                    )
+                    data['file[1]'] = (
+                        metadata_file_name,
+                        METADATA,
+                        'application/json',
+                    )
+                    json, returned_json = apihandle()
+        else:
+            with open(file_path, 'rb') as FILE:
+                data['file[0]'] = (
+                    file_name,
+                    FILE,
+                    'application/vnd.ms-excel',
+                )
+                json, returned_json = apihandle()
 
         return Dataset(self.__api, json, returned_json)
 
     @Helper.try_catch
     def create_from_dataframe(self, name, dataframe, description='', modalities=2,
-                              continuous_threshold=0.95, missing_threshold=0.95):
+                              continuous_threshold=0.95, missing_threshold=0.95,
+                              metadata=None, discreteDict=None):
         """
         Create a Dataset from a Pandas DataFrame
 
@@ -96,17 +148,25 @@ class DatasetFactory:
             modalities (int): Modality threshold for discrete variables, default is 2
             continuous_threshold (float): % of continuous values threshold for continuous variables ,default is 0.95
             missing_threshold (float): % of missing values threshold for ignored variables, default is 0.95
-
         Returns:
             Dataset
         """
         project_id = self.__project_id
         file_name = '{}.csv'.format(uuid.uuid4())
+        metadata_file_name = '{}.json'.format(uuid.uuid4())
+        discreteDict_file_name = '{}.json'.format(uuid.uuid4())
         DECIMAL = "."
         SEPARATOR = ";"
         ENCODING = "utf-8"
 
         stream_df = io.StringIO(dataframe.to_csv(sep=SEPARATOR, index=False))
+        if metadata:
+            import json
+            stream_metadata = io.StringIO()
+            json.dump(metadata, stream_metadata)
+            if discreteDict:
+                stream_discreteDict = io.StringIO()
+                json.dump(discreteDict, stream_discreteDict)
 
         data = {
             'name': name,
@@ -130,10 +190,23 @@ class DatasetFactory:
             stream_df,
             'application/vnd.ms-excel',
         )
-        json = {'project_ID': project_id, 'data': data, 'streaming': True}
+        if metadata:
+            data['metadataFileName'] = metadata_file_name
+            data['file[1]'] = (
+                metadata_file_name,
+                stream_metadata,
+                'application/json',
+            )
+            if discreteDict:
+                data['discreteDictFileName'] = discreteDict_file_name
+                data['file[2]'] = (
+                    discreteDict_file_name,
+                    stream_discreteDict,
+                    'application/json',
+                )
+        json_ = {'project_ID': project_id, 'data': data, 'streaming': True}
 
-        creation_json = self.__api.Datasets.uploaddatasets(**json)
-
+        creation_json = self.__api.Datasets.uploaddatasets(**json_)
         try:
             self.__api.handle_work_states(project_id, work_type='datasetValidation', query={"datasetId": creation_json.get('_id')})
             self.__api.handle_work_states(project_id, work_type='datasetDescription', query={"datasetId": creation_json.get('_id')})
@@ -142,7 +215,7 @@ class DatasetFactory:
 
         returned_json = self.__api.Datasets.getadataset(project_ID=project_id, dataset_ID=creation_json.get('_id'))
 
-        return Dataset(self.__api, json, returned_json)
+        return Dataset(self.__api, json_, returned_json)
 
     @Helper.try_catch
     def create_from_sql(self, name, connection_string, query, description='', modalities=2,
@@ -190,6 +263,13 @@ class DatasetFactory:
         returned_json = self.__api.Datasets.getadataset(project_ID=project_id, dataset_ID=creation_json.get('_id'))
 
         return Dataset(self.__api, json, returned_json)
+
+    @Helper.try_catch
+    def create_from_dataframe_and_previous_model(self, name, dataframe, model_id):
+        metadata = self.__api.Prediction.readmetadata(project_ID=self.__project_id, model_ID=model_id)
+        discreteDict = self.__api.Prediction.readdiscretedict(project_ID=self.__project_id, model_ID=model_id)
+        dataset = self.create_from_dataframe(name, dataframe, metadata=metadata, discreteDict=discreteDict)
+        return dataset
 
     @Helper.try_catch
     def filter(self):

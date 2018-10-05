@@ -52,11 +52,11 @@ class Prediction(Resource):
     class _Exportscikit(Route):
         name = "Export scikit"
         httpMethod = Route.GET
-        path = "/projects/{project_ID}/datasets/{dataset_ID}/models/{prediction_ID}/export"
+        path = "/projects/{project_ID}/datasets/{dataset_ID}/models/{model_ID}/export"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID,
-            'prediction_ID': Route.VALIDATOR_OBJECTID,
+            'model_ID': Route.VALIDATOR_OBJECTID,
         }
 
     class _newModelName(Route):
@@ -122,10 +122,28 @@ class Prediction(Resource):
             'model_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    class _export(Route):
+        name = "export"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/models/{model_ID}/export"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'model_ID': Route.VALIDATOR_OBJECTID,
+        }
+
     class _exportRules(Route):
         name = "exportRules"
         httpMethod = Route.GET
         path = "/projects/{project_ID}/models/{model_ID}/exportRules"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'model_ID': Route.VALIDATOR_OBJECTID,
+        }
+
+    class _exportPreprocessedData(Route):
+        name = "exportPreprocessedData"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/models/{model_ID}/exportPreprocessedData"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
             'model_ID': Route.VALIDATOR_OBJECTID,
@@ -138,4 +156,22 @@ class Prediction(Resource):
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID,
+        }
+
+    class _readMetadata(Route):
+        name = "readMetadata"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/models/{model_ID}/readMetadata"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'model_ID': Route.VALIDATOR_OBJECTID,
+        }
+
+    class _readDiscreteDict(Route):
+        name = "readDiscreteDict"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/models/{model_ID}/readDiscreteDict"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'model_ID': Route.VALIDATOR_OBJECTID,
         }
