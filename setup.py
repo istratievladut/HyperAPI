@@ -5,7 +5,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name="HyperAPI-Nitro",
-    version="0",
+    version="1",
     author="HyperCube",
     author_email="support@hypercube-research.com",
     description="HyperCube API for Nitro",
