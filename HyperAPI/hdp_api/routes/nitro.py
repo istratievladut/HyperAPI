@@ -111,3 +111,13 @@ class Nitro(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
             'forecast_ID': Route.VALIDATOR_OBJECTID
         }
+
+    class _exportReport(Route):
+        name = "exportReport"
+        httpMethod = Route.GET
+        path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/exportreport"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID,
+            'forecast_ID': Route.VALIDATOR_OBJECTID
+        }
