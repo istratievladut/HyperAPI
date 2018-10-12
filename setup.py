@@ -1,3 +1,4 @@
+from HyperAPI import __version__
 import setuptools
 
 with open('requirements.txt') as f:
@@ -5,7 +6,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name="HyperAPI-Nitro",
-    version="1",
+    version=__version__,
     author="HyperCube",
     author_email="support@hypercube-research.com",
     description="HyperCube API for Nitro",

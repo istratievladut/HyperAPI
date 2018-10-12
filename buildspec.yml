@@ -20,14 +20,14 @@ phases:
       - export GIT_SOURCE_VERSION=$(git rev-parse HEAD)
       - echo "Building HyperAPI Wheel"
       - python setup.py sdist bdist_wheel
-      - aws s3 cp dist/HyperAPI_Nitro-1-py3-none-any.whl s3://pypi.hcube.cool/HyperAPI-Nitro/HyperAPI_Nitro-1-py3-none-any.whl
+      - aws s3 cp dist/HyperAPI_Nitro-2-py3-none-any.whl s3://pypi.hcube.cool/HyperAPI-Nitro/HyperAPI_Nitro-2-py3-none-any.whl
       - echo "Installing HyperAPI's environment"
-      - pip install dist/HyperAPI_Nitro-1-py3-none-any.whl
+      - pip install dist/HyperAPI_Nitro-2-py3-none-any.whl
       - echo "Generating HyperAPI documentation sources"
       - cd $CODEBUILD_SRC_DIR/docs; chmod +x generate_doc.sh; ./generate_doc.sh $CODEBUILD_SRC_DIR/HyperAPI/hyper_api $DOCUUID
       - python $CODEBUILD_SRC_DIR/scripts/deploy.py -p $CODEBUILD_SRC_DIR/docs/$DOCUUID
       - echo "Building HyperAPI Docker image"
       - cd $CODEBUILD_SRC_DIR/dist
-      - docker build -t hypercube/hyperapi . --build-arg hyperapiversion=1
+      - docker build -t hypercube/hyperapi . --build-arg hyperapiversion=2
       - docker tag hypercube/hyperapi:latest 021798317095.dkr.ecr.eu-central-1.amazonaws.com/hypercube/hyperapi:$GIT_SOURCE_VERSION
       - docker push 021798317095.dkr.ecr.eu-central-1.amazonaws.com/hypercube/hyperapi:$GIT_SOURCE_VERSION
