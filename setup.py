@@ -1,8 +1,8 @@
 import json
 import setuptools
 import os
-from distutils.core import setup
 from distutils.command.build_py import build_py
+
 
 class hyperAPI_builder(build_py):
     # Custom class to build the HyperCube API
@@ -19,6 +19,7 @@ class hyperAPI_builder(build_py):
 
         build_py.run(self)
         print(self.build_lib)
+
 
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
