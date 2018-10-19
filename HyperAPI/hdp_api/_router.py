@@ -106,9 +106,9 @@ class Router(object):
         try:
             # We must fetch the System version BEFORE creating route, so this call is hard coded
             _system_details = self.session.request('GET', System._About.path)
-            _version = _system_details.get('version')
+            _version = _system_details.get('hdpVersion', 0)
         except Exception:
-            _version = Version('unknown')
+            _version = 0
         self.session.version = Version(_version)
 
         # Creating Resources
