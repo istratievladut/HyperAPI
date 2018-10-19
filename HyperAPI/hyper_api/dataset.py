@@ -381,7 +381,7 @@ class Dataset(Base):
             self.description,
             self.size,
             self.created.strftime('%Y-%m-%d %H:%M:%S UTC'),
-            self.modified.strftime('%Y-%m-%d %H:%M:%S UTC'),
+            self.modified.strftime('%Y-%m-%d %H:%M:%S UTC') if self.modified is not None else "N/A",
             self.source_file_name)
 
     # Factory part
@@ -627,6 +627,13 @@ class Dataset(Base):
             try:
                 import pandas
             except ImportError as E:
-                raise ApiException('Pandas is required for this operation, please execute "!pip install pandas" and restart the kernel', str(E))
+                raise ApiException('Pandas is required for this operation, please execute "!pip install pandas" and restart the kernel',
+                                   str(E))
             _data = io.StringIO(self._export().decode('utf-8'))
-            return pandas.read_csv(_data, sep=";")
+
+            # Create a dictionnary giving the string dtype for all discrete variables
+            _forced_types = dict((_v.name, str) for _v in self.variables if _v.is_discrete)
+
+            # Reading the stream with forced datatypes
+            # _forced_types can be replaced with {'name_of_the_variable': str} to force specific variables
+            return pandas.read_csv(_data, sep=";", encoding="utf-8", dtype=_forced_types)

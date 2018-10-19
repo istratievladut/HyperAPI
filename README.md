@@ -6,7 +6,7 @@ visit https://www.hcube.io
 
 # Documentation
 
-[Direct link](http://hyperapi-doc.s3-website.eu-west-3.amazonaws.com/9b44d175-2300-4a7c-aa09-b3803a601122/index.html)
+[Direct link](http://hyperapi-doc.s3-website.eu-west-3.amazonaws.com/29dc2abb-fc26-403e-bad0-0088c7640168/index.html)
 
 # Quick installation
 
