@@ -1,4 +1,21 @@
 from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.routes.base.version_management import reroute, available_since
+
+
+class _ExportscikitWithModel(Route):
+    name = "Export scikit"
+    httpMethod = Route.GET
+    path = "/projects/{project_ID}/datasets/{dataset_ID}/models/{model_ID}/export"
+    _path_keys = {
+        'project_ID': Route.VALIDATOR_OBJECTID,
+        'dataset_ID': Route.VALIDATOR_OBJECTID,
+        'model_ID': Route.VALIDATOR_OBJECTID,
+    }
+
+    @staticmethod
+    def convert_path(**kwargs):
+        kwargs['model_ID'] = kwargs.pop('prediction_ID')
+        return kwargs
 
 
 class Prediction(Resource):
@@ -49,14 +66,15 @@ class Prediction(Resource):
             'prediction_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    @reroute('3.0', _ExportscikitWithModel, _ExportscikitWithModel.convert_path)
     class _Exportscikit(Route):
         name = "Export scikit"
         httpMethod = Route.GET
-        path = "/projects/{project_ID}/datasets/{dataset_ID}/models/{model_ID}/export"
+        path = "/projects/{project_ID}/datasets/{dataset_ID}/models/{prediction_ID}/export"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID,
-            'model_ID': Route.VALIDATOR_OBJECTID,
+            'prediction_ID': Route.VALIDATOR_OBJECTID,
         }
 
     class _newModelName(Route):
@@ -122,6 +140,7 @@ class Prediction(Resource):
             'model_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    @available_since("4.0")
     class _export(Route):
         name = "export"
         httpMethod = Route.GET
@@ -140,6 +159,7 @@ class Prediction(Resource):
             'model_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    @available_since("4.0")
     class _exportPreprocessedData(Route):
         name = "exportPreprocessedData"
         httpMethod = Route.GET
@@ -158,6 +178,7 @@ class Prediction(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    @available_since("4.0")
     class _readMetadata(Route):
         name = "readMetadata"
         httpMethod = Route.GET
@@ -167,6 +188,7 @@ class Prediction(Resource):
             'model_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    @available_since("4.0")
     class _readDiscreteDict(Route):
         name = "readDiscreteDict"
         httpMethod = Route.GET

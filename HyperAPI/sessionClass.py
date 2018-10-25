@@ -94,7 +94,7 @@ class Session:
     def refresh(self, username=None, password=None, token=None):
         self.__login(username, password, token)
 
-    def request(self, method, url, params=None, json=None, data=None, streaming=False):
+    def request(self, method, url, params=None, json=None, data=None, affinity=None, streaming=False):
         """Make a request to rest API and return response as json."""
         params = params or {}
         json = json or {}
@@ -107,17 +107,20 @@ class Session:
         if method not in ['GET', 'POST']:
             raise ValueError("method should be in ['GET', 'POST']")
 
+        headers = self.session.headers.copy()
+        if affinity is not None:
+            headers['HC-WorkerAffinity'] = affinity
+
         if method == 'POST' and streaming:
             # Create new data with encoder
             encoder = MultipartEncoder(fields=data)
 
             multi_data = MultipartEncoderMonitor(encoder, None)
 
-            headers = self.session.headers.copy()
             headers['Content-Type'] = multi_data.content_type
             resp = self.session.request(method, url, params=params, json=json, data=multi_data, headers=headers)
         else:
-            resp = self.session.request(method, url, params=params, json=json, data=data)
+            resp = self.session.request(method, url, params=params, json=json, data=data, headers=headers)
 
         if not resp.ok:
             raise requests.exceptions.HTTPError(
@@ -131,7 +134,7 @@ class Session:
         except Exception:
             return resp.content
 
-    def request_v2(self, method, url, params=None, json=None, data=None, streaming=False):
+    def request_v2(self, method, url, params=None, json=None, data=None, affinity=None, streaming=False):
         """Make a request to rest API and return response."""
         params = params or {}
         json = json or {}
@@ -140,6 +143,10 @@ class Session:
         method = method.upper()
         if method not in ['GET', 'POST']:
             raise ValueError("method should be in ['GET', 'POST']")
+
+        headers = self.session.headers.copy()
+        if affinity is not None:
+            headers['HC-WorkerAffinity'] = affinity
 
         if method == 'POST' and streaming:
             # Create new data with encoder
@@ -158,7 +165,7 @@ class Session:
             headers['Content-Type'] = multi_data.content_type
             resp = self.session.request(method, url, params=params, json=json, data=multi_data, headers=headers)
         else:
-            resp = self.session.request(method, url, params=params, json=json, data=data)
+            resp = self.session.request(method, url, params=params, json=json, data=data, headers=headers)
 
         try:
             return resp

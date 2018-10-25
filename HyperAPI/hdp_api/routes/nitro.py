@@ -1,4 +1,5 @@
 from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.routes.base.version_management import available_since
 
 
 class Nitro(Resource):
@@ -36,6 +37,17 @@ class Nitro(Resource):
         name = "updateForecast"
         httpMethod = Route.POST
         path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID,
+            'forecast_ID': Route.VALIDATOR_OBJECTID
+        }
+
+    @available_since('2.0')
+    class _updateForecastCoef(Route):
+        name = "updateForecastCoef"
+        httpMethod = Route.POST
+        path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/updatecoef"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID,
@@ -96,6 +108,17 @@ class Nitro(Resource):
         name = "exportForecastTunes"
         httpMethod = Route.GET
         path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/export"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID,
+            'forecast_ID': Route.VALIDATOR_OBJECTID
+        }
+
+    @available_since('2.0')
+    class _exportReport(Route):
+        name = "exportReport"
+        httpMethod = Route.GET
+        path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/exportreport"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID,

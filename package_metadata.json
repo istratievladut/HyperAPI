@@ -1,0 +1,9 @@
+{
+    "name": "HyperAPI",
+    "version": "3",
+    "author": "HyperCube",
+    "author_email": "support@hypercube-research.com",
+    "description": "HyperCube API",
+    "url": "https://github.com/HyperCube/HyperAPI",
+    "license": "BSD-3-Clause"
+}
