@@ -15,7 +15,7 @@ class Resource(object):
         self.session = session
         self._routes = {}
         for _route in (_m[1] for _m in inspect.getmembers(self.__class__) if inspect.isclass(_m[1]) and issubclass(_m[1], Route)):
-            if _route.available_since is None or _route.available_since >= self.session.version:
+            if _route.available_since is None or _route.available_since <= self.session.version:
                 _routeInstance = _route(session, watcher=watcher)
                 _routeName = _route.get_route_name()
                 self.__setattr__(_routeName, _routeInstance)
