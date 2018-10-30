@@ -2,8 +2,6 @@ from HyperAPI.util import Helper
 from HyperAPI.hyper_api.base import Base
 from HyperAPI.utils.exceptions import ApiException
 from datetime import datetime
-from pandas import read_csv
-from numpy import reshape
 from io import StringIO
 from json import dump
 
@@ -821,12 +819,17 @@ class ClassifierModel(Model):
         Returns:
             preprocessed dataframe
         """
+        try:
+            import pandas as pd
+        except ImportError as E:
+            raise ApiException('Pandas is required for this operation, please execute "!pip install pandas" and restart the kernel', str(E))  # noqa: E501
+
         if self.algoType == AlgoTypes.HYPERCUBE:
             raise ApiException('Preprocessing is not available for Hypercube models')
         applied_model = self.apply(dataset, self.name + '_applied')
         json = {'project_ID': self.project_id, 'model_ID': applied_model.id}
         url = self.__api.Prediction.exportpreprocesseddata(**json)
-        df = read_csv(StringIO(url.decode('utf-8')))
+        df = pd.read_csv(StringIO(url.decode('utf-8')))
         applied_model.delete()
         return df
 
@@ -874,6 +877,11 @@ class ClassifierModel(Model):
         Returns:
             a NumPy array of shape [n_samples,] where n_samples is the number of samples in the input dataset
         """
+        try:
+            import pandas as pd
+        except ImportError as E:
+            raise ApiException('Pandas is required for this operation, please execute "!pip install pandas" and restart the kernel', str(E))  # noqa: E501
+
         applied_model = self.apply(dataset, '{}_applied_{}'.format(self.name, datetime.now().strftime("%Y-%m-%d_%H-%M-%S")))
         data = {
             'datasetId': dataset.dataset_id,
@@ -896,14 +904,14 @@ class ClassifierModel(Model):
         scoreIO = StringIO(scores.decode('utf-8'))
 
         try:
-            df = read_csv(scoreIO, sep=';', usecols=[1])
+            df = pd.read_csv(scoreIO, sep=';', usecols=[1])
         except Exception as E:
             raise ApiException('Unable to read the model scores for {}'.format(self.name), str(E))
 
         if not keep_applied_model:
             applied_model.delete()
 
-        return reshape(df.values, (df.values.shape[0]))
+        return pd.np.reshape(df.values, (df.values.shape[0]))
 
     def __load_confusion_matrix(self):
         if not self.__json_confusion_matrix:
@@ -1147,10 +1155,15 @@ class RegressorModel(Model):
         Returns:
             preprocessed dataframe
         """
+        try:
+            import pandas as pd
+        except ImportError as E:
+            raise ApiException('Pandas is required for this operation, please execute "!pip install pandas" and restart the kernel', str(E))  # noqa: E501
+
         applied_model = self.apply(dataset, self.name + '_applied')
         json = {'project_ID': self.project_id, 'model_ID': applied_model.id}
         url = self.__api.Prediction.exportpreprocesseddata(**json)
-        df = read_csv(StringIO(url.decode('utf-8')))
+        df = pd.read_csv(StringIO(url.decode('utf-8')))
         applied_model.delete()
         return df
 
@@ -1198,6 +1211,11 @@ class RegressorModel(Model):
         Returns:
             a NumPy array of shape [n_samples,] where n_samples is the number of samples in the input dataset
         """
+        try:
+            import pandas as pd
+        except ImportError as E:
+            raise ApiException('Pandas is required for this operation, please execute "!pip install pandas" and restart the kernel', str(E))  # noqa: E501
+
         applied_model = self.apply(dataset, '{}_applied_{}'.format(self.name, datetime.now().strftime("%Y-%m-%d_%H-%M-%S")))
         data = {
             'datasetId': dataset.dataset_id,
@@ -1220,14 +1238,14 @@ class RegressorModel(Model):
         scoreIO = StringIO(scores.decode('utf-8'))
 
         try:
-            df = read_csv(scoreIO, sep=';', usecols=[1])
+            df = pd.read_csv(scoreIO, sep=';', usecols=[1])
         except Exception as E:
             raise ApiException('Unable to read the model scores for {}'.format(self.name), str(E))
 
         if not keep_applied_model:
             applied_model.delete()
 
-        return reshape(df.values, (df.values.shape[0]))
+        return pd.np.reshape(df.values, (df.values.shape[0]))
 
     @Helper.try_catch
     def export_model(self, path):

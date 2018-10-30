@@ -625,10 +625,10 @@ class Dataset(Base):
         """
         if not self._is_deleted:
             try:
-                import pandas
+                import pandas as pd
             except ImportError as E:
-                raise ApiException('Pandas is required for this operation, please execute "!pip install pandas" and restart the kernel',
-                                   str(E))
+                raise ApiException('Pandas is required for this operation, please execute "!pip install pandas" and restart the kernel', str(E))  # noqa: E501
+
             _data = io.StringIO(self._export().decode('utf-8'))
 
             # Create a dictionnary giving the string dtype for all discrete variables
@@ -636,4 +636,4 @@ class Dataset(Base):
 
             # Reading the stream with forced datatypes
             # _forced_types can be replaced with {'name_of_the_variable': str} to force specific variables
-            return pandas.read_csv(_data, sep=";", encoding="utf-8", dtype=_forced_types)
+            return pd.read_csv(_data, sep=";", encoding="utf-8", dtype=_forced_types)

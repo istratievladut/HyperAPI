@@ -6,6 +6,4 @@ pyjwt
 requests
 requests_toolbelt==0.8.0
 boto3==1.7.4
-numpy
-pandas
 IPython
