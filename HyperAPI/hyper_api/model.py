@@ -1,6 +1,7 @@
 from HyperAPI.util import Helper
 from HyperAPI.hyper_api.base import Base
 from HyperAPI.utils.exceptions import ApiException
+from HyperAPI.utils.imports import get_required_module
 from datetime import datetime
 from io import StringIO
 from json import dump
@@ -819,10 +820,7 @@ class ClassifierModel(Model):
         Returns:
             preprocessed dataframe
         """
-        try:
-            import pandas as pd
-        except ImportError as E:
-            raise ApiException('Pandas is required for this operation, please execute "!pip install pandas" and restart the kernel', str(E))  # noqa: E501
+        pd = get_required_module('pandas')
 
         if self.algoType == AlgoTypes.HYPERCUBE:
             raise ApiException('Preprocessing is not available for Hypercube models')
@@ -877,10 +875,7 @@ class ClassifierModel(Model):
         Returns:
             a NumPy array of shape [n_samples,] where n_samples is the number of samples in the input dataset
         """
-        try:
-            import pandas as pd
-        except ImportError as E:
-            raise ApiException('Pandas is required for this operation, please execute "!pip install pandas" and restart the kernel', str(E))  # noqa: E501
+        pd = get_required_module('pandas')
 
         applied_model = self.apply(dataset, '{}_applied_{}'.format(self.name, datetime.now().strftime("%Y-%m-%d_%H-%M-%S")))
         data = {
@@ -1155,10 +1150,7 @@ class RegressorModel(Model):
         Returns:
             preprocessed dataframe
         """
-        try:
-            import pandas as pd
-        except ImportError as E:
-            raise ApiException('Pandas is required for this operation, please execute "!pip install pandas" and restart the kernel', str(E))  # noqa: E501
+        pd = get_required_module('pandas')
 
         applied_model = self.apply(dataset, self.name + '_applied')
         json = {'project_ID': self.project_id, 'model_ID': applied_model.id}
@@ -1211,10 +1203,7 @@ class RegressorModel(Model):
         Returns:
             a NumPy array of shape [n_samples,] where n_samples is the number of samples in the input dataset
         """
-        try:
-            import pandas as pd
-        except ImportError as E:
-            raise ApiException('Pandas is required for this operation, please execute "!pip install pandas" and restart the kernel', str(E))  # noqa: E501
+        pd = get_required_module('pandas')
 
         applied_model = self.apply(dataset, '{}_applied_{}'.format(self.name, datetime.now().strftime("%Y-%m-%d_%H-%M-%S")))
         data = {

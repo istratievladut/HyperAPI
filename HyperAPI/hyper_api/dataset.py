@@ -4,6 +4,7 @@ import uuid
 import io
 from HyperAPI.util import Helper
 from HyperAPI.utils.exceptions import ApiException
+from HyperAPI.utils.imports import get_required_module
 from HyperAPI.hyper_api.base import Base
 from HyperAPI.hyper_api.variable import VariableFactory
 from HyperAPI.hyper_api.xray import XrayFactory
@@ -624,11 +625,7 @@ class Dataset(Base):
             DataFrame
         """
         if not self._is_deleted:
-            try:
-                import pandas as pd
-            except ImportError as E:
-                raise ApiException('Pandas is required for this operation, please execute "!pip install pandas" and restart the kernel', str(E))  # noqa: E501
-
+            pd = get_required_module('pandas')
             _data = io.StringIO(self._export().decode('utf-8'))
 
             # Create a dictionnary giving the string dtype for all discrete variables
