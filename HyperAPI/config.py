@@ -86,6 +86,7 @@ def get_env(s):
 def get_dev_env(s):
     env_var = os.environ.get(s.replace('dev-env:', ''))
     try:
+        env_var = env_var.replace('`', '\"')
         env_var = env_var.replace('\'', '\"')
         var_to_return = json.loads(env_var)
     except Exception:
