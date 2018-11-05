@@ -3,12 +3,17 @@ from HyperAPI.hdp_api.routes.base.version_management import reroute
 
 
 class _getSmartDataVizsWithoutDataset(Route):
-        name = "getSmartDataVizs"
-        httpMethod = Route.GET
-        path = "/projects/{project_ID}/smartDataViz/"
-        _path_keys = {
-            'project_ID': Route.VALIDATOR_OBJECTID,
-        }
+    name = "getSmartDataVizs"
+    httpMethod = Route.GET
+    path = "/projects/{project_ID}/smartDataViz/"
+    _path_keys = {
+        'project_ID': Route.VALIDATOR_OBJECTID,
+    }
+
+    @staticmethod
+    def convert_path(**kwargs):
+        kwargs.pop('dataset_ID')
+        return kwargs
 
 
 class SmartDataViz(Resource):
@@ -33,7 +38,7 @@ class SmartDataViz(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @reroute("3.0", _getSmartDataVizsWithoutDataset, lambda x: x)
+    @reroute("3.0", _getSmartDataVizsWithoutDataset, _getSmartDataVizsWithoutDataset.convert_path)
     class _getSmartDataVizs(Route):
         name = "getSmartDataVizs"
         httpMethod = Route.GET
