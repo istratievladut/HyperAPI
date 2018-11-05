@@ -50,7 +50,7 @@ class Route(object):
                 return cls.__direct_call__
             else:
                 cls_route_to, convert_to = cls.get_routing_table()[_routing_version]
-                return lambda self, **kwargs: cls_route_to(session, watcher).__call__(**convert_to(kwargs))
+                return lambda self, **kwargs: cls_route_to(session, watcher).__call__(**convert_to(**kwargs))
 
     @abstractproperty
     def name(self):
