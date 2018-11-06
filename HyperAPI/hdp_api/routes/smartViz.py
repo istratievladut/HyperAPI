@@ -1,19 +1,5 @@
 from HyperAPI.hdp_api.routes import Resource, Route
-from HyperAPI.hdp_api.routes.base.version_management import reroute
-
-
-class _getSmartDataVizsWithoutDataset(Route):
-    name = "getSmartDataVizs"
-    httpMethod = Route.GET
-    path = "/projects/{project_ID}/smartDataViz/"
-    _path_keys = {
-        'project_ID': Route.VALIDATOR_OBJECTID,
-    }
-
-    @staticmethod
-    def convert_path(**kwargs):
-        kwargs.pop('dataset_ID')
-        return kwargs
+from HyperAPI.hdp_api.routes.base.version_management import available_since
 
 
 class SmartDataViz(Resource):
@@ -38,14 +24,13 @@ class SmartDataViz(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @reroute("3.0", _getSmartDataVizsWithoutDataset, _getSmartDataVizsWithoutDataset.convert_path)
+    @available_since('3.0')
     class _getSmartDataVizs(Route):
         name = "getSmartDataVizs"
         httpMethod = Route.GET
-        path = "/projects/{project_ID}/datasets/{dataset_ID}/smartDataViz/"
+        path = "/projects/{project_ID}/smartDataViz/"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
-            'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
     class _deleteSmartDataViz(Route):
