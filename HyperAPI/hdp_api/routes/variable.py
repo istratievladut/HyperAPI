@@ -1,4 +1,5 @@
 from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.routes.base.version_management import available_since
 
 
 class Variable(Resource):
@@ -31,6 +32,7 @@ class Variable(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    @available_since("3.0")
     class _addVariableValidation(Route):
         name = "addVariableValidation"
         httpMethod = Route.POST
@@ -40,6 +42,7 @@ class Variable(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    @available_since("3.0")
     class _deleteVariableValidation(Route):
         name = "removeVariableValidation"
         httpMethod = Route.POST
