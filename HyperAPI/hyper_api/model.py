@@ -1041,12 +1041,10 @@ class ClassifierModel(Model):
         Args:
             path (str): the destination path for the exported model (zipped Pickle)
         """
-        json = {'project_ID': self.project_id, 'dataset_ID': self.dataset_id, 'model_ID': self.id}
+        json = {'project_ID': self.project_id, 'dataset_ID': self.dataset_id, 'prediction_ID': self.id}
         res = self.__api.Prediction.exportscikit(**json)
-        if not path.split('.'):
-            path = path + '.zip'
-        elif path.split('.')[-1] != 'zip':
-            path = path.split('.')[:-1] + '.zip'
+        if not path.split('.')[-1] == 'zip':
+            path += '.zip'
         if isinstance(res, bytes):
             with open(path, 'wb') as FILE_OUT:
                 FILE_OUT.write(res)
@@ -1244,13 +1242,10 @@ class RegressorModel(Model):
         Args:
             path (str): the destination path for the exported model (zipped Pickle)
         """
-        json = {'project_ID': self.project_id, 'dataset_ID': self.dataset_id, 'model_ID': self.id}
+        json = {'project_ID': self.project_id, 'dataset_ID': self.dataset_id, 'prediction_ID': self.id}
         res = self.__api.Prediction.exportscikit(**json)
-        if not path.split('.'):
-            path = path + '.zip'
-        elif path.split('.')[-1] != 'zip':
-            path = path.split('.')[:-1] + '.zip'
-
+        if not path.split('.')[-1] == 'zip':
+            path += '.zip'
         if isinstance(res, bytes):
             with open(path, 'wb') as FILE_OUT:
                 FILE_OUT.write(res)

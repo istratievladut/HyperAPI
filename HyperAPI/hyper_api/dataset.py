@@ -43,13 +43,13 @@ class DatasetFactory:
         """
 
         project_id = self.__project_id
-        dataset_path, file_name = split(file_path)
+        _, file_name = split(file_path)
         if metadata_file_path:
-            metadata_path, metadata_file_name = split(metadata_file_path)
+            _, metadata_file_name = split(metadata_file_path)
         else:
             metadata_file_name = None
         if discreteDict_file_path:
-            discreteDict_path, discreteDict_file_name = split(discreteDict_file_path)
+            _, discreteDict_file_name = split(discreteDict_file_path)
         else:
             discreteDict_file_name = None
         selectedSheet = max(1, selectedSheet)
@@ -149,6 +149,7 @@ class DatasetFactory:
             modalities (int): Modality threshold for discrete variables, default is 2
             continuous_threshold (float): % of continuous values threshold for continuous variables ,default is 0.95
             missing_threshold (float): % of missing values threshold for ignored variables, default is 0.95
+
         Returns:
             Dataset
         """
@@ -264,13 +265,6 @@ class DatasetFactory:
         returned_json = self.__api.Datasets.getadataset(project_ID=project_id, dataset_ID=creation_json.get('_id'))
 
         return Dataset(self.__api, json, returned_json)
-
-    @Helper.try_catch
-    def create_from_dataframe_and_previous_model(self, name, dataframe, model_id):
-        metadata = self.__api.Prediction.readmetadata(project_ID=self.__project_id, model_ID=model_id)
-        discreteDict = self.__api.Prediction.readdiscretedict(project_ID=self.__project_id, model_ID=model_id)
-        dataset = self.create_from_dataframe(name, dataframe, metadata=metadata, discreteDict=discreteDict)
-        return dataset
 
     @Helper.try_catch
     def filter(self):
@@ -634,3 +628,46 @@ class Dataset(Base):
             # Reading the stream with forced datatypes
             # _forced_types can be replaced with {'name_of_the_variable': str} to force specific variables
             return pd.read_csv(_data, sep=";", encoding="utf-8", dtype=_forced_types)
+
+    @Helper.try_catch
+    def get_metadata(self):
+        """
+        Get dataset metadata
+        """
+        if not self._is_deleted:
+            return self.__api.Datasets.exportmetadata(project_ID=self.project_id,
+                                                  dataset_ID=self.dataset_id)
+
+    @Helper.try_catch
+    def get_discreteDict(self):
+        """
+        Get dataset DiscreteDict
+        """
+        if not self._is_deleted:
+            return self.__api.Datasets.exportdiscretedict(project_ID=self.project_id,
+                                                  dataset_ID=self.dataset_id)
+
+    @Helper.try_catch
+    def encode_dataframe(self, name, dataframe, description='', modalities=2,
+                         continuous_threshold=0.95, missing_threshold=0.95):
+        '''
+        Create a new dataset from a dataframe with the same encoding than the current dataset
+
+        Args:
+            name (str): The name of the dataset
+            dataframe (pandas.DataFrame): The dataframe to import
+            description (str): The dataset description, default is ''
+            modalities (int): Modality threshold for discrete variables, default is 2
+            continuous_threshold (float): % of continuous values threshold for continuous variables ,default is 0.95
+            missing_threshold (float): % of missing values threshold for ignored variables, default is 0.95
+            
+        Returns:
+            Dataset
+        '''
+        metadata = self.get_metadata()
+        discreteDict = self.get_discreteDict()
+        dataset = DatasetFactory(self.__api, self.project_id).create_from_dataframe(name, dataframe,  
+                    description=description, modalities=modalities,  
+                    continuous_threshold=continuous_threshold, missing_threshold=missing_threshold, 
+                    metadata=metadata, discreteDict=discreteDict)
+        return dataset
