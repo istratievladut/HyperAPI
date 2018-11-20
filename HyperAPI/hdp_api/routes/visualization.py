@@ -23,6 +23,16 @@ class Visualization(Resource):
             'visualization_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    @available_since('5.0')
+    class _getProjectVisualisation(Route):
+        name = "getProjectVisualisation"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/visualizations/{visualization_ID}"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'visualization_ID': Route.VALIDATOR_OBJECTID,
+        }
+
     class _Create(Route):
         name = "Create"
         httpMethod = Route.POST
