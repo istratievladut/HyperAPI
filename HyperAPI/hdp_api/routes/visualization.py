@@ -1,4 +1,5 @@
 from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.routes.base.version_management import available_since
 
 
 class Visualization(Resource):
@@ -23,7 +24,7 @@ class Visualization(Resource):
             'visualization_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since('5.0')
+    @available_since('3.1')
     class _getProjectVisualisation(Route):
         name = "getProjectVisualisation"
         httpMethod = Route.GET
