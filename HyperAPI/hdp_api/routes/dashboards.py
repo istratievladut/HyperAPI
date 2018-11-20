@@ -12,8 +12,28 @@ class Dashboards(Resource):
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID
         }
+    
+    @available_since('5.0')
+    class _ProjectDashboards(Route):
+        name = "getProjectDashboards"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/dashboards"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID
+        }
 
     class _GetDashboard(Route):
+        name = "getDashboard"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/datasets/{dataset_ID}/dashboards/{dashboard_ID}"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID,
+            'dashboard_ID': Route.VALIDATOR_OBJECTID
+        }
+
+    @available_since('5.0')
+    class _GetProjectDashboard(Route):
         name = "getDashboard"
         httpMethod = Route.GET
         path = "/projects/{project_ID}/datasets/{dataset_ID}/dashboards/{dashboard_ID}"
@@ -32,6 +52,15 @@ class Dashboards(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID
         }
 
+    @available_since('5.0')
+    class _addProjectDashboard(Route):
+        name = "addProjectDashboard"
+        httpMethod = Route.POST
+        path = "/projects/{project_ID}/dashboards"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID
+        }
+
     class _updateDashboard(Route):
         name = "updateDashboard"
         httpMethod = Route.POST
@@ -42,6 +71,16 @@ class Dashboards(Resource):
             'dashboard_ID': Route.VALIDATOR_OBJECTID
         }
 
+    @available_since('5.0')
+    class _updateProjectDashboard(Route):
+        name = "updateProjectDashboard"
+        httpMethod = Route.POST
+        path = "/projects/{project_ID}/dashboards/{dashboard_ID}"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dashboard_ID': Route.VALIDATOR_OBJECTID
+        }
+
     class _deleteDashboard(Route):
         name = "deleteDashboard"
         httpMethod = Route.POST
@@ -49,5 +88,15 @@ class Dashboards(Resource):
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID,
+            'dashboard_ID': Route.VALIDATOR_OBJECTID
+        }
+
+    @available_since('5.0')
+    class _deleteProjectDashboard(Route):
+        name = "deleteProjectDashboard"
+        httpMethod = Route.POST
+        path = "/projects/{project_ID}/dashboards/{dashboard_ID}/delete"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
             'dashboard_ID': Route.VALIDATOR_OBJECTID
         }
