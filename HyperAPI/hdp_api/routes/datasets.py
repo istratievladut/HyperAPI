@@ -162,6 +162,15 @@ class Datasets(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    class _ExportdiscreteDict(Route):
+        name = "Export discreteDict"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/datasets/{dataset_ID}/discreteDict/export"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID,
+        }
+
     class _getSample(Route):
         name = "getSample"
         httpMethod = Route.GET
