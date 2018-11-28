@@ -1,4 +1,5 @@
 from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.routes.base.version_management import available_since
 
 
 class Dashboards(Resource):
@@ -13,7 +14,7 @@ class Dashboards(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID
         }
     
-    @available_since('5.0')
+    @available_since('3.1')
     class _ProjectDashboards(Route):
         name = "getProjectDashboards"
         httpMethod = Route.GET
@@ -32,14 +33,13 @@ class Dashboards(Resource):
             'dashboard_ID': Route.VALIDATOR_OBJECTID
         }
 
-    @available_since('5.0')
+    @available_since('3.1')
     class _GetProjectDashboard(Route):
-        name = "getDashboard"
+        name = "getProjectDashboard"
         httpMethod = Route.GET
-        path = "/projects/{project_ID}/datasets/{dataset_ID}/dashboards/{dashboard_ID}"
+        path = "/projects/{project_ID}/dashboards/{dashboard_ID}"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
-            'dataset_ID': Route.VALIDATOR_OBJECTID,
             'dashboard_ID': Route.VALIDATOR_OBJECTID
         }
 
@@ -52,7 +52,7 @@ class Dashboards(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID
         }
 
-    @available_since('5.0')
+    @available_since('3.1')
     class _addProjectDashboard(Route):
         name = "addProjectDashboard"
         httpMethod = Route.POST
@@ -71,7 +71,7 @@ class Dashboards(Resource):
             'dashboard_ID': Route.VALIDATOR_OBJECTID
         }
 
-    @available_since('5.0')
+    @available_since('3.1')
     class _updateProjectDashboard(Route):
         name = "updateProjectDashboard"
         httpMethod = Route.POST
@@ -91,7 +91,7 @@ class Dashboards(Resource):
             'dashboard_ID': Route.VALIDATOR_OBJECTID
         }
 
-    @available_since('5.0')
+    @available_since('3.1')
     class _deleteProjectDashboard(Route):
         name = "deleteProjectDashboard"
         httpMethod = Route.POST
