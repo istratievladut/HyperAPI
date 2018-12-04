@@ -22,7 +22,7 @@ class DatasetFactory:
     def create(self, name, file_path, decimal='.',
                delimiter=';', encoding='UTF-8', selectedSheet=1,
                description='', modalities=2, continuous_threshold=0.95, missing_threshold=0.95,
-               metadata_file_path=None, discreteDict_file_path=None):
+               metadata_file_path=None, discreteDict_file_path=None, keepVariableName=None):
         """
         Create a Dataset from a file (csv, Excel)
 
@@ -72,6 +72,9 @@ class DatasetFactory:
             'percentageMissingThreshold': str(missing_threshold)
         }
 
+        if keepVariableName:
+            data['keepVariableName'] = keepVariableName
+
         def apihandle():
                 json = {'project_ID': project_id, 'data': data, 'streaming': True}
 
@@ -80,9 +83,12 @@ class DatasetFactory:
 
                 try:
                     self.__api.handle_work_states(project_id, work_type='datasetValidation', query={"datasetId": creation_json.get('_id')})
+                except Exception as E:
+                    raise ApiException('Unable to get the dataset validation status', str(E))
+                try:
                     self.__api.handle_work_states(project_id, work_type='datasetDescription', query={"datasetId": creation_json.get('_id')})
                 except Exception as E:
-                    raise ApiException('Unable to get the dataset status', str(E))
+                    raise ApiException('Unable to get the dataset description status', str(E))
 
                 returned_json = self.__api.Datasets.getadataset(project_ID=project_id, dataset_ID=creation_json.get('_id'))
                 return json, returned_json
@@ -138,7 +144,7 @@ class DatasetFactory:
     @Helper.try_catch
     def create_from_dataframe(self, name, dataframe, description='', modalities=2,
                               continuous_threshold=0.95, missing_threshold=0.95,
-                              metadata=None, discreteDict=None):
+                              metadata=None, discreteDict=None, keepVariableName=None):
         """
         Create a Dataset from a Pandas DataFrame
 
@@ -187,6 +193,9 @@ class DatasetFactory:
             'percentageMissingThreshold': str(missing_threshold)
         }
 
+        if keepVariableName:
+            data['keepVariableName'] = keepVariableName
+
         data['file[0]'] = (
             file_name,
             stream_df,
@@ -211,10 +220,12 @@ class DatasetFactory:
         creation_json = self.__api.Datasets.uploaddatasets(**json_)
         try:
             self.__api.handle_work_states(project_id, work_type='datasetValidation', query={"datasetId": creation_json.get('_id')})
+        except Exception as E:
+            raise ApiException('Unable to get the dataset validation status', str(E))
+        try:
             self.__api.handle_work_states(project_id, work_type='datasetDescription', query={"datasetId": creation_json.get('_id')})
         except Exception as E:
-            raise ApiException('Unable to get the dataset status', str(E))
-
+            raise ApiException('Unable to get the dataset description status', str(E))
         returned_json = self.__api.Datasets.getadataset(project_ID=project_id, dataset_ID=creation_json.get('_id'))
 
         return Dataset(self.__api, json_, returned_json)
@@ -258,9 +269,12 @@ class DatasetFactory:
 
         try:
             self.__api.handle_work_states(project_id, work_type='datasetValidation', query={"datasetId": creation_json.get('_id')})
+        except Exception as E:
+            raise ApiException('Unable to get the dataset validation status', str(E))
+        try:
             self.__api.handle_work_states(project_id, work_type='datasetDescription', query={"datasetId": creation_json.get('_id')})
         except Exception as E:
-            raise ApiException('Unable to get the dataset status', str(E))
+            raise ApiException('Unable to get the dataset description status', str(E))
 
         returned_json = self.__api.Datasets.getadataset(project_ID=project_id, dataset_ID=creation_json.get('_id'))
 
@@ -665,9 +679,18 @@ class Dataset(Base):
             Dataset
         '''
         metadata = self.get_metadata()
+        oldNames = set([
+                str(var.get("varName", '')).strip().replace("\n", "")
+                for var in metadata.get("variables")
+            ])
+        newNames = set([
+                str(var).strip().replace("\n", "")
+                for var in dataframe.columns
+            ])
+        keepVariableName =  'true' if newNames <= oldNames else 'false'
         discreteDict = self.get_discreteDict()
         dataset = DatasetFactory(self.__api, self.project_id).create_from_dataframe(name, dataframe,  
                     description=description, modalities=modalities,  
                     continuous_threshold=continuous_threshold, missing_threshold=missing_threshold, 
-                    metadata=metadata, discreteDict=discreteDict)
+                    metadata=metadata, discreteDict=discreteDict, keepVariableName=keepVariableName)
         return dataset
