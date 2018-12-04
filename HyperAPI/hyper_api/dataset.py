@@ -22,7 +22,7 @@ class DatasetFactory:
     def create(self, name, file_path, decimal='.',
                delimiter=';', encoding='UTF-8', selectedSheet=1,
                description='', modalities=2, continuous_threshold=0.95, missing_threshold=0.95,
-               metadata_file_path=None, discreteDict_file_path=None):
+               metadata_file_path=None, discreteDict_file_path=None, keepVariableName=None):
         """
         Create a Dataset from a file (csv, Excel)
 
@@ -71,6 +71,9 @@ class DatasetFactory:
             'percentageContinuousThreshold': str(continuous_threshold),
             'percentageMissingThreshold': str(missing_threshold)
         }
+
+        if keepVariableName:
+            data['keepVariableName'] = keepVariableName
 
         def apihandle():
                 json = {'project_ID': project_id, 'data': data, 'streaming': True}
