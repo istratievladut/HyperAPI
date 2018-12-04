@@ -83,9 +83,12 @@ class DatasetFactory:
 
                 try:
                     self.__api.handle_work_states(project_id, work_type='datasetValidation', query={"datasetId": creation_json.get('_id')})
+                except Exception as E:
+                    raise ApiException('Unable to get the dataset validation status', str(E))
+                try:
                     self.__api.handle_work_states(project_id, work_type='datasetDescription', query={"datasetId": creation_json.get('_id')})
                 except Exception as E:
-                    raise ApiException('Unable to get the dataset status', str(E))
+                    raise ApiException('Unable to get the dataset description status', str(E))
 
                 returned_json = self.__api.Datasets.getadataset(project_ID=project_id, dataset_ID=creation_json.get('_id'))
                 return json, returned_json
@@ -218,11 +221,11 @@ class DatasetFactory:
         try:
             self.__api.handle_work_states(project_id, work_type='datasetValidation', query={"datasetId": creation_json.get('_id')})
         except Exception as E:
-            raise ApiException('Unable to get the dataset status', str(E))
+            raise ApiException('Unable to get the dataset validation status', str(E))
         try:
             self.__api.handle_work_states(project_id, work_type='datasetDescription', query={"datasetId": creation_json.get('_id')})
         except Exception as E:
-            raise ApiException('Unable to get the dataset status2', str(E))
+            raise ApiException('Unable to get the dataset description status', str(E))
         returned_json = self.__api.Datasets.getadataset(project_ID=project_id, dataset_ID=creation_json.get('_id'))
 
         return Dataset(self.__api, json_, returned_json)
@@ -266,9 +269,12 @@ class DatasetFactory:
 
         try:
             self.__api.handle_work_states(project_id, work_type='datasetValidation', query={"datasetId": creation_json.get('_id')})
+        except Exception as E:
+            raise ApiException('Unable to get the dataset validation status', str(E))
+        try:
             self.__api.handle_work_states(project_id, work_type='datasetDescription', query={"datasetId": creation_json.get('_id')})
         except Exception as E:
-            raise ApiException('Unable to get the dataset status', str(E))
+            raise ApiException('Unable to get the dataset description status', str(E))
 
         returned_json = self.__api.Datasets.getadataset(project_ID=project_id, dataset_ID=creation_json.get('_id'))
 
