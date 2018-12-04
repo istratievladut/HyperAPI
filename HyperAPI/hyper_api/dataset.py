@@ -138,7 +138,7 @@ class DatasetFactory:
     @Helper.try_catch
     def create_from_dataframe(self, name, dataframe, description='', modalities=2,
                               continuous_threshold=0.95, missing_threshold=0.95,
-                              metadata=None, discreteDict=None):
+                              metadata=None, discreteDict=None, keepVariableName=None):
         """
         Create a Dataset from a Pandas DataFrame
 
@@ -186,6 +186,9 @@ class DatasetFactory:
             'percentageContinuousThreshold': str(continuous_threshold),
             'percentageMissingThreshold': str(missing_threshold)
         }
+
+        if keepVariableName:
+            data['keepVariableName'] = keepVariableName
 
         data['file[0]'] = (
             file_name,
@@ -669,5 +672,5 @@ class Dataset(Base):
         dataset = DatasetFactory(self.__api, self.project_id).create_from_dataframe(name, dataframe,  
                     description=description, modalities=modalities,  
                     continuous_threshold=continuous_threshold, missing_threshold=missing_threshold, 
-                    metadata=metadata, discreteDict=discreteDict)
+                    metadata=metadata, discreteDict=discreteDict, keepVariableName='true')
         return dataset
