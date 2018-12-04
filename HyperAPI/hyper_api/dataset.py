@@ -681,7 +681,7 @@ class Dataset(Base):
                 str(var).strip().replace("\n", "")
                 for var in dataframe.columns
             ])
-        keepVariableName =  'true' if set(newNames) <= set(oldNames) else 'false'
+        keepVariableName =  'true' if newNames <= oldNames else 'false'
         discreteDict = self.get_discreteDict()
         dataset = DatasetFactory(self.__api, self.project_id).create_from_dataframe(name, dataframe,  
                     description=description, modalities=modalities,  
