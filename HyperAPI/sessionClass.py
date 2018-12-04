@@ -6,8 +6,6 @@ import urllib3
 
 from os.path import join
 from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor
-from HyperAPI.util import get_hypercube_path
-from HyperAPI.config import get_config
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -23,24 +21,9 @@ class Session:
         - self.session,
         - self.api_entry_point
         """
-        url = url or os.environ.get('H3_API_URI')
-        if url is None:
-            config = get_config()
-            if config:
-                # Fill credentials and url with default values if they are empty
-                prx_protocol = config['proxy']['protocol']
-                prx_address = config['proxy']['address']
-                prx_port = config['proxy']['port']
-                url = f'{prx_protocol}://{prx_address}:{prx_port}'
-                # Get data folder
-                data_folder = os.path.realpath(join(get_hypercube_path(), config['storage']['dataDir']))
-                if os.path.exists(data_folder):
-                    self.data_folder = data_folder
-                    self.is_local = True
-        else:
-            self.data_folder = ''
-            self.is_local = False
-        self.url = url or 'https://localhost:3000/app'
+        self.url = url or os.environ.get('H3_API_URI') or 'https://localhost:3000/app'
+        self.data_folder = ''
+        self.is_local = False
 
         # Initiate session parameters
         self.session = requests.Session()

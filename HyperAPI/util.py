@@ -30,13 +30,6 @@ def safePathJoin(first_part, *other_parts):
     return posixpath.join(first_part, *other_parts)
 
 
-def get_hypercube_path():
-    """Return path to HyperCube System folder after checking that we can load HyperCube module."""
-
-    if sys.modules.get('HyperCube'):
-        return safePathJoin(sys.executable, r'../../')
-
-
 def find_csv_delimiter(filename):
 
     with open(filename, 'r', encoding="utf-8") as csvfile:
