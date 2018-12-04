@@ -217,10 +217,12 @@ class DatasetFactory:
         creation_json = self.__api.Datasets.uploaddatasets(**json_)
         try:
             self.__api.handle_work_states(project_id, work_type='datasetValidation', query={"datasetId": creation_json.get('_id')})
-            self.__api.handle_work_states(project_id, work_type='datasetDescription', query={"datasetId": creation_json.get('_id')})
         except Exception as E:
             raise ApiException('Unable to get the dataset status', str(E))
-
+        try:
+            self.__api.handle_work_states(project_id, work_type='datasetDescription', query={"datasetId": creation_json.get('_id')})
+        except Exception as E:
+            raise ApiException('Unable to get the dataset status2', str(E))
         returned_json = self.__api.Datasets.getadataset(project_ID=project_id, dataset_ID=creation_json.get('_id'))
 
         return Dataset(self.__api, json_, returned_json)
@@ -671,9 +673,18 @@ class Dataset(Base):
             Dataset
         '''
         metadata = self.get_metadata()
+        oldNames = set([
+                str(var.get("varName", '')).strip().replace("\n", "")
+                for var in metadata.get("variables")
+            ])
+        newNames = set([
+                str(var).strip().replace("\n", "")
+                for var in dataframe.columns
+            ])
+        keepVariableName =  'true' if set(newNames) <= set(oldNames) else 'false'
         discreteDict = self.get_discreteDict()
         dataset = DatasetFactory(self.__api, self.project_id).create_from_dataframe(name, dataframe,  
                     description=description, modalities=modalities,  
                     continuous_threshold=continuous_threshold, missing_threshold=missing_threshold, 
-                    metadata=metadata, discreteDict=discreteDict, keepVariableName='true')
+                    metadata=metadata, discreteDict=discreteDict, keepVariableName=keepVariableName)
         return dataset
