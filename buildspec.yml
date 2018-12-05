@@ -18,11 +18,12 @@ phases:
   build:
     commands:
       - export GIT_SOURCE_VERSION=$(git rev-parse HEAD)
+      - export WHEEL_FILENAME="HyperAPI-$PACKAGE_VERSION-py3-none-any.whl"
       - echo "Building HyperAPI Wheel"
       - python setup.py sdist bdist_wheel
-      - aws s3 cp dist/HyperAPI-5-py3-none-any.whl s3://pypi.hcube.cool/HyperAPI/HyperAPI-5-py3-none-any.whl
+      - aws s3 cp dist/$WHEEL_FILENAME s3://pypi.hcube.cool/HyperAPI/$WHEEL_FILENAME
       - echo "Installing HyperAPI's environment"
-      - pip install dist/HyperAPI-5-py3-none-any.whl
+      - pip install dist/$WHEEL_FILENAME
       - echo "Generating HyperAPI documentation sources"
       - cd $CODEBUILD_SRC_DIR/docs; chmod +x generate_doc.sh; ./generate_doc.sh $CODEBUILD_SRC_DIR/HyperAPI/hyper_api $DOCUUID
       - python $CODEBUILD_SRC_DIR/scripts/deploy.py -p $CODEBUILD_SRC_DIR/docs/$DOCUUID
