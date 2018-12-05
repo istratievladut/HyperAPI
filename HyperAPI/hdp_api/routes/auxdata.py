@@ -109,6 +109,16 @@ class AuxData(Resource):
             'auxdata_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    class _exportAuxDataMatrices(Route):
+        name = "exportAuxDataMatrices"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/auxdata/{auxdata_ID}/exportMatrices/{work_ID}"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'auxdata_ID': Route.VALIDATOR_OBJECTID,
+            'work_ID': Route.VALIDATOR_OBJECTID,
+        }
+
     class _validateAuxData(Route):
         name = "validateAuxData"
         httpMethod = Route.POST
