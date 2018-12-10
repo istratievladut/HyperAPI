@@ -271,9 +271,19 @@ class Datasets(Resource):
         }
 
     @available_since('3.2')
-    class _estimate(Route):
-        name = "Estimate"
+    class _getEstimate(Route):
+        name = "getEstimate"
         httpMethod = Route.GET
+        path = "/projects/{project_ID}/datasets/{dataset_ID}/estimate"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID,
+        }
+
+    @available_since('3.2')
+    class _setEstimate(Route):
+        name = "setEstimate"
+        httpMethod = Route.POST
         path = "/projects/{project_ID}/datasets/{dataset_ID}/estimate"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
