@@ -7,7 +7,7 @@ from distutils.command.build_py import build_py
 class hyperAPI_builder(build_py):
     # Custom class to build the HyperCube API
     def write_metadata(self):
-        return '__version__ = {version}\n\n'.format(version=self.distribution.get_version())
+        return "__version__ = '{version}'\n\n".format(version=self.distribution.get_version())
 
     def run(self):
         if not self.dry_run:
