@@ -27,7 +27,7 @@ with open('requirements.txt') as f:
 with open('package_metadata.json') as m:
     setup_metadata = json.load(m)
 
-setup_metadata['version'] = os.environ.get('PACKAGE_VERSION', '999.1-dev')
+setup_metadata['version'] = os.environ.get('PACKAGE_VERSION')
 
 setup_kwargs = {
     "long_description": "HyperCube API",
