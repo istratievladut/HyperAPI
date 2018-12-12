@@ -42,7 +42,7 @@ class Variable(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since("3.0")
+    @available_since("3.2")
     class _getVariableValidation(Route):
         name = "getVariableValidation"
         httpMethod = Route.GET
