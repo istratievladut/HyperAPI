@@ -13,6 +13,15 @@ class SWPMatchmaking(Resource):
             'work_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    class _getOptimizationDetail(Route):
+        name = "getOptimizationDetail"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/redeployments/{work_ID}/optimizationDetail"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'work_ID': Route.VALIDATOR_OBJECTID,
+        }
+
     class _getMatches(Route):
         name = "getMatches"
         httpMethod = Route.GET
