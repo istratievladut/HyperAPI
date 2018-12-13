@@ -1,4 +1,5 @@
 from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.routes.base.version_management import available_since
 
 
 class Datasets(Resource):
@@ -267,4 +268,24 @@ class Datasets(Resource):
         path = "/projects/{project_ID}/datasets/create"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID
+        }
+
+    @available_since('3.2')
+    class _getEstimate(Route):
+        name = "getEstimate"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/datasets/{dataset_ID}/estimate"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID,
+        }
+
+    @available_since('3.2')
+    class _setEstimate(Route):
+        name = "setEstimate"
+        httpMethod = Route.POST
+        path = "/projects/{project_ID}/datasets/{dataset_ID}/estimate"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
