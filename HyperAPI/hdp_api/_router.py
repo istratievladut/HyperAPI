@@ -47,6 +47,7 @@ from HyperAPI.hdp_api.routes.workflows import Workflows
 from HyperAPI.hdp_api.routes.settings import Settings
 from HyperAPI.hdp_api.routes.monitoring import Monitoring
 from HyperAPI.hdp_api.routes.authentication import Authentication
+from HyperAPI.hdp_api.routes.thirdParties import ThirdParties
 from HyperAPI.utils.timeoutSettings import TimeOutSettings
 
 
@@ -97,6 +98,7 @@ class Router(object):
         Workalendar,
         Workflows,
         Settings,
+        ThirdParties,
         Authentication
     ]
 
