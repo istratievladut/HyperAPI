@@ -124,3 +124,15 @@ class Nitro(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
             'forecast_ID': Route.VALIDATOR_OBJECTID
         }
+
+    @available_since('3.5')
+    class _getForecastTunesStats(Route):
+        name = "getForecastTunesStats"
+        httpMethod = Route.POST
+        path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/stats"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID,
+            'forecast_ID': Route.VALIDATOR_OBJECTID
+        }
+

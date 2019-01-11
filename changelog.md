@@ -2,7 +2,13 @@
 
 ## 5.1
 
-### 5.1.6 - 3rd Parties Routes
+### 5.1.7 - Nitro Forecast Tunes Stats
+
+- Adding Route `nitro.getForecastTunesStats`
+    - Available since HDP 3.5
+    - POST `/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/stats`
+
+### 5.1.6 - Adding Lasso Model
 
 - Adding Lasso model
 
