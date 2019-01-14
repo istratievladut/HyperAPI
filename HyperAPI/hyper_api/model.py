@@ -4,7 +4,7 @@ from HyperAPI.utils.exceptions import ApiException
 from HyperAPI.utils.imports import get_required_module
 from datetime import datetime
 from io import StringIO
-from json import dump
+from json import dump, dumps
 
 
 class AlgoTypes:
@@ -17,9 +17,10 @@ class AlgoTypes:
     GRADIENTBOOSTING = 'GradientBoosting'
     GRADIENTBOOSTINGREGRESSOR = 'GradientBoostingRegressor'
     XGBREGRESSOR = 'XGBRegressor'
+    LASSO = 'Lasso'
     LIST = [HYPERCUBE, LOGISTICREGRESSION, DECISIONTREE, RANDOMFOREST,
-            GRADIENTBOOSTING, GRADIENTBOOSTINGREGRESSOR, XGBREGRESSOR]
-    REGRESSORLIST = [GRADIENTBOOSTINGREGRESSOR, XGBREGRESSOR]
+            GRADIENTBOOSTING, GRADIENTBOOSTINGREGRESSOR, XGBREGRESSOR, LASSO]
+    REGRESSORLIST = [GRADIENTBOOSTINGREGRESSOR, XGBREGRESSOR, LASSO]
 
 
 class Curves:
@@ -386,7 +387,6 @@ class ModelFactory:
         Returns:
             the created model
         """
-
         if params['algoType'] not in AlgoTypes.LIST:
             print('Unexpected algorithm type : {}, valid options are : {}'.format(params['algoType'], ', '.join(AlgoTypes.LIST)))
             return
@@ -491,7 +491,7 @@ class ModelFactory:
             'nbMaxModality': nbMaxModality,
             'nbMinObservation': nbMinObservation,
             'replaceMissingValues': replaceMissingValues,
-            'paramsSk': str(hyperParameters).replace("'", '"'),
+            'paramsSk': dumps(hyperParameters),
             'algoType': AlgoTypes.DECISIONTREE,
             'modelName': name,
             'enable_custom_discretizations': enable_custom_discretizations,
@@ -531,7 +531,7 @@ class ModelFactory:
             'nbMaxModality': nbMaxModality,
             'nbMinObservation': nbMinObservation,
             'replaceMissingValues': replaceMissingValues,
-            'paramsSk': str(hyperParameters).replace("'", '"'),
+            'paramsSk': dumps(hyperParameters),
             'algoType': AlgoTypes.LOGISTICREGRESSION,
             'modelName': name,
             'enable_custom_discretizations': enable_custom_discretizations,
@@ -570,7 +570,7 @@ class ModelFactory:
             'nbMaxModality': nbMaxModality,
             'nbMinObservation': nbMinObservation,
             'replaceMissingValues': replaceMissingValues,
-            'paramsSk': str(hyperParameters).replace("'", '"'),
+            'paramsSk': dumps(hyperParameters),
             'algoType': AlgoTypes.RANDOMFOREST,
             'modelName': name,
             'enable_custom_discretizations': enable_custom_discretizations,
@@ -609,7 +609,7 @@ class ModelFactory:
             'nbMaxModality': nbMaxModality,
             'nbMinObservation': nbMinObservation,
             'replaceMissingValues': replaceMissingValues,
-            'paramsSk': str(hyperParameters).replace("'", '"'),
+            'paramsSk': dumps(hyperParameters),
             'algoType': AlgoTypes.GRADIENTBOOSTING,
             'modelName': name,
             'enable_custom_discretizations': enable_custom_discretizations,
@@ -646,7 +646,7 @@ class ModelFactory:
             'nbMaxModality': nbMaxModality,
             'nbMinObservation': nbMinObservation,
             'replaceMissingValues': replaceMissingValues,
-            'paramsSk': str(hyperParameters).replace("'", '"'),
+            'paramsSk': dumps(hyperParameters),
             'algoType': AlgoTypes.GRADIENTBOOSTINGREGRESSOR,
             'modelName': name,
             'enable_custom_discretizations': enable_custom_discretizations,
@@ -674,7 +674,7 @@ class ModelFactory:
         Returns:
             the created model
         """
-        hyperParameters = {'n_estimators': n_estimators, 'learning_rate': 0.1, 'max_depth': maxdepth, 'learning_rate': 0.1}
+        hyperParameters = {'n_estimators': n_estimators, 'learning_rate': 0.1, 'max_depth': maxdepth}
         discretizations = {}
         if enable_custom_discretizations is True:
             discretizations = dataset._discretizations
@@ -682,7 +682,7 @@ class ModelFactory:
             'nbMaxModality': nbMaxModality,
             'nbMinObservation': nbMinObservation,
             'replaceMissingValues': 'Median',
-            'paramsSk': str(hyperParameters).replace("'", '"'),
+            'paramsSk': dumps(hyperParameters),
             'algoType': AlgoTypes.XGBREGRESSOR,
             'modelName': name,
             'enable_custom_discretizations': enable_custom_discretizations,
@@ -690,6 +690,46 @@ class ModelFactory:
         }
         return self.__create_skModel(dataset, target, params)
 
+    @Helper.try_catch
+    def create_Lasso(self, dataset, name, target,  max_iter=1000, tol=0.0001, alpha=1.0, fit_intercept=True, normalize=False,
+                     split_ratio=0.7, enable_custom_discretizations=True, nbMaxModality=50, nbMinObservation=10):
+        """
+        Linear Model trained with L1 prior as regularizer (Lasso)
+
+        Args:
+            dataset (Dataset): Dataset the model is fitted on
+            name (str): Name of the new model
+            target (Target): Target used to generate the model
+            max_iter (int): The maximum number of iterations. Default is 1000
+            tol (float): The tolerance for the optimization. Default is 0.0001
+            alpha (float) : Constant that multiplies the L1 term. Default is 1.0
+            fit_intercept (boolean) : Whether to calculate the intercept for this model. Default is True
+            normalize (boolean) : if True, the regressors X will be normalized before regression by 
+                subtracting the mean and dividing by the l2-norm. Default is False
+            split_ratio (float): the first step in the model generation is the random split of the original dataset into a learning (or train) dataset
+                representing by default 70% of the original dataset, and a validation (or test) dataset containing the remaining 30%. Default is 0.7
+            enable_custom_discretizations (boolean): when ticked use the custom discretization(s) link to the selected dataset. Default is True
+            nbMaxModality (int): Maximum number of modalities per variable. Default is 50
+            nbMinObservation (int): Modalities with a number of observations lower will be ignored. Default is 10
+        Returns:
+            the created model
+        """
+        hyperParameters = {'max_iter': max_iter, 'tol': tol, 'alpha': alpha, 'fit_intercept': fit_intercept, 
+                           'normalize': normalize}
+        discretizations = {}
+        if enable_custom_discretizations is True:
+            discretizations = dataset._discretizations
+        params = {
+            'nbMaxModality': nbMaxModality,
+            'nbMinObservation': nbMinObservation,
+            'replaceMissingValues': 'Median',
+            'paramsSk': dumps(hyperParameters),
+            'algoType': AlgoTypes.LASSO,
+            'modelName': name,
+            'enable_custom_discretizations': enable_custom_discretizations,
+            'discretizations': discretizations,
+        }
+        return self.__create_skModel(dataset, target, params)
 
 class Model(Base):
     """
