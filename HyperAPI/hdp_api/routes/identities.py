@@ -60,3 +60,8 @@ class Identities(Resource):
         _path_keys = {
             'identity_ID': Route.VALIDATOR_OBJECTID
         }
+    
+    class _getAllUserInfos(Route):
+        name = "Get all user infos"
+        httpMethod = Route.GET
+        path = "/identities/users/info"
