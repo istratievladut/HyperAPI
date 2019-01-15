@@ -501,7 +501,7 @@ class ModelFactory:
 
     @Helper.try_catch
     def create_LogisticRegression(self, dataset, name, target, penalty='l2', C=1, solver='liblinear', split_ratio=0.7, enable_custom_discretizations=True,
-                                  nbMaxModality=50, nbMinObservation=10, replaceMissingValues='Delete'):
+                                  nbMaxModality=50, nbMinObservation=10, replaceMissingValues='Median'):
         """
         Create a logistic regression model
 
@@ -656,7 +656,7 @@ class ModelFactory:
 
     @Helper.try_catch
     def create_XGBRegressor(self, dataset, name, target, n_estimators=100, maxdepth=3, split_ratio=0.7, enable_custom_discretizations=True,
-                            nbMaxModality=50, nbMinObservation=10):
+                            nbMaxModality=50, nbMinObservation=10, replaceMissingValues='Median'):
         """
         Create a eXtreme Gradient Boosting (XGBoost) regressor
 
@@ -681,7 +681,7 @@ class ModelFactory:
         params = {
             'nbMaxModality': nbMaxModality,
             'nbMinObservation': nbMinObservation,
-            'replaceMissingValues': 'Median',
+            'replaceMissingValues': replaceMissingValues,
             'paramsSk': dumps(hyperParameters),
             'algoType': AlgoTypes.XGBREGRESSOR,
             'modelName': name,
@@ -692,7 +692,7 @@ class ModelFactory:
 
     @Helper.try_catch
     def create_Lasso(self, dataset, name, target,  max_iter=1000, tol=0.0001, alpha=1.0, fit_intercept=True, normalize=False,
-                     split_ratio=0.7, enable_custom_discretizations=True, nbMaxModality=50, nbMinObservation=10):
+                     split_ratio=0.7, enable_custom_discretizations=True, nbMaxModality=50, nbMinObservation=10, replaceMissingValues='Median'):
         """
         Linear Model trained with L1 prior as regularizer (Lasso)
 
@@ -722,7 +722,7 @@ class ModelFactory:
         params = {
             'nbMaxModality': nbMaxModality,
             'nbMinObservation': nbMinObservation,
-            'replaceMissingValues': 'Median',
+            'replaceMissingValues': replaceMissingValues,
             'paramsSk': dumps(hyperParameters),
             'algoType': AlgoTypes.LASSO,
             'modelName': name,
