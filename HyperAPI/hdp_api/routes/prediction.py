@@ -104,6 +104,7 @@ class Prediction(Resource):
             'model_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    @available_since('2.0')
     class _publishModel(Route):
         name = "publishModel"
         httpMethod = Route.POST

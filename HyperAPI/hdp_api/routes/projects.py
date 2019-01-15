@@ -1,5 +1,5 @@
 from HyperAPI.hdp_api.routes import Resource, Route
-
+from HyperAPI.hdp_api.routes.base.version_management import deprecated_since
 
 class Projects(Resource):
     name = "Projects"
@@ -62,6 +62,7 @@ class Projects(Resource):
             'project_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    @deprecated_since('1.1')
     class _getShareusers(Route):
         name = "getShareUsers"
         httpMethod = Route.GET

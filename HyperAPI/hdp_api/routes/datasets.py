@@ -163,6 +163,7 @@ class Datasets(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    @available_since('3.2')
     class _ExportdiscreteDict(Route):
         name = "Export discreteDict"
         httpMethod = Route.GET

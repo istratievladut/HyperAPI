@@ -43,6 +43,7 @@ class Visualization(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    @available_since('2.0')
     class _CreateMany(Route):
         name = "CreateMany"
         httpMethod = Route.POST

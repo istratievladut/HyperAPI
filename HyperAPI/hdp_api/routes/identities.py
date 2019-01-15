@@ -1,4 +1,5 @@
 from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.routes.base.version_management import deprecated_since
 
 
 class Identities(Resource):
@@ -60,7 +61,8 @@ class Identities(Resource):
         _path_keys = {
             'identity_ID': Route.VALIDATOR_OBJECTID
         }
-    
+
+    @deprecated_since('1.1')
     class _getAllUserInfos(Route):
         name = "Get all user infos"
         httpMethod = Route.GET
