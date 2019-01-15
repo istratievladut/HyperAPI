@@ -118,7 +118,7 @@ class Nitro(Resource):
             'forecast_ID': Route.VALIDATOR_OBJECTID
         }
     
-    @deprecated_since('1.1')
+    @deprecated_since('2.0')
     class _getForecastAggregateTunes(Route):
         name = "getForecastAggregateTunes"
         httpMethod = Route.GET

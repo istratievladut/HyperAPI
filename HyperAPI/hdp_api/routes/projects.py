@@ -62,7 +62,7 @@ class Projects(Resource):
             'project_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @deprecated_since('1.1')
+    @deprecated_since('2.0')
     class _getShareusers(Route):
         name = "getShareUsers"
         httpMethod = Route.GET

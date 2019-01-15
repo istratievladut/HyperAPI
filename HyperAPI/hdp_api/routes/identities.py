@@ -62,7 +62,7 @@ class Identities(Resource):
             'identity_ID': Route.VALIDATOR_OBJECTID
         }
 
-    @deprecated_since('1.1')
+    @deprecated_since('2.0')
     class _getAllUserInfos(Route):
         name = "Get all user infos"
         httpMethod = Route.GET
