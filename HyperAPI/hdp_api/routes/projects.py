@@ -61,3 +61,11 @@ class Projects(Resource):
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
         }
+
+    class _getShareusers(Route):
+        name = "getShareUsers"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/getShareUsers"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+        }
