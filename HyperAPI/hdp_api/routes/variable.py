@@ -54,9 +54,9 @@ class Variable(Resource):
 
     @available_since("3.6")
     class _getModalites(Route):
-        name = "getModalites"
+        name = "getModalities"
         httpMethod = Route.GET
-        path = "/projects/{project_ID}/datasets/{dataset_ID}/stats/modalities"
+        path = "/projects/{project_ID}/datasets/{dataset_ID}/modalities"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID,
