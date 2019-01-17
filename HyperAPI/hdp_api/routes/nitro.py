@@ -125,7 +125,7 @@ class Nitro(Resource):
             'forecast_ID': Route.VALIDATOR_OBJECTID
         }
 
-    @available_since('3.5')
+    @available_since('3.0.1')
     class _getForecastTunesStats(Route):
         name = "getForecastTunesStats"
         httpMethod = Route.POST
