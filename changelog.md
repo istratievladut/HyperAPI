@@ -26,7 +26,6 @@
 - Adding Route `3rdParties.get3rdpartiessettings`
     - Available since HDP 3.4
     - GET `/3rdparties`
-
 ### 5.1.4 - Publish to ETL Routes
 
 - Adding Route `DatasetReshapes.publishreshapetoetl`
@@ -68,3 +67,12 @@
 
 - Adding Route `AuxData.importauxdatamatrices`
     - POST `/projects/{project_ID}/auxdata/{auxdata_ID}/importMatrices`
+
+
+### 5.1.10 - Get RealTime socket configuration
+
+- Adding Resource `Realtime`
+
+- Adding Route `realTimeSocket.getRealTimeSettings`
+    - Available since HDP 3.4
+    - GET `/realTimeSocket` 
