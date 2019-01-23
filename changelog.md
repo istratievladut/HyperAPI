@@ -2,6 +2,13 @@
 
 ## 5.1
 
+### 5.1.9 - add getModalites api
+
+- Adding Route `getModalites`
+    - Available since HDP 3.6
+    - POST `/projects/{project_ID}/datasets/{dataset_ID}/modalities`
+
+
 ### 5.1.7 - Nitro Forecast Tunes Stats
 
 - Adding Route `nitro.getForecastTunesStats`

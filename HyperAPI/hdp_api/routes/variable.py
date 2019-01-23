@@ -52,6 +52,16 @@ class Variable(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    @available_since("3.6")
+    class _getModalites(Route):
+        name = "getModalities"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/datasets/{dataset_ID}/modalities"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID,
+        }
+
     @available_since("3.0")
     class _deleteVariableValidation(Route):
         name = "removeVariableValidation"
