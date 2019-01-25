@@ -2,6 +2,16 @@
 
 ## 5.1
 
+### 5.1.10 - Get RealTime socket configuration
+
+- Adding Resource `Realtime`
+
+- Adding Route `realTimeSocket.getRealTimeSettings`
+    - Available since HDP 3.4
+    - GET `/realTimeSocket` 
+
+- Fix hdp version handling
+
 ### 5.1.9 - add getModalites api
 
 - Adding Route `getModalites`
@@ -67,12 +77,3 @@
 
 - Adding Route `AuxData.importauxdatamatrices`
     - POST `/projects/{project_ID}/auxdata/{auxdata_ID}/importMatrices`
-
-
-### 5.1.10 - Get RealTime socket configuration
-
-- Adding Resource `Realtime`
-
-- Adding Route `realTimeSocket.getRealTimeSettings`
-    - Available since HDP 3.4
-    - GET `/realTimeSocket` 
