@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class Color(Resource):
     name = "Color"
+    available_since = "3.0"
+    removed_since = None
 
     class _getColors(Route):
         name = "get Project Color sList"

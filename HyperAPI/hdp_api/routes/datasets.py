@@ -1,9 +1,10 @@
 from HyperAPI.hdp_api.routes import Resource, Route
-from HyperAPI.hdp_api.routes.base.version_management import available_since, deprecated_since
 
 
 class Datasets(Resource):
     name = "Datasets"
+    available_since = "3.0"
+    removed_since = None
 
     class _Datasets(Route):
         name = "Datasets"
@@ -91,7 +92,6 @@ class Datasets(Resource):
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
-
 
     class _getDatasetTempData(Route):
         name = "getDatasetTempData"

@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class Tags(Resource):
     name = "Tags"
+    available_since = "3.0"
+    removed_since = None
 
     class _addtag(Route):
         name = "add tag"

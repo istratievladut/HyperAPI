@@ -1,9 +1,10 @@
 from HyperAPI.hdp_api.routes import Resource, Route
-from HyperAPI.hdp_api.routes.base.version_management import available_since
 
 
 class OptimProcess(Resource):
     name = "optimProcess"
+    available_since = "3.0"
+    removed_since = None
 
     class _getSandboxDataForControlChart(Route):
         name = "getSandboxDataForControlChart"

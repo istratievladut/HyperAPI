@@ -1,8 +1,10 @@
 from HyperAPI.hdp_api.routes import Resource, Route
-from HyperAPI.hdp_api.routes.base.version_management import reroute, available_since
+
 
 class Prediction(Resource):
     name = "Prediction"
+    available_since = "3.0"
+    removed_since = None
 
     class _getModel(Route):
         name = "getModel"

@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class Identities(Resource):
     name = "Identities"
+    available_since = "3.0"
+    removed_since = None
 
     class _getAllIdentities(Route):
         name = "Get all identities"

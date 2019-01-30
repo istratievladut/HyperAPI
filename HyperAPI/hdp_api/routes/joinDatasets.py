@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class JoinDatasets(Resource):
     name = "joinDatasets"
+    available_since = "3.0"
+    removed_since = None
 
     class _joinDatasets(Route):
         name = "joinDatasets"

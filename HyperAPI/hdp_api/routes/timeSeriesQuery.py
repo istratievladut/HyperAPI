@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class TimeSeriesQuery(Resource):
     name = "TimeSeriesQuery"
+    available_since = "3.0"
+    removed_since = None
 
     class _timeSeriesQueryTags(Route):
         name = "timeSeriesQueryTags"

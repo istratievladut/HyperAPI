@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class Authentication(Resource):
     name = "Authentication"
+    available_since = "3.0"
+    removed_since = None
 
     class _login(Route):
         name = "login"

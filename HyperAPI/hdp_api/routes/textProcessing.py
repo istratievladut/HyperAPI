@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class TextProcessing(Resource):
     name = "Text Processing"
+    available_since = "3.0"
+    removed_since = None
 
     class _ExtractWordset(Route):
         name = "Extract Wordset"

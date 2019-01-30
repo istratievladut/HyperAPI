@@ -1,9 +1,10 @@
 from HyperAPI.hdp_api.routes import Resource, Route
-from HyperAPI.hdp_api.routes.base.version_management import available_since
 
 
 class Nitro(Resource):
     name = "nitro"
+    available_since = "3.0"
+    removed_since = None
 
     class _getForecasts(Route):
         name = "getForecasts"
@@ -135,4 +136,3 @@ class Nitro(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
             'forecast_ID': Route.VALIDATOR_OBJECTID
         }
-

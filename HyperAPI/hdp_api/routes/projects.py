@@ -4,6 +4,8 @@ from HyperAPI.hdp_api.routes.base.version_management import deprecated_since
 
 class Projects(Resource):
     name = "Projects"
+    available_since = "3.0"
+    removed_since = None
 
     class _Projects(Route):
         name = "Projects"

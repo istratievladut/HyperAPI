@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class Settings(Resource):
     name = "Settings"
+    available_since = "3.0"
+    removed_since = None
 
     class _getUserSettings(Route):
         name = "Get User Settings"

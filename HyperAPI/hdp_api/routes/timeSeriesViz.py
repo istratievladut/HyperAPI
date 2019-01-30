@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class TimeSeriesViz(Resource):
     name = "TimeSeriesViz"
+    available_since = "3.0"
+    removed_since = None
 
     class _listTimeSeriesViz(Route):
         name = "listTimeSeriesViz"

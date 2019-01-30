@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class System(Resource):
     name = "System"
+    available_since = "3.0"
+    removed_since = None
 
     class _features(Route):
         name = "features"

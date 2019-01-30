@@ -7,6 +7,16 @@ class Resource(object):
     __metaclass__ = ABCMeta
 
     @abstractproperty
+    def available_since(self):
+        """The HDP version on which the resource was created """
+        return "Available Since"
+
+    @abstractproperty
+    def removed_since(self):
+        """The HDP version on which the resource was removed """
+        return "Removed Since"
+
+    @abstractproperty
     def name(self):
         """The resource name as defined in the API schema"""
         return "Resource Name"
@@ -26,9 +36,13 @@ class Resource(object):
             yield _r
 
     @property
-    def help(self):
+    def __doc__(self):
         for _r in self._routes.values():
             _r.help
+
+    @property
+    def help(self):
+        return self.__doc__
 
     def __repr__(self):
         return '{} <{}>'.format(self.__class__.__name__, id(self))

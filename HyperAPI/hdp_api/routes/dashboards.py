@@ -1,9 +1,10 @@
 from HyperAPI.hdp_api.routes import Resource, Route
-from HyperAPI.hdp_api.routes.base.version_management import available_since
 
 
 class Dashboards(Resource):
     name = "Dashboards"
+    available_since = "3.0"
+    removed_since = None
 
     class _Dashboards(Route):
         name = "getDashboards"
@@ -13,7 +14,7 @@ class Dashboards(Resource):
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID
         }
-    
+
     @available_since('3.1')
     class _ProjectDashboards(Route):
         name = "getProjectDashboards"

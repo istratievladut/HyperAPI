@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class Alerts(Resource):
     name = "alerts"
+    available_since = "3.0"
+    removed_since = None
 
     class _getAlerts(Route):
         name = "getAlerts"

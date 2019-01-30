@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class Map(Resource):
     name = "Map"
+    available_since = "3.0"
+    removed_since = None
 
     class _Retrievedataforgeomapping(Route):
         name = "Retrieve data for geo mapping"

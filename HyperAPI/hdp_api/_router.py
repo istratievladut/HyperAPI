@@ -51,6 +51,11 @@ from HyperAPI.hdp_api.routes.thirdParties import ThirdParties
 from HyperAPI.hdp_api.routes.realTime import RealTime
 from HyperAPI.utils.timeoutSettings import TimeOutSettings
 
+from collections import namedtuple
+
+SessionDetails = namedtuple('SessionDetails', ['url', 'name', 'product', 'version', 'build_date', 'hdp_version'], 
+                            defaults={'url': None, 'name': None, 'product': None, 'version': None, 'build_date': None, 'hdp_version': None})
+
 
 class Router(object):
     _resources = [
@@ -110,14 +115,21 @@ class Router(object):
         try:
             # We must fetch the System version BEFORE creating route, so this call is hard coded
             _system_details = self.session.request('GET', System._About.path)
-            _version = _system_details.get('hdpVersion', 0)
+            self.session_details = SessionDetails(url=self.session.url,
+                                                  name=_system_details.get('name', 'N/A'),
+                                                  product=_system_details.get('product', 'N/A'),
+                                                  version=_system_details.get('version', 'N/A'),
+                                                  hdp_version=_system_details.get('hdpVersion', 0),
+                                                  build_date=_system_details.get('buildDate', 'N/A'),
+                                                  )
         except Exception:
-            _version = 0
-        self.session.version = Version(_version)
+            self.session_details = SessionDetails(url=url)
+        self.session.version = Version(self.session_details.hdp_version)
 
         # Creating Resources
         for resourceCls in self._resources:
-            self.__setattr__(resourceCls.__name__, resourceCls(self.session, watcher=watcher))
+            if resourceCls.available_since <= self.session.version and resourceCls.removed_since > self.session.version:
+                self.__setattr__(resourceCls.__name__, resourceCls(self.session, watcher=watcher))
         self._default_timeout_settings = TimeOutSettings()
 
     def refresh_session(self, username=None, password=None, token=None):
@@ -147,7 +159,7 @@ class Router(object):
         else:
             raise ValueError('Missing conditions for works')
 
-        _works = self.Task.task.wait_until(project_ID=project_id, json=work_data, condition=lambda x: len(x) > 0)
+        _works = self.Task.task.wait_until(project_ID=project_id, json=work_data, condition=lambda x: len(x) > 0)  # noqa: E1101
         if not _works:
             # List empty, the work has not been created
             if work_id:

@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class SimpleLift(Resource):
     name = "Simple Lift"
+    available_since = "3.0"
+    removed_since = None
 
     class _NewSimpleLift(Route):
         name = "New Simple Lift"

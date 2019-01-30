@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class RulesetViz(Resource):
     name = "RulesetViz"
+    available_since = "3.0"
+    removed_since = None
 
     class _DeleteRulesetViz(Route):
         name = "Delete Ruleset Viz"

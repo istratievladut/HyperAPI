@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class HyperEngines(Resource):
     name = "hyperEngines"
+    available_since = "3.0"
+    removed_since = None
 
     class _hyperenginesListUp(Route):
         name = "hyperenginesListUp"

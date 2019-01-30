@@ -3,7 +3,9 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class Reports(Resource):
     name = "Reports"
-    
+    available_since = "3.0"
+    removed_since = None
+
     class _exportProjectReports(Route):
         name = "exportProjectReports"
         httpMethod = Route.GET

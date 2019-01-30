@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class Rules(Resource):
     name = "Rules"
+    available_since = "3.0"
+    removed_since = None
 
     class _ruleAsDataset(Route):
         name = "ruleAsDataset"

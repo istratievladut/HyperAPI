@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class AuxData(Resource):
     name = "auxdata"
+    available_since = "3.0"
+    removed_since = None
 
     class _getProjectAuxData(Route):
         name = "getProjectAuxData"

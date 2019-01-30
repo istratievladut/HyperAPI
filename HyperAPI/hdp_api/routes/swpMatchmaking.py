@@ -3,6 +3,8 @@ from HyperAPI.hdp_api.routes import Resource, Route
 
 class SWPMatchmaking(Resource):
     name = "swpMatchmaking"
+    available_since = "3.0"
+    removed_since = None
 
     class _getAgents(Route):
         name = "getAgents"
