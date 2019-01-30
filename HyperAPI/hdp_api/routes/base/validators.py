@@ -13,6 +13,10 @@ class RoutePathInvalidException(Exception):
         return 'Route path invalid : {}={} ({})\n\t{}'.format(self.name, self.value, self.validator.__class__.__name__, self.path)
 
 
+class RouteCompatibilityFailed(Exception):
+    pass
+
+
 class ValidatorObjectID(object):
     """(str) A 24 hex digit MongoDB ObjectID."""
     @staticmethod

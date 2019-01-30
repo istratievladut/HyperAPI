@@ -128,7 +128,7 @@ class Router(object):
 
         # Creating Resources
         for resourceCls in self._resources:
-            if resourceCls.available_since <= self.session.version and resourceCls.removed_since > self.session.version:
+            if resourceCls.is_available(self.session.version):
                 self.__setattr__(resourceCls.__name__, resourceCls(self.session, watcher=watcher))
         self._default_timeout_settings = TimeOutSettings()
 

@@ -1,7 +1,8 @@
 from abc import ABCMeta, abstractproperty
 import warnings
 import time
-from HyperAPI.hdp_api.routes.base.validators import ValidatorObjectID, ValidatorAny, ValidatorInt, RoutePathInvalidException
+from HyperAPI.hdp_api.routes.base.validators import ValidatorObjectID, ValidatorAny, ValidatorInt, RoutePathInvalidException, RouteCompatibilityFailed
+from HyperAPI.utils.version import Version
 from requests.exceptions import HTTPError
 
 
@@ -10,47 +11,59 @@ class Route(object):
     GET = "GET"
     POST = "POST"
     _path_keys = {}
+    _compatibility_routes = []
+    _convert_args = None
 
     VALIDATOR_OBJECTID = ValidatorObjectID()
     VALIDATOR_ANY = ValidatorAny()
     VALIDATOR_INT = ValidatorInt()
-
-    deprecated_since = None
-    available_since = None
 
     @classmethod
     def get_route_name(cls):
         return cls.__name__.lower().replace('_', '')
 
     @classmethod
-    def add_redirection(cls, version, route_to, convert_to):
-        if issubclass(route_to, cls):
-            raise Exception('A route can not be redirected to itself')
-        if not hasattr(cls, 'routing_table'):
-            cls.routing_table = dict()
-        cls.routing_table[version] = (route_to, convert_to)
+    def reroute_to(cls, name=None, httpMethod=None, path=None, path_keys=None, convert_args=None, available_since=None, removed_since=None):
+
+        def default_convert(**args):
+            return args
+
+        properties = {
+            'name': name or cls.name,
+            'httpMethod': httpMethod or cls.httpMethod,
+            'path': path or cls.path,
+            '_path_keys': path_keys or cls._path_keys,
+            'available_since': available_since or '0.0',
+            'removed_since': removed_since or cls.available_since,
+            '_convert_args': convert_args or default_convert,
+        }
+
+        # Creating a new class name for the compatibility route
+        _cmp_class_name = '{}_{}_{}'.format(cls.__name__, properties.get('available_since').remove('.'), properties.get('removed_since').remove('.'))
+        # Dynamically creating a new class definition for the route
+        try:
+            _cmp_route = type(_cmp_class_name, (Route), properties)
+            cls._compatibility_routes.append(_cmp_route)
+        except Exception:
+            _message = f"Unable to create compatibility version of the route '{cls.get_route_name()}' for versions {properties.get('available_since', 'N/A')} to {properties.get('removed_since', 'N/A')}."
+            warnings.warn(_message, stacklevel=0)
+
+    @abstractproperty
+    def available_since(self):
+        """The HDP version on which the resource was created """
+        return "Available Since"
+
+    @property
+    def removed_since(self):
+        """The HDP version on which the resource was removed """
+        return None
 
     @classmethod
-    def get_routing_table(cls):
-        return getattr(cls, 'routing_table', {})
-
-    @classmethod
-    def has_redirections(cls):
-        return len(cls.get_routing_table().keys())
-
-    @classmethod
-    def get_redirection_fct(cls, session, watcher):
-        if not cls.has_redirections():
-            return cls.__direct_call__
-        else:
-            # Getting the highest route version available
-            _sorted_versions = sorted(cls.get_routing_table().keys(), reverse=True)
-            _routing_version = next(filter(lambda v: session.version >= v, _sorted_versions), None)
-            if _routing_version is None:
-                return cls.__direct_call__
-            else:
-                cls_route_to, convert_to = cls.get_routing_table()[_routing_version]
-                return lambda self, **kwargs: cls_route_to(session, watcher).__call__(**convert_to(**kwargs))
+    def is_available(cls, version):
+        _check_version = Version(version)
+        if Version(cls.available_since) <= _check_version and Version(cls.removed_since) > _check_version:
+            return True
+        return any(_r.is_available(version) for _r in cls._compatibility_routes)
 
     @abstractproperty
     def name(self):
@@ -67,12 +80,19 @@ class Route(object):
         """The Route path as defined in the API schema"""
         return "Route Path"
 
+    @classmethod
+    def get_redirection_fct(cls, session, watcher):
+        if cls.is_available(session.version):
+            return cls.__direct_call__
+        else:
+            for _cmp_route in cls._compatibility_routes:
+                if _cmp_route.is_available(session.version):
+                    return lambda self, **kwargs: _cmp_route(session, watcher).__call__(**_cmp_route._convert_args(**kwargs))
+            raise RouteCompatibilityFailed('Unable to create the route version compatible')
+
     def __init__(self, session, watcher=None):
         self.session = session
         self._watcher = watcher
-        if self.deprecated_since is not None and self.session.version >= self.deprecated_since:
-            _message = f"The route '{self.get_route_name()}' is deprecated since server version {self.deprecated_since}."
-            warnings.warn(_message, stacklevel=0)
 
         self.__routed_call__ = self.get_redirection_fct(session, watcher)
 
@@ -139,13 +159,17 @@ class Route(object):
         return None
 
     @property
-    def help(self):
+    def __doc__(self):
         msg = 'Route {} [{}]'.format(self.name, self.httpMethod)
         msg += '\n{}'.format(self.path)
         for _k, _v in self._path_keys.items():
             msg += '\n{:>20} : {}'.format(_k, _v.__doc__)
         msg += '\n'
-        print(msg)
+        return msg
+
+    @property
+    def help(self):
+        print(self.__doc__)
 
     def __repr__(self):
         return '{} <{}> {}:{}'.format(self.get_route_name(), id(self), self.httpMethod, self.path)

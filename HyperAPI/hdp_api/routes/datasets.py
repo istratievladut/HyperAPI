@@ -282,9 +282,9 @@ class Datasets(Resource):
             'project_ID': Route.VALIDATOR_OBJECTID
         }
 
-    @available_since('3.2')
     class _getEstimate(Route):
         name = "getEstimate"
+        available_since = '3.2'
         httpMethod = Route.GET
         path = "/projects/{project_ID}/datasets/{dataset_ID}/estimate"
         _path_keys = {
@@ -292,9 +292,9 @@ class Datasets(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since('3.2')
     class _setEstimate(Route):
         name = "setEstimate"
+        available_since = '3.2'
         httpMethod = Route.POST
         path = "/projects/{project_ID}/datasets/{dataset_ID}/estimate"
         _path_keys = {

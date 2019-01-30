@@ -25,9 +25,9 @@ class Visualization(Resource):
             'visualization_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since('3.1')
     class _getProjectVisualisation(Route):
         name = "getProjectVisualisation"
+        available_since = '3.1'
         httpMethod = Route.GET
         path = "/projects/{project_ID}/visualizations/{visualization_ID}"
         _path_keys = {

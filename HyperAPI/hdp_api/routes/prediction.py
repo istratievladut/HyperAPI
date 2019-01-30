@@ -124,9 +124,9 @@ class Prediction(Resource):
             'model_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since("3.0")
     class _export(Route):
         name = "export"
+        available_since = '3.0'
         httpMethod = Route.GET
         path = "/projects/{project_ID}/models/{model_ID}/export"
         _path_keys = {
@@ -143,9 +143,9 @@ class Prediction(Resource):
             'model_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since("3.0")
     class _exportPreprocessedData(Route):
         name = "exportPreprocessedData"
+        available_since = '3.0'
         httpMethod = Route.GET
         path = "/projects/{project_ID}/models/{model_ID}/exportPreprocessedData"
         _path_keys = {

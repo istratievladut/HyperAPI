@@ -58,9 +58,9 @@ class DatasetReshapes(Resource):
             'reshape_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since('3.3')
     class _publishReshapeToEtl(Route):
         name = "publishReshapeToEtl"
+        available_since = '3.3'
         httpMethod = Route.POST
         path = "/projects/{project_ID}/reshapes/{reshape_ID}/etlpublish"
         _path_keys = {

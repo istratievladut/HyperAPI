@@ -1,5 +1,4 @@
 from HyperAPI.hdp_api.routes import Resource, Route
-from HyperAPI.hdp_api.routes.base.version_management import available_since
 
 
 class RealTime(Resource):
@@ -7,8 +6,8 @@ class RealTime(Resource):
     available_since = "3.0"
     removed_since = None
 
-    @available_since("3.6")
     class _getRealTimeSettings(Route):
         name = "getRealTimeSettings"
+        available_since = '3.6'
         httpMethod = Route.GET
         path = "/realTimeSocket"

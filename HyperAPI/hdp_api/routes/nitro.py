@@ -44,9 +44,9 @@ class Nitro(Resource):
             'forecast_ID': Route.VALIDATOR_OBJECTID
         }
 
-    @available_since('2.0')
     class _updateForecastCoef(Route):
         name = "updateForecastCoef"
+        available_since = '2.0'
         httpMethod = Route.POST
         path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/updatecoef"
         _path_keys = {
@@ -115,9 +115,9 @@ class Nitro(Resource):
             'forecast_ID': Route.VALIDATOR_OBJECTID
         }
 
-    @available_since('2.0')
     class _exportReport(Route):
         name = "exportReport"
+        available_since = '2.0'
         httpMethod = Route.GET
         path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/exportreport"
         _path_keys = {
@@ -126,9 +126,9 @@ class Nitro(Resource):
             'forecast_ID': Route.VALIDATOR_OBJECTID
         }
 
-    @available_since('3.5')
     class _getForecastTunesStats(Route):
         name = "getForecastTunesStats"
+        available_since = '3.5'
         httpMethod = Route.POST
         path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/stats"
         _path_keys = {

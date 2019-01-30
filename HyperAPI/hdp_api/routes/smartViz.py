@@ -25,9 +25,9 @@ class SmartDataViz(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since('3.0')
     class _getSmartDataVizs(Route):
         name = "getSmartDataVizs"
+        available_since = '3.0'
         httpMethod = Route.GET
         path = "/projects/{project_ID}/smartDataViz/"
         _path_keys = {

@@ -49,9 +49,9 @@ class OptimProcess(Resource):
             'controlChart_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since('3.3')
     class _publishControlChartToEtl(Route):
         name = "PublishControlChartToEtl"
+        available_since = '3.3'
         httpMethod = Route.POST
         path = "/optimProcess/projects/{project_ID}/controlCharts/{controlChart_ID}/etlpublish"
         _path_keys = {

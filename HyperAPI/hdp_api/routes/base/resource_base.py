@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractproperty
 import inspect
 from HyperAPI.hdp_api.routes.base.route_base import Route
+from HyperAPI.utils.version import Version
 
 
 class Resource(object):
@@ -11,10 +12,10 @@ class Resource(object):
         """The HDP version on which the resource was created """
         return "Available Since"
 
-    @abstractproperty
+    @property
     def removed_since(self):
         """The HDP version on which the resource was removed """
-        return "Removed Since"
+        return None
 
     @abstractproperty
     def name(self):
@@ -25,7 +26,7 @@ class Resource(object):
         self.session = session
         self._routes = {}
         for _route in (_m[1] for _m in inspect.getmembers(self.__class__) if inspect.isclass(_m[1]) and issubclass(_m[1], Route)):
-            if _route.available_since is None or _route.available_since <= self.session.version:
+            if _route.is_available(self.session.version):
                 _routeInstance = _route(session, watcher=watcher)
                 _routeName = _route.get_route_name()
                 self.__setattr__(_routeName, _routeInstance)
@@ -35,14 +36,18 @@ class Resource(object):
         for _r in self._routes.values():
             yield _r
 
+    @classmethod
+    def is_available(cls, version):
+        _check_version = Version(version)
+        return Version(cls.available_since) <= _check_version and Version(cls.removed_since) > _check_version
+
     @property
     def __doc__(self):
-        for _r in self._routes.values():
-            _r.help
+        return '\n'.join(_r.help for _r in self._routes.values())
 
     @property
     def help(self):
-        return self.__doc__
+        print(self.__doc__)
 
     def __repr__(self):
         return '{} <{}>'.format(self.__class__.__name__, id(self))
