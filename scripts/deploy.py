@@ -45,8 +45,15 @@ class AwsDeployer():
         code = proc.wait()
         if code != 0:
             print("No bucket policies found, creating an empty one.")
+            data = {
+                "Statement": [
+                    {
+                        "Effect": "Allow", "Principal": "*", "Action": "s3:GetObject", "Resource": f"arn:aws:s3:::{self.bucket}/index.html"
+                    }
+                ]
+            }
             with open("policy.json", "w+") as f:
-                f.write('{"Statement": [{"Effect": "Allow", "Principal": "*", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::hyperapi-doc/index.html"}]}')
+                f.write(json.dumps(data))
                 f.close()
             print("policy file created")
 
