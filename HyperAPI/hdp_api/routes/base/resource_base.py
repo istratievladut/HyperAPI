@@ -6,16 +6,8 @@ from HyperAPI.utils.version import Version
 
 class Resource(object):
     __metaclass__ = ABCMeta
-
-    @abstractproperty
-    def available_since(self):
-        """The HDP version on which the resource was created """
-        return "Available Since"
-
-    @property
-    def removed_since(self):
-        """The HDP version on which the resource was removed """
-        return None
+    available_since = 0
+    remove_since = None
 
     @abstractproperty
     def name(self):

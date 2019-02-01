@@ -127,10 +127,13 @@ class Router(object):
         self.session.version = Version(self.session_details.hdp_version)
 
         # Creating Resources
-        for resourceCls in self._resources:
+        self._create_resources(self._resources, watcher=None)
+        self._default_timeout_settings = TimeOutSettings()
+
+    def _create_resources(self, resources_list, watcher=None):
+        for resourceCls in resources_list:
             if resourceCls.is_available(self.session.version):
                 self.__setattr__(resourceCls.__name__, resourceCls(self.session, watcher=watcher))
-        self._default_timeout_settings = TimeOutSettings()
 
     def refresh_session(self, username=None, password=None, token=None):
         self.session.refresh(username, password, token)

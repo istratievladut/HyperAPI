@@ -2,7 +2,10 @@ class Version(object):
 
     def __init__(self, version_label: str):
         try:
-            result = [int(v) for v in version_label.strip().split('.')]
+            if isinstance(version_label, (str, float, int, Version)):
+                result = [int(v) for v in str(version_label).strip().split('.')]
+            else:
+                result = None
         except Exception:
             result = None
         if result is None:
@@ -12,13 +15,13 @@ class Version(object):
             self.is_dev = True
         else:
             self.major = result[0]
-            self.minor = 0 if len(result) == 1 else result[1]
-            self.patch = 0 if len(result) == 2 else result[2]
+            self.minor = 0 if len(result) < 2 else result[1]
+            self.patch = 0 if len(result) < 3 else result[2]
             self.is_dev = False
 
     def __str__(self):
         if self.is_dev:
-            return "Dev Version"
+            return "Dev"
         return "{x.major}.{x.minor}.{x.patch}".format(x=self)
 
     def __eq__(self, other):
@@ -31,7 +34,9 @@ class Version(object):
 
     def __lt__(self, other):
         if self.is_dev:
-            return False
+            return not other.is_dev
+        if other.is_dev:
+            return True
         if self.major > other.major:
             return False
         if self.major == other.major:
@@ -44,6 +49,8 @@ class Version(object):
     def __gt__(self, other):
         if self.is_dev:
             return not other.is_dev
+        if other.is_dev:
+            return False
         if self.major < other.major:
             return False
         if self.major == other.major:

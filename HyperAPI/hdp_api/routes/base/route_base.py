@@ -10,6 +10,10 @@ class Route(object):
     __metaclass__ = ABCMeta
     GET = "GET"
     POST = "POST"
+
+    available_since = 0
+    removed_since = None
+
     _path_keys = {}
     _compatibility_routes = []
     _convert_args = None
@@ -17,6 +21,8 @@ class Route(object):
     VALIDATOR_OBJECTID = ValidatorObjectID()
     VALIDATOR_ANY = ValidatorAny()
     VALIDATOR_INT = ValidatorInt()
+
+    __reroute_class__ = False
 
     @classmethod
     def get_route_name(cls):
@@ -33,37 +39,31 @@ class Route(object):
             'httpMethod': httpMethod or cls.httpMethod,
             'path': path or cls.path,
             '_path_keys': path_keys or cls._path_keys,
-            'available_since': available_since or '0.0',
-            'removed_since': removed_since or cls.available_since,
+            'available_since': available_since or cls.removed_since,
+            'removed_since': removed_since or None,
             '_convert_args': convert_args or default_convert,
+            '__reroute_class__': True,
         }
 
         # Creating a new class name for the compatibility route
-        _cmp_class_name = '{}_{}_{}'.format(cls.__name__, properties.get('available_since').remove('.'), properties.get('removed_since').remove('.'))
+        _cmp_class_name = '{}_{}_{}'.format(cls.__name__, properties.get('available_since'), properties.get('removed_since')).replace('.', '')
         # Dynamically creating a new class definition for the route
         try:
-            _cmp_route = type(_cmp_class_name, (Route), properties)
+            _cmp_route = type(_cmp_class_name, (Route,), properties)
             cls._compatibility_routes.append(_cmp_route)
         except Exception:
             _message = f"Unable to create compatibility version of the route '{cls.get_route_name()}' for versions {properties.get('available_since', 'N/A')} to {properties.get('removed_since', 'N/A')}."
             warnings.warn(_message, stacklevel=0)
-
-    @abstractproperty
-    def available_since(self):
-        """The HDP version on which the resource was created """
-        return "Available Since"
-
-    @property
-    def removed_since(self):
-        """The HDP version on which the resource was removed """
-        return None
 
     @classmethod
     def is_available(cls, version):
         _check_version = Version(version)
         if Version(cls.available_since) <= _check_version and Version(cls.removed_since) > _check_version:
             return True
-        return any(_r.is_available(version) for _r in cls._compatibility_routes)
+        elif cls.__reroute_class__:
+            return False
+        else:
+            return any(_r.is_available(version) for _r in cls._compatibility_routes)
 
     @abstractproperty
     def name(self):
