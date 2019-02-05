@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractproperty
 import warnings
 import time
+import inspect
 from HyperAPI.hdp_api.routes.base.validators import ValidatorObjectID, ValidatorAny, ValidatorInt, RoutePathInvalidException, RouteCompatibilityFailed
 from HyperAPI.utils.version import Version
 from requests.exceptions import HTTPError
@@ -16,85 +17,67 @@ class Route(object):
 
     _path_keys = {}
     _compatibility_routes = []
-    _convert_args = None
 
     VALIDATOR_OBJECTID = ValidatorObjectID()
     VALIDATOR_ANY = ValidatorAny()
     VALIDATOR_INT = ValidatorInt()
-
-    __reroute_class__ = False
 
     @classmethod
     def get_route_name(cls):
         return cls.__name__.lower().replace('_', '')
 
     @classmethod
-    def reroute_to(cls, name=None, httpMethod=None, path=None, path_keys=None, convert_args=None, available_since=None, removed_since=None):
-
-        def default_convert(**args):
-            return args
-
-        properties = {
-            'name': name or cls.name,
-            'httpMethod': httpMethod or cls.httpMethod,
-            'path': path or cls.path,
-            '_path_keys': path_keys or cls._path_keys,
-            'available_since': available_since or cls.removed_since,
-            'removed_since': removed_since or None,
-            '_convert_args': convert_args or default_convert,
-            '__reroute_class__': True,
-        }
-
-        # Creating a new class name for the compatibility route
-        _cmp_class_name = '{}_{}_{}'.format(cls.__name__, properties.get('available_since'), properties.get('removed_since')).replace('.', '')
-        # Dynamically creating a new class definition for the route
-        try:
-            _cmp_route = type(_cmp_class_name, (Route,), properties)
-            cls._compatibility_routes.append(_cmp_route)
-        except Exception:
-            _message = f"Unable to create compatibility version of the route '{cls.get_route_name()}' for versions {properties.get('available_since', 'N/A')} to {properties.get('removed_since', 'N/A')}."
-            warnings.warn(_message, stacklevel=0)
-
-    @classmethod
-    def is_available(cls, version):
+    def is_available(cls, version, compatiblity_mode=True):
         _check_version = Version(version)
         if Version(cls.available_since) <= _check_version and Version(cls.removed_since) > _check_version:
             return True
-        elif cls.__reroute_class__:
+
+        if not compatiblity_mode:
             return False
-        else:
-            return any(_r.is_available(version) for _r in cls._compatibility_routes)
+
+        _compatibility_routes = list(_r for _r in cls.get_subroutes())
+        return any(_r.is_available(version) for _r in _compatibility_routes)
 
     @abstractproperty
     def name(self):
         """The Route key (not name) as defined in the API schema"""
-        return "Route Name"
+        return None
 
     @abstractproperty
     def httpMethod(self):
         """The Route http method as defined in the API schema"""
-        return "http Method"
+        return None
 
     @abstractproperty
     def path(self):
         """The Route path as defined in the API schema"""
-        return "Route Path"
+        return None
 
     @classmethod
-    def get_redirection_fct(cls, session, watcher):
-        if cls.is_available(session.version):
-            return cls.__direct_call__
-        else:
-            for _cmp_route in cls._compatibility_routes:
-                if _cmp_route.is_available(session.version):
-                    return lambda self, **kwargs: _cmp_route(session, watcher).__call__(**_cmp_route._convert_args(**kwargs))
-            raise RouteCompatibilityFailed('Unable to create the route version compatible')
+    def get_subroutes(cls):
+        for _route in (_m[1] for _m in inspect.getmembers(cls) if inspect.isclass(_m[1]) and issubclass(_m[1], SubRoute)):
+            yield _route
 
     def __init__(self, session, watcher=None):
         self.session = session
         self._watcher = watcher
 
-        self.__routed_call__ = self.get_redirection_fct(session, watcher)
+        if self.is_available(session.version, compatiblity_mode=False):
+            self.__routed_call__ = self.__direct_call__
+        else:
+            for _route in self.get_subroutes():
+                if _route.is_available(self.session.version):
+                    _routeInstance = _route(session, watcher=watcher)
+                    self.name = _route.name or self.name
+                    self.path = _route.path or self.path
+                    self._path_keys = _route._path_keys or self._path_keys
+                    self.httpMethod = _route.httpMethod or self.httpMethod
+                    self.available_since = _route.available_since or self.available_since
+                    self.removed_since = _route.removed_since or self.removed_since
+                    self.__routed_call__ = lambda self, **kwargs: _routeInstance.__call__(**_routeInstance._convert_args(**kwargs))
+                    break
+            else:
+                raise RouteCompatibilityFailed('Unable to create the route version compatible')
 
     def __call__(self, **kwargs):
         return self.__routed_call__(self, **kwargs)
@@ -118,7 +101,6 @@ class Route(object):
             except HTTPError as HE:
                 self._watcher(str(self), str(HE.response))
                 raise
-
         return self.session.request(self.httpMethod, _path, **kwargs)
 
     def call_when(self, condition=lambda x: True, call=lambda x: None, step=1, timeout=500, **kwargs):
@@ -176,3 +158,28 @@ class Route(object):
 
     def __str__(self):
         return '{: >4}:{}'.format(self.httpMethod, self.path)
+
+
+class SubRoute(Route):
+    # Abstract properties are redefined so they are no longer mandatory for sub routes
+    name = None
+    httpMethod = None
+    path = None
+
+    def __init__(self, session, watcher=None):
+        self.session = session
+        self._watcher = watcher
+
+    def __call__(self, **kwargs):
+        return self.__direct_call__(**kwargs)
+
+    @classmethod
+    def is_available(cls, version):
+        _check_version = Version(version)
+        if Version(cls.available_since) <= _check_version and Version(cls.removed_since) > _check_version:
+            return True
+        return False
+
+    @staticmethod
+    def _convert_args(**kwargs):
+        return kwargs

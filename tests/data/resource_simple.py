@@ -1,4 +1,4 @@
-from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.routes import Resource, Route, SubRoute
 
 
 class TestResource(Resource):
@@ -31,5 +31,23 @@ class TestResource(Resource):
         available_since = "3.0"
         removed_since = "3.1"
 
-    # RouteCompatible.reroute_to(name="Route Compatible 3.1", path="/route/compatible/v1", httpMethod=Route.POST, available_since="3.1", removed_since="3.2")
-    # RouteCompatible.reroute_to(name="Route Compatible 3.2", available_since="3.2", removed_since="3.3")
+        class RouteCompatible_31(SubRoute):
+            name = "Route Compatible 3.1"
+            httpMethod = Route.POST
+            path = "/route/compatible/v1"
+            available_since = "3.1"
+            removed_since = "3.2"
+
+        class RouteCompatible_32(SubRoute):
+            httpMethod = Route.GET
+            available_since = "3.2"
+            removed_since = "3.3"
+            path = "/route/compatible/{route_ID}"
+            _path_keys = {
+                'route_ID': Route.VALIDATOR_ANY,
+            }
+
+            @staticmethod
+            def _convert_args(**kwargs):
+                kwargs["route_ID"] = 0
+                return kwargs

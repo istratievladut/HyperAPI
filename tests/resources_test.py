@@ -1,15 +1,12 @@
 import unittest
-from collections import namedtuple
 from HyperAPI.hdp_api._router import Router
-
-
-SessionCls = namedtuple('SessionCls', ['version'])
+from tests._utils import DummySession
 
 
 class ResourceTestCase(unittest.TestCase):
 
     def setUp(self):
-        from tests.data.dummy_resource import TestResource
+        from tests.data.resource_simple import TestResource
 
         self.resourceCls = TestResource
         self.create_resources = Router._create_resources
@@ -21,22 +18,22 @@ class ResourceTestCase(unittest.TestCase):
         if hasattr(self, self.resourceCls.__name__):
             delattr(self, self.resourceCls.__name__)
 
-    # def test_resource_availability(self):
-    #     self.assertFalse(self.resourceCls.is_available('0.0'))
-    #     self.assertTrue(self.resourceCls.is_available('1.0'))
-    #     self.assertFalse(self.resourceCls.is_available('4.0'))
+    def test_resource_availability(self):
+        self.assertFalse(self.resourceCls.is_available('0.0'))
+        self.assertTrue(self.resourceCls.is_available('1.0'))
+        self.assertFalse(self.resourceCls.is_available('4.0'))
 
-    # def test_resource_not_available(self):
-    #     self.session = SessionCls(version='0.0')
-    #     self.create_resources(self, [self.resourceCls], None)
-    #     self.assertFalse(hasattr(self, self.resourceCls.__name__), 'Future Resources should not be created')
+    def test_resource_not_available(self):
+        self.session = DummySession(version='0.0')
+        self.create_resources(self, [self.resourceCls], None)
+        self.assertFalse(hasattr(self, self.resourceCls.__name__), 'Future Resources should not be created')
 
-    # def test_resource_created(self):
-    #     self.session = SessionCls(version='1.0')
-    #     self.create_resources(self, [self.resourceCls], None)
-    #     self.assertTrue(hasattr(self, self.resourceCls.__name__), 'Available Resources should be created')
+    def test_resource_created(self):
+        self.session = DummySession(version='1.0')
+        self.create_resources(self, [self.resourceCls], None)
+        self.assertTrue(hasattr(self, self.resourceCls.__name__), 'Available Resources should be created')
 
-    # def test_resource_removed(self):
-    #     self.session = SessionCls(version='4.0')
-    #     self.create_resources(self, [self.resourceCls], None)
-    #     self.assertFalse(hasattr(self, self.resourceCls.__name__), 'Obsolete Resources should not be created')
+    def test_resource_removed(self):
+        self.session = DummySession(version='4.0')
+        self.create_resources(self, [self.resourceCls], None)
+        self.assertFalse(hasattr(self, self.resourceCls.__name__), 'Obsolete Resources should not be created')
