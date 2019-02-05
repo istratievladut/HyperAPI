@@ -32,26 +32,6 @@ class Variable(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since("3.0")
-    class _addVariableValidation(Route):
-        name = "addVariableValidation"
-        httpMethod = Route.POST
-        path = "/projects/{project_ID}/datasets/{dataset_ID}/variables/validation"
-        _path_keys = {
-            'project_ID': Route.VALIDATOR_OBJECTID,
-            'dataset_ID': Route.VALIDATOR_OBJECTID,
-        }
-
-    @available_since("3.0")
-    class _deleteVariableValidation(Route):
-        name = "removeVariableValidation"
-        httpMethod = Route.POST
-        path = "/projects/{project_ID}/datasets/{dataset_ID}/variables/validation/delete"
-        _path_keys = {
-            'project_ID': Route.VALIDATOR_OBJECTID,
-            'dataset_ID': Route.VALIDATOR_OBJECTID,
-        }
-
     class _getVariableAndTags(Route):
         name = "getVariableAndTags"
         httpMethod = Route.GET

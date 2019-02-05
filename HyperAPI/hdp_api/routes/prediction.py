@@ -122,30 +122,10 @@ class Prediction(Resource):
             'model_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since("3.0")
-    class _export(Route):
-        name = "export"
-        httpMethod = Route.GET
-        path = "/projects/{project_ID}/models/{model_ID}/export"
-        _path_keys = {
-            'project_ID': Route.VALIDATOR_OBJECTID,
-            'model_ID': Route.VALIDATOR_OBJECTID,
-        }
-
     class _exportRules(Route):
         name = "exportRules"
         httpMethod = Route.GET
         path = "/projects/{project_ID}/models/{model_ID}/exportRules"
-        _path_keys = {
-            'project_ID': Route.VALIDATOR_OBJECTID,
-            'model_ID': Route.VALIDATOR_OBJECTID,
-        }
-
-    @available_since("3.0")
-    class _exportPreprocessedData(Route):
-        name = "exportPreprocessedData"
-        httpMethod = Route.GET
-        path = "/projects/{project_ID}/models/{model_ID}/exportPreprocessedData"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
             'model_ID': Route.VALIDATOR_OBJECTID,
