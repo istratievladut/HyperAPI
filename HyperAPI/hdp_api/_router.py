@@ -49,7 +49,10 @@ from HyperAPI.hdp_api.routes.monitoring import Monitoring
 from HyperAPI.hdp_api.routes.authentication import Authentication
 from HyperAPI.hdp_api.routes.thirdParties import ThirdParties
 from HyperAPI.hdp_api.routes.realTime import RealTime
+
+
 from HyperAPI.utils.timeoutSettings import TimeOutSettings
+from HyperAPI.utils.validation import compare_schema_resources, compare_schema_routes
 
 from collections import namedtuple
 
@@ -207,3 +210,28 @@ class Router(object):
 
             _work = next(iter(_works))
         return _work
+
+    # Work Management Specific Code ---------------------------------------------------------------------
+
+    def validate_schema(self, schema):
+        results = dict()
+
+        unexpected_resources, missing_resources, match_resources = compare_schema_resources(self._resources, schema.get('resources'))
+
+        results['unexpected_resources'] = unexpected_resources
+        results['missing_resources'] = missing_resources
+        results['different_resources'] = {}
+
+        for _resource in self._resources:
+            if _resource.name not in match_resources:
+                continue
+
+            _resource_schema = schema.get('resources').get(_resource.name)
+            unexpected_routes, missing_routes, match_routes = compare_schema_routes(_resource._routes, _resource_schema)
+            if unexpected_routes or missing_routes:
+                results['different_resources'][_resource.name] = {
+                    'unexpected_routes': unexpected_routes,
+                    'missing_routes': missing_routes,
+                }
+
+        return results

@@ -33,6 +33,11 @@ class Resource(object):
         _check_version = Version(version)
         return Version(cls.available_since) <= _check_version and Version(cls.removed_since) > _check_version
 
+    @classmethod
+    def check_routes_integrity(cls):
+        for _route in (_m[1] for _m in inspect.getmembers(cls) if inspect.isclass(_m[1]) and issubclass(_m[1], Route)):
+            _route.check_routes_integrity()
+
     @property
     def __doc__(self):
         return '\n'.join(_r.help for _r in self._routes.values())

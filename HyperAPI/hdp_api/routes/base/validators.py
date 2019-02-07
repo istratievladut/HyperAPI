@@ -17,6 +17,10 @@ class RouteCompatibilityFailed(Exception):
     pass
 
 
+class RouteConsistencyException(Exception):
+    pass
+
+
 class ValidatorObjectID(object):
     """(str) A 24 hex digit MongoDB ObjectID."""
     @staticmethod

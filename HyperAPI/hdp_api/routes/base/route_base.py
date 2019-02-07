@@ -1,8 +1,8 @@
 from abc import ABCMeta, abstractproperty
-import warnings
 import time
 import inspect
-from HyperAPI.hdp_api.routes.base.validators import ValidatorObjectID, ValidatorAny, ValidatorInt, RoutePathInvalidException, RouteCompatibilityFailed
+from HyperAPI.hdp_api.routes.base.validators import ValidatorObjectID, ValidatorAny, ValidatorInt
+from HyperAPI.hdp_api.routes.base.validators import RoutePathInvalidException, RouteCompatibilityFailed, RouteConsistencyException
 from HyperAPI.utils.version import Version
 from requests.exceptions import HTTPError
 
@@ -57,6 +57,19 @@ class Route(object):
     def get_subroutes(cls):
         for _route in (_m[1] for _m in inspect.getmembers(cls) if inspect.isclass(_m[1]) and issubclass(_m[1], SubRoute)):
             yield _route
+
+    @classmethod
+    def check_routes_integrity(cls):
+        sub_routes = sorted(cls.get_subroutes(), key=lambda x: x.available_since)
+        sub_routes.insert(0, cls)
+
+        for _n, _route in enumerate(sub_routes):
+            if _route.removed_since <= _route.available_since:
+                raise RouteConsistencyException('Route removed before availability')
+            if _n > 0:
+                _previous = sub_routes[_n - 1]
+                if _route.available_since != _previous.removed_since:
+                    raise RouteConsistencyException('Break in route continuity')
 
     def __init__(self, session, watcher=None):
         self.session = session

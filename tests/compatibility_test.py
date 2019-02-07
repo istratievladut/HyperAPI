@@ -3,7 +3,7 @@ from HyperAPI.hdp_api.routes import Route
 from tests._utils import DummySession
 
 
-class RoutesTestCase(unittest.TestCase):
+class CompatibilityTestCase(unittest.TestCase):
 
     def setUp(self):
         from tests.data.resource_simple import TestResource
