@@ -2,6 +2,15 @@
 
 ## 5.1
 
+### 5.1.11 - Fix variable ignore test
+
+- Fix variable ignore test in [variable.py](HyperAPI/hyper_api/variable.py)
+```
+varname = self.name
+data = {'updateFields': {varname: {'ignored': True}}
+```
+
+
 ### 5.1.10 - Get RealTime socket configuration
 
 - Adding Resource `Realtime`
@@ -10,7 +19,6 @@
     - Available since HDP 3.4
     - GET `/realTimeSocket` 
 
-- Fix hdp version handling
 
 ### 5.1.9 - add getModalites api
 
