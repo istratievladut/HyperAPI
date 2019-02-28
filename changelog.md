@@ -4,6 +4,10 @@
 
 ### 5.1.11 - Fix variable ignore test
 
+- Adding Route `DefaultResampling`
+    - Available since HDP 3.6
+    - POST `/projects/{project_ID}/datasets/{dataset_ID}/defaultResampling` 
+
 - Fix variable ignore test in [variable.py](HyperAPI/hyper_api/variable.py)
 ```
 varname = self.name
