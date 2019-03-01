@@ -147,7 +147,7 @@ class Variable(Base):
         """
         if not self.is_ignored:
             varname = self.name
-            data = {'updateFields': {varname: {'ignored': True}}
+            data = {'updateFields': {varname: {'ignored': True}}}
             self.__api.Datasets.metadata(project_ID=self.project_id, dataset_ID=self.dataset_id, json=data)
             self.__json_returned['ignored'] = True
         return self
@@ -160,7 +160,7 @@ class Variable(Base):
         """
         if self.is_ignored:
             varname = self.name
-            data = {'updateFields': {varname: {'ignored': False}}
+            data = {'updateFields': {varname: {'ignored': False}}}
             self.__api.Datasets.metadata(project_ID=self.project_id, dataset_ID=self.dataset_id, json=data)
             self.__json_returned['ignored'] = False
         return self
