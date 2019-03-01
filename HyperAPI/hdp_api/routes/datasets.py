@@ -83,7 +83,7 @@ class Datasets(Resource):
         }
 
     @available_since('3.6')
-    class _postDefaultResamplig(Route):
+    class _DefaultResampling(Route):
         name = "Default Resampling"
         httpMethod = Route.POST
         path = "/projects/{project_ID}/datasets/{dataset_ID}/defaultResampling",
