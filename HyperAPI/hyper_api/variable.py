@@ -146,8 +146,11 @@ class Variable(Base):
             Variable: variable that has been ignored
         """
         if not self.is_ignored:
-            varname = self.name
-            data = {'updateFields': {varname: {'ignored': True}}}
+            if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
+                varname = self.name
+                data = {'updateFields': {varname: {'ignored': True }}}
+            else:
+                data = {'changedMetadata': [self.name]}    
             self.__api.Datasets.metadata(project_ID=self.project_id, dataset_ID=self.dataset_id, json=data)
             self._update()
         return self
@@ -159,8 +162,11 @@ class Variable(Base):
             Variable: variable that has been kept
         """
         if self.is_ignored:
-            varname = self.name
-            data = {'updateFields': {varname: {'ignored': False}}}
+            if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
+                varname = self.name
+                data = {'updateFields': {varname: {'ignored': True }}}
+            else:
+                data = {'changedMetadata': [self.name]}    
             self.__api.Datasets.metadata(project_ID=self.project_id, dataset_ID=self.dataset_id, json=data)
             self._update()
         return self

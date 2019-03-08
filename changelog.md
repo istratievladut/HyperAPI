@@ -11,7 +11,7 @@
 - Fix variable ignore test in [variable.py](HyperAPI/hyper_api/variable.py)
 ```
 varname = self.name
-data = {'updateFields': {varname: {'ignored': True}}
+data = {'updateFields': {varname: {'ignored': True }}}
 ```
 
 
