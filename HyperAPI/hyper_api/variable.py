@@ -149,7 +149,7 @@ class Variable(Base):
             varname = self.name
             data = {'updateFields': {varname: {'ignored': True}}}
             self.__api.Datasets.metadata(project_ID=self.project_id, dataset_ID=self.dataset_id, json=data)
-            self.__json_returned['ignored'] = True
+            self._update()
         return self
 
     @Helper.try_catch
@@ -162,9 +162,15 @@ class Variable(Base):
             varname = self.name
             data = {'updateFields': {varname: {'ignored': False}}}
             self.__api.Datasets.metadata(project_ID=self.project_id, dataset_ID=self.dataset_id, json=data)
-            self.__json_returned['ignored'] = False
+            self._update()
         return self
 
+    @Helper.try_catch
+    def _update(self):
+        json = {'project_ID': self.project_id, 'dataset_ID': self.dataset_id}
+        variable_res = self.__api.Variable.getvariable(**json)
+        self.__json_returned = list(filter(lambda x: x.get('name') == self.name, variable_res['variables']))[0]
+        
 
 class DiscreteVariable(Variable):
     def __init__(self, api, json_sent, json_returned):
@@ -297,8 +303,3 @@ class ContinuousVariable(Variable):
             self._update()
         return self
 
-    @Helper.try_catch
-    def _update(self):
-        json = {'project_ID': self.project_id, 'dataset_ID': self.dataset_id}
-        variable_res = self.__api.Variable.getvariable(**json)
-        self.__json_returned = list(filter(lambda x: x.get('name') == self.name, variable_res['variables']))[0]
