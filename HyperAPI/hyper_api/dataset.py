@@ -9,6 +9,8 @@ from HyperAPI.hyper_api.base import Base
 from HyperAPI.hyper_api.variable import VariableFactory
 from HyperAPI.hyper_api.xray import XrayFactory
 from HyperAPI.hyper_api.ruleset import RulesetFactory
+from HyperAPI.hdp_api.routes.base.version_management import deprecated_since
+from HyperAPI.hyper_api.project import Project
 
 
 class DatasetFactory:
@@ -329,9 +331,14 @@ class DatasetFactory:
         Returns:
             Dataset
         """
-        datasets = list(filter(lambda x: x.is_default is True, self.filter()))
-        if datasets:
-            return datasets[0]
+        if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
+            json = {'project_ID': self.__project_id}
+            project = Project(self.__api, {'project_ID': self.__project_id}, self.__api.Projects.getaproject(**json))
+            return self.get_by_id(project.default_dataset_id)
+        else:
+            datasets = list(filter(lambda x: x.is_default is True, self.filter()))
+            if datasets:
+                return datasets[0]
         return None
 
     @Helper.try_catch
@@ -507,8 +514,12 @@ class Dataset(Base):
         Set this dataset as default.
         """
         if not self._is_deleted:
-            self.__json_sent = {'project_ID': self.project_id, 'dataset_ID': self.dataset_id}
-            self.__api.Datasets.defaultdataset(**self.__json_sent)
+            if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
+                self.__json_sent = {'defaultDatasetId': self.dataset_id}
+                self.__api.Projects.update(project_ID=self.project_id, json=self.__json_sent)
+            else:
+                self.__json_sent = {'project_ID': self.project_id, 'dataset_ID': self.dataset_id}
+                self.__api.Datasets.defaultdataset(**self.__json_sent)
             self.__json_returned = DatasetFactory(self.__api, self.project_id).get_by_id(self.dataset_id).__json_returned
         return self
 
