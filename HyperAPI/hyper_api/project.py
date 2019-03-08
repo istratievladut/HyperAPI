@@ -46,6 +46,8 @@ class ProjectFactory:
         Returns:
             list of Project
         """
+        if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
+            return list(map(lambda x: Project(self.__api, {}, x), self.__api.Projects.projects()))        
         return list(map(lambda x: Project(self.__api, {}, x), self.__api.Projects.projects().get('projects')))
 
     @Helper.try_catch
@@ -89,7 +91,11 @@ class ProjectFactory:
         Returns:
             Project
         """
-        defaultProjectId = self.__api.Projects.projects().get('defaultProject')
+        if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
+            defaultProjectId = self.__api.Settings._getusersettings().get('defaultProjectId')
+        else:
+            defaultProjectId = self.__api.Projects.projects().get('defaultProject')
+
         if defaultProjectId is None:
             return None
 
@@ -207,7 +213,11 @@ class Project(Base):
         """
         Returns a boolean indicating if this project is the default project.
         """
-        defaultProjectId = self.__api.Projects.projects().get('defaultProject')
+        if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
+            defaultProjectId = self.__api.Settings._getusersettings().get('defaultProjectId')
+        else:
+            defaultProjectId = self.__api.Projects.projects().get('defaultProject')
+
         return self.project_id == defaultProjectId
 
     @property
@@ -284,6 +294,13 @@ class Project(Base):
         The project description.
         """
         return self.__json_returned.get('description')
+
+    @property
+    def default_dataset_id(self):
+        """
+        The default dataset's ID.
+        """
+        return self.__json_returned.get('defaultDatasetId')        
 
     @property
     def created(self):

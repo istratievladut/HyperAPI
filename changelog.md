@@ -1,5 +1,15 @@
 # HyperAPI Changelog
 
+## 5.2 - Refactoring of Projects and Datasets routes
+
+- Deprecated route `DefaultProject`
+    - Starting from HDP 3.6
+    - Superseded by `updateProject`
+
+- Deprecated route `renameProject`
+    - Starting from HDP 3.6
+    - Superseded by `updateProject`
+
 ## 5.1
 
 ### 5.1.11 - Fix variable ignore test

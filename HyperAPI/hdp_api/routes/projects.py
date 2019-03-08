@@ -1,4 +1,5 @@
 from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.routes.base.version_management import deprecated_since
 
 
 class Projects(Resource):
@@ -22,6 +23,7 @@ class Projects(Resource):
         httpMethod = Route.POST
         path = "/projects"
 
+    @deprecated_since('3.6')
     class _Defaultproject(Route):
         name = "Default project"
         httpMethod = Route.POST
@@ -38,6 +40,7 @@ class Projects(Resource):
             'project_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    @deprecated_since('3.6')
     class _renameProject(Route):
         name = "renameProject"
         httpMethod = Route.POST

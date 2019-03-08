@@ -1,5 +1,5 @@
 from HyperAPI.hdp_api.routes import Resource, Route
-from HyperAPI.hdp_api.routes.base.version_management import available_since
+from HyperAPI.hdp_api.routes.base.version_management import available_since, deprecated_since
 
 
 class Datasets(Resource):
@@ -129,6 +129,7 @@ class Datasets(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    @deprecated_since('3.6')
     class _Defaultdataset(Route):
         name = "Default dataset"
         httpMethod = Route.POST
