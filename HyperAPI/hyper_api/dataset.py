@@ -10,7 +10,6 @@ from HyperAPI.hyper_api.variable import VariableFactory
 from HyperAPI.hyper_api.xray import XrayFactory
 from HyperAPI.hyper_api.ruleset import RulesetFactory
 from HyperAPI.hdp_api.routes.base.version_management import deprecated_since
-from HyperAPI.hyper_api.project import Project
 
 
 class DatasetFactory:
@@ -332,9 +331,8 @@ class DatasetFactory:
             Dataset
         """
         if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
-            json = {'project_ID': self.__project_id}
-            project = Project(self.__api, {'project_ID': self.__project_id}, self.__api.Projects.getaproject(**json))
-            return self.get_by_id(project.default_dataset_id)
+            project_json = self.__api.Projects.getaproject(project_ID=self.__project_id)
+            return self.get_by_id(project_json.get('defaultDatasetId'))
         else:
             datasets = list(filter(lambda x: x.is_default is True, self.filter()))
             if datasets:
