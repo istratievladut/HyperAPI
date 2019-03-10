@@ -86,7 +86,7 @@ class Datasets(Resource):
     class _DefaultResampling(Route):
         name = "Default Resampling"
         httpMethod = Route.POST
-        path = "/projects/{project_ID}/datasets/{dataset_ID}/defaultResampling",
+        path = "/projects/{project_ID}/datasets/{dataset_ID}/defaultResampling"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID,
