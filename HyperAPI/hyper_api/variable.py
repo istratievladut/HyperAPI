@@ -153,7 +153,7 @@ class Variable(Base):
         elif not self.is_ignored:
             data = {'changedMetadata': [self.name]}
             self.__api.Datasets.metadata(project_ID=self.project_id, dataset_ID=self.dataset_id, json=data)
-            self._update()
+            self.__json_returned = self._update()
         return self
 
     @Helper.try_catch
@@ -170,14 +170,14 @@ class Variable(Base):
         elif not self.is_ignored:
             data = {'changedMetadata': [self.name]}
             self.__api.Datasets.metadata(project_ID=self.project_id, dataset_ID=self.dataset_id, json=data)
-            self._update()
+            self.__json_returned = self._update()
         return self
 
     @Helper.try_catch
     def _update(self):
         json = {'project_ID': self.project_id, 'dataset_ID': self.dataset_id}
         variable_res = self.__api.Variable.getvariable(**json)
-        self.__json_returned = list(filter(lambda x: x.get('name') == self.name, variable_res['variables']))[0]
+        return list(filter(lambda x: x.get('name') == self.name, variable_res['variables']))[0]
         
 
 class DiscreteVariable(Variable):
@@ -296,7 +296,7 @@ class ContinuousVariable(Variable):
         except Exception as E:
             raise ApiException('Unable to get the discretization status', str(E))
 
-        self._update()
+        self.__json_returned = self._update()
         return self
 
     @Helper.try_catch
@@ -308,6 +308,6 @@ class ContinuousVariable(Variable):
         if self.discretization is not None:
             data = {'name': self.name}
             self.__api.Datasets.deletediscretization(project_ID=self.project_id, dataset_ID=self.dataset_id, json=data)
-            self._update()
+            self.__json_returned = self._update()
         return self
 
