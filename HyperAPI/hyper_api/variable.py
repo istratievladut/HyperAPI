@@ -145,14 +145,15 @@ class Variable(Base):
         Returns:
             Variable: variable that has been ignored
         """
-        if not self.is_ignored:
-            if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
-                varname = self.name
-                data = {'updateFields': {varname: {'ignored': True }}}
-            else:
-                data = {'changedMetadata': [self.name]}    
+        if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
+            varname = self.name
+            data = {'updateFields': {varname: {'ignored': True }}}
+            returned_json = self.__api.Datasets.metadata(project_ID=self.project_id, dataset_ID=self.dataset_id, json=data)
+            self.__json_returned['ignored'] = list(filter(lambda x: x.get('varName') == self.name, returned_json['metadata']['variables']))[0].get('ignored')
+        elif not self.is_ignored:
+            data = {'changedMetadata': [self.name]}
             self.__api.Datasets.metadata(project_ID=self.project_id, dataset_ID=self.dataset_id, json=data)
-            self._update()
+            self.__json_returned = self._update()
         return self
 
     @Helper.try_catch
@@ -161,21 +162,22 @@ class Variable(Base):
         Returns:
             Variable: variable that has been kept
         """
-        if self.is_ignored:
-            if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
-                varname = self.name
-                data = {'updateFields': {varname: {'ignored': False }}}
-            else:
-                data = {'changedMetadata': [self.name]}    
+        if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
+            varname = self.name
+            data = {'updateFields': {varname: {'ignored': False }}}
+            returned_json = self.__api.Datasets.metadata(project_ID=self.project_id, dataset_ID=self.dataset_id, json=data)
+            self.__json_returned['ignored'] = list(filter(lambda x: x.get('varName') == self.name, returned_json['metadata']['variables']))[0].get('ignored')
+        elif not self.is_ignored:
+            data = {'changedMetadata': [self.name]}
             self.__api.Datasets.metadata(project_ID=self.project_id, dataset_ID=self.dataset_id, json=data)
-            self._update()
+            self.__json_returned = self._update()
         return self
 
     @Helper.try_catch
     def _update(self):
         json = {'project_ID': self.project_id, 'dataset_ID': self.dataset_id}
         variable_res = self.__api.Variable.getvariable(**json)
-        self.__json_returned = list(filter(lambda x: x.get('name') == self.name, variable_res['variables']))[0]
+        return list(filter(lambda x: x.get('name') == self.name, variable_res['variables']))[0]
         
 
 class DiscreteVariable(Variable):
@@ -294,7 +296,7 @@ class ContinuousVariable(Variable):
         except Exception as E:
             raise ApiException('Unable to get the discretization status', str(E))
 
-        self._update()
+        self.__json_returned = self._update()
         return self
 
     @Helper.try_catch
@@ -306,6 +308,6 @@ class ContinuousVariable(Variable):
         if self.discretization is not None:
             data = {'name': self.name}
             self.__api.Datasets.deletediscretization(project_ID=self.project_id, dataset_ID=self.dataset_id, json=data)
-            self._update()
+            self.__json_returned = self._update()
         return self
 
