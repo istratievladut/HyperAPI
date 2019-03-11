@@ -164,7 +164,7 @@ class Variable(Base):
         if self.is_ignored:
             if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
                 varname = self.name
-                data = {'updateFields': {varname: {'ignored': True }}}
+                data = {'updateFields': {varname: {'ignored': False }}}
             else:
                 data = {'changedMetadata': [self.name]}    
             self.__api.Datasets.metadata(project_ID=self.project_id, dataset_ID=self.dataset_id, json=data)
