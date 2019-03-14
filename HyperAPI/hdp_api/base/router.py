@@ -213,10 +213,11 @@ class Router(object):
 
     # Work Management Specific Code ---------------------------------------------------------------------
 
-    def validate_schema(self, schema):
+    @classmethod
+    def validate_schema(self, schema, version):
         results = dict()
 
-        unexpected_resources, missing_resources, match_resources = compare_schema_resources(self._resources, schema.get('resources'))
+        unexpected_resources, missing_resources, match_resources = compare_schema_resources(self._resources, schema.get('resources'), version)
 
         results['unexpected_resources'] = unexpected_resources
         results['missing_resources'] = missing_resources
@@ -226,8 +227,9 @@ class Router(object):
             if _resource.name not in match_resources:
                 continue
 
-            _resource_schema = schema.get('resources').get(_resource.name)
-            unexpected_routes, missing_routes, match_routes = compare_schema_routes(_resource._routes, _resource_schema)
+            _resource_schema = schema.get('resources').get(_resource.name, {}).get('methods', {})
+            _routes = list(_resource._iter_routes_classes(version))
+            unexpected_routes, missing_routes, match_routes = compare_schema_routes(_routes, _resource_schema, version)
             if unexpected_routes or missing_routes:
                 results['different_resources'][_resource.name] = {
                     'unexpected_routes': unexpected_routes,

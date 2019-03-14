@@ -1,9 +1,10 @@
-from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route
 
 
 class Visualization(Resource):
     name = "Visualization"
-    available_since = "3.0"
+    available_since = "1.0"
     removed_since = None
 
     class _List(Route):
@@ -47,6 +48,7 @@ class Visualization(Resource):
     class _CreateMany(Route):
         name = "CreateMany"
         httpMethod = Route.POST
+        available_since = "3.0"
         path = "/projects/{project_ID}/datasets/{dataset_ID}/visualizations/createMany"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,

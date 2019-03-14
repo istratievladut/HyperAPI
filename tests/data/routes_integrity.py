@@ -1,4 +1,5 @@
-from HyperAPI.hdp_api.routes import Resource, Route, SubRoute
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route, SubRoute
 
 
 class TestResource(Resource):

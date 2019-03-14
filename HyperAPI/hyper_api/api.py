@@ -1,4 +1,4 @@
-from HyperAPI.hdp_api._router import Router
+from HyperAPI.hdp_api.base.router import Router
 from HyperAPI.util import Helper
 from HyperAPI.hyper_api.project import ProjectFactory
 

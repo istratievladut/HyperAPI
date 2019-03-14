@@ -1,5 +1,5 @@
 import unittest
-from HyperAPI.hdp_api.routes import Route
+from HyperAPI.hdp_api.base.route import Route
 
 
 class ValidatorTestCase(unittest.TestCase):

@@ -1,8 +1,8 @@
 from abc import ABCMeta, abstractproperty
 import time
 import inspect
-from HyperAPI.hdp_api.routes.base.validators import ValidatorObjectID, ValidatorAny, ValidatorInt
-from HyperAPI.hdp_api.routes.base.validators import RoutePathInvalidException, RouteCompatibilityFailed, RouteConsistencyException
+from HyperAPI.hdp_api.base.validators import ValidatorObjectID, ValidatorAny, ValidatorInt
+from HyperAPI.hdp_api.base.validators import RoutePathInvalidException, RouteCompatibilityFailed, RouteConsistencyException
 from HyperAPI.utils.version import Version
 from requests.exceptions import HTTPError
 

@@ -1,9 +1,10 @@
-from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route, SubRoute
 
 
 class Dashboards(Resource):
     name = "Dashboards"
-    available_since = "3.0"
+    available_since = "1.0"
     removed_since = None
 
     class _Dashboards(Route):
@@ -64,7 +65,8 @@ class Dashboards(Resource):
 
     class _updateDashboard(Route):
         name = "updateDashboard"
-        available_since = '3.1'
+        available_since = "1.0"
+        removed_since = "3.0.2"
         httpMethod = Route.POST
         path = "/projects/{project_ID}/datasets/{dataset_ID}/dashboards/{dashboard_ID}"
         _path_keys = {
@@ -72,6 +74,17 @@ class Dashboards(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
             'dashboard_ID': Route.VALIDATOR_OBJECTID
         }
+
+        class _updateDashboardAgain(SubRoute):
+            name = "updateDashboard"
+            available_since = "3.0.2"
+            httpMethod = Route.POST
+            path = "/projects/{project_ID}/datasets/{dataset_ID}/dashboards/{dashboard_ID}"
+            _path_keys = {
+                'project_ID': Route.VALIDATOR_OBJECTID,
+                'dataset_ID': Route.VALIDATOR_OBJECTID,
+                'dashboard_ID': Route.VALIDATOR_OBJECTID
+            }
 
     class _updateProjectDashboard(Route):
         name = "updateProjectDashboard"

@@ -1,4 +1,5 @@
-from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route
 
 
 class AuxData(Resource):
@@ -114,6 +115,7 @@ class AuxData(Resource):
     class _exportAuxDataMatrices(Route):
         name = "exportAuxDataMatrices"
         httpMethod = Route.GET
+        available_since = "3.1"
         path = "/projects/{project_ID}/auxdata/{auxdata_ID}/exportMatrices/{work_ID}"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
@@ -124,6 +126,7 @@ class AuxData(Resource):
     class _importAuxDataMatrices(Route):
         name = "importAuxDataMatrices"
         httpMethod = Route.POST
+        available_since = "3.1"
         path = "/projects/{project_ID}/auxdata/{auxdata_ID}/importMatrices"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,

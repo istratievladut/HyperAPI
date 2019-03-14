@@ -1,1 +1,1 @@
-from HyperAPI.hdp_api._router import Router  # noqa:  F401
+from HyperAPI.hdp_api.base.router import Router  # noqa:  F401

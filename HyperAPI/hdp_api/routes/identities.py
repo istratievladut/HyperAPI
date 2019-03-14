@@ -1,9 +1,10 @@
-from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route
 
 
 class Identities(Resource):
     name = "Identities"
-    available_since = "3.0"
+    available_since = "1.0"
     removed_since = None
 
     class _getAllIdentities(Route):
@@ -15,6 +16,12 @@ class Identities(Resource):
         name = "Get all users"
         httpMethod = Route.GET
         path = "/identities/users"
+
+    class _getAllUserInfos(Route):
+        name = "Get all user infos"
+        httpMethod = Route.GET
+        removed_since = "3.0"
+        path = "/identities/users/info"
 
     class _addUser(Route):
         name = "Add a user"

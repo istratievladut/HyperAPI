@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractproperty
 import inspect
-from HyperAPI.hdp_api.routes.base.route_base import Route
+from HyperAPI.hdp_api.base.route import Route
 from HyperAPI.utils.version import Version
 
 
@@ -8,6 +8,7 @@ class Resource(object):
     __metaclass__ = ABCMeta
     available_since = 0
     remove_since = None
+    unavailable_on = []
 
     @abstractproperty
     def name(self):
@@ -17,21 +18,26 @@ class Resource(object):
     def __init__(self, session, watcher=None):
         self.session = session
         self._routes = {}
-        for _route in (_m[1] for _m in inspect.getmembers(self.__class__) if inspect.isclass(_m[1]) and issubclass(_m[1], Route)):
-            if _route.is_available(self.session.version):
-                _routeInstance = _route(session, watcher=watcher)
-                _routeName = _route.get_route_name()
-                self.__setattr__(_routeName, _routeInstance)
-                self._routes[_routeName] = _routeInstance
+        for _route in self._iter_routes_classes(self.session.version):
+            _routeInstance = _route(session, watcher=watcher)
+            _routeName = _route.get_route_name()
+            self.__setattr__(_routeName, _routeInstance)
+            self._routes[_routeName] = _routeInstance
 
     def __iter__(self):
         for _r in self._routes.values():
             yield _r
 
     @classmethod
+    def _iter_routes_classes(cls, version):
+        for _route in (_m[1] for _m in inspect.getmembers(cls) if inspect.isclass(_m[1]) and issubclass(_m[1], Route)):
+            if _route.is_available(version):
+                yield _route
+
+    @classmethod
     def is_available(cls, version):
         _check_version = Version(version)
-        return Version(cls.available_since) <= _check_version and Version(cls.removed_since) > _check_version
+        return Version(cls.available_since) <= _check_version and Version(cls.removed_since) > _check_version and _check_version not in list(Version(_v) for _v in cls.unavailable_on)
 
     @classmethod
     def check_routes_integrity(cls):

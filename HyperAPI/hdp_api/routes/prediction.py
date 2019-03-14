@@ -1,9 +1,10 @@
-from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route
 
 
 class Prediction(Resource):
     name = "Prediction"
-    available_since = "3.0"
+    available_since = "1.0"
     removed_since = None
 
     class _getModel(Route):
@@ -109,6 +110,7 @@ class Prediction(Resource):
     class _publishModel(Route):
         name = "publishModel"
         httpMethod = Route.POST
+        available_since = "3.0"
         path = "/projects/{project_ID}/models/{model_ID}/publish"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
@@ -126,8 +128,8 @@ class Prediction(Resource):
 
     class _export(Route):
         name = "export"
-        available_since = '3.0'
         httpMethod = Route.GET
+        available_since = '3.6'
         path = "/projects/{project_ID}/models/{model_ID}/export"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
@@ -145,7 +147,7 @@ class Prediction(Resource):
 
     class _exportPreprocessedData(Route):
         name = "exportPreprocessedData"
-        available_since = '3.0'
+        available_since = '3.6'
         httpMethod = Route.GET
         path = "/projects/{project_ID}/models/{model_ID}/exportPreprocessedData"
         _path_keys = {

@@ -1,12 +1,23 @@
-from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route, SubRoute
 
 
 class Nitro(Resource):
     name = "nitro"
-    available_since = "3.0"
+    available_since = "1.0"
     removed_since = None
 
     class _getForecasts(Route):
+        name = "getForecasts"
+        httpMethod = Route.GET
+        removed_since = "3.0"
+        path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID
+        }
+
+    class _postForecasts(Route):
         name = "getForecasts"
         httpMethod = Route.POST
         path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts"
@@ -28,6 +39,7 @@ class Nitro(Resource):
     class _insertForecast(Route):
         name = "insertForecast"
         httpMethod = Route.POST
+        available_since = "3.0"
         path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/add"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
@@ -67,13 +79,26 @@ class Nitro(Resource):
 
     class _getForecastTunes(Route):
         name = "getForecastTunes"
-        httpMethod = Route.POST
+        httpMethod = Route.GET
+        available_since = "1.0"
+        removed_since = "3.0"
         path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID,
             'forecast_ID': Route.VALIDATOR_OBJECTID
         }
+
+        class _postForecastTunes(SubRoute):
+            name = "getForecastTunes"
+            httpMethod = Route.POST
+            available_since = "3.0"
+            path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes"
+            _path_keys = {
+                'project_ID': Route.VALIDATOR_OBJECTID,
+                'dataset_ID': Route.VALIDATOR_OBJECTID,
+                'forecast_ID': Route.VALIDATOR_OBJECTID
+            }
 
     class _updateForecastTunes(Route):
         name = "updateForecastTunes"
@@ -85,9 +110,22 @@ class Nitro(Resource):
             'forecast_ID': Route.VALIDATOR_OBJECTID
         }
 
+    class _getForecastTunesAggregate(Route):
+        name = "getForecastTunesAggregateGeo"
+        httpMethod = Route.GET
+        available_since = "1.0"
+        removed_since = "3.0"
+        path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/aggregate"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID,
+            'forecast_ID': Route.VALIDATOR_OBJECTID
+        }
+
     class _getForecastTunesAggregateGeo(Route):
         name = "getForecastTunesAggregateGeo"
         httpMethod = Route.POST
+        available_since = "3.0"
         path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/aggregate/geo"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
@@ -98,6 +136,7 @@ class Nitro(Resource):
     class _getForecastTunesAggregateDepot(Route):
         name = "getForecastTunesAggregateDepot"
         httpMethod = Route.POST
+        available_since = "3.0"
         path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/aggregate/depot"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
@@ -108,6 +147,7 @@ class Nitro(Resource):
     class _exportForecastTunes(Route):
         name = "exportForecastTunes"
         httpMethod = Route.GET
+        available_since = "3.0"
         path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/export"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
@@ -128,7 +168,7 @@ class Nitro(Resource):
 
     class _getForecastTunesStats(Route):
         name = "getForecastTunesStats"
-        available_since = '3.5'
+        available_since = '3.0.2'
         httpMethod = Route.POST
         path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/stats"
         _path_keys = {

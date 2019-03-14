@@ -1,9 +1,10 @@
-from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route
 
 
 class Datasets(Resource):
     name = "Datasets"
-    available_since = "3.0"
+    available_since = "1.0"
     removed_since = None
 
     class _Datasets(Route):
@@ -83,10 +84,10 @@ class Datasets(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since('3.6')
     class _DefaultResampling(Route):
         name = "Default Resampling"
         httpMethod = Route.POST
+        available_since = "4.0"
         path = "/projects/{project_ID}/datasets/{dataset_ID}/defaultResampling"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
@@ -129,10 +130,10 @@ class Datasets(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @deprecated_since('3.6')
     class _Defaultdataset(Route):
         name = "Default dataset"
         httpMethod = Route.POST
+        removed_since = "4.0"
         path = "/projects/{project_ID}/datasets/{dataset_ID}/updateSelected"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
@@ -178,6 +179,7 @@ class Datasets(Resource):
     class _ExportdiscreteDict(Route):
         name = "Export discreteDict"
         httpMethod = Route.GET
+        available_since = "3.6"
         path = "/projects/{project_ID}/datasets/{dataset_ID}/discreteDict/export"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,

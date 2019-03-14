@@ -1,4 +1,5 @@
-from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route
 
 
 class SWPMatchmaking(Resource):
@@ -18,6 +19,7 @@ class SWPMatchmaking(Resource):
     class _getOptimizationDetail(Route):
         name = "getOptimizationDetail"
         httpMethod = Route.GET
+        available_since = "3.1"
         path = "/projects/{project_ID}/redeployments/{work_ID}/optimizationDetail"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,

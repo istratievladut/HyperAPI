@@ -1,5 +1,5 @@
 import unittest
-from HyperAPI.hdp_api.routes.base.validators import RouteConsistencyException
+from HyperAPI.hdp_api.base.validators import RouteConsistencyException
 
 
 class ConsistencyTestCase(unittest.TestCase):
