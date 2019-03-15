@@ -87,13 +87,13 @@ class Route(object):
                     self.httpMethod = _route.httpMethod or self.httpMethod
                     self.available_since = _route.available_since or self.available_since
                     self.removed_since = _route.removed_since or self.removed_since
-                    self.__routed_call__ = lambda self, **kwargs: _routeInstance.__call__(**_routeInstance._convert_args(**kwargs))
+                    self.__routed_call__ = lambda **kwargs: _routeInstance.__call__(**_routeInstance._convert_args(self, **kwargs))
                     break
             else:
                 raise RouteCompatibilityFailed('Unable to create the route version compatible')
 
     def __call__(self, **kwargs):
-        return self.__routed_call__(self, **kwargs)
+        return self.__routed_call__(**kwargs)
 
     def __direct_call__(self, **kwargs):
         formatter = dict.fromkeys(self._path_keys)
@@ -194,5 +194,5 @@ class SubRoute(Route):
         return False
 
     @staticmethod
-    def _convert_args(**kwargs):
+    def _convert_args(self, **kwargs):
         return kwargs

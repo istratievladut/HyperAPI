@@ -4,6 +4,6 @@ RUN apk add bash alpine-sdk libexecinfo-dev
 
 ARG hyperapiversion="0"
 
-RUN pip install https://s3.eu-central-1.amazonaws.com/pypi.hcube.cool/HyperAPI/HyperAPI-${hyperapiversion}-py3-none-any.whl
+RUN pip install -i https://pypi.hcube.cool/simple HyperAPI=="${hyperapiversion}"
 
 CMD ["python"]

@@ -56,8 +56,7 @@ from HyperAPI.utils.validation import compare_schema_resources, compare_schema_r
 
 from collections import namedtuple
 
-SessionDetails = namedtuple('SessionDetails', ['url', 'name', 'product', 'version', 'build_date', 'hdp_version'], 
-                            defaults={'url': None, 'name': None, 'product': None, 'version': None, 'build_date': None, 'hdp_version': None})
+SessionDetails = namedtuple('SessionDetails', ['url', 'name', 'product', 'version', 'build_date', 'hdp_version'])
 
 
 class Router(object):
@@ -126,7 +125,13 @@ class Router(object):
                                                   build_date=_system_details.get('buildDate', 'N/A'),
                                                   )
         except Exception:
-            self.session_details = SessionDetails(url=url)
+            self.session_details = SessionDetails(url=url,
+                                                  name=None,
+                                                  product=None,
+                                                  version=None,
+                                                  hdp_version=None,
+                                                  build_date=None,
+                                                  )
         self.session.version = Version(self.session_details.hdp_version)
 
         # Creating Resources

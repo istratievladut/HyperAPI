@@ -17,6 +17,16 @@ class Nitro(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID
         }
 
+        class _getForecastsPost(SubRoute):
+            name = "getForecasts"
+            httpMethod = Route.POST
+            available_since = "3.0"
+            path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts"
+            _path_keys = {
+                'project_ID': Route.VALIDATOR_OBJECTID,
+                'dataset_ID': Route.VALIDATOR_OBJECTID
+            }
+
     class _postForecasts(Route):
         name = "getForecasts"
         httpMethod = Route.POST

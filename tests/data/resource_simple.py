@@ -49,6 +49,6 @@ class TestResource(Resource):
             }
 
             @staticmethod
-            def _convert_args(**kwargs):
+            def _convert_args(self, **kwargs):
                 kwargs["route_ID"] = 0
                 return kwargs
