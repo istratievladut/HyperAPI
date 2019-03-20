@@ -1,9 +1,11 @@
-from HyperAPI.hdp_api.routes import Resource, Route
-from HyperAPI.hdp_api.routes.base.version_management import available_since
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route
 
 
 class DatasetReshapes(Resource):
     name = "datasetReshapes"
+    available_since = "3.0"
+    removed_since = None
 
     class _getReshapes(Route):
         name = "getReshapes"
@@ -57,9 +59,9 @@ class DatasetReshapes(Resource):
             'reshape_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since('3.3')
     class _publishReshapeToEtl(Route):
         name = "publishReshapeToEtl"
+        available_since = '3.3'
         httpMethod = Route.POST
         path = "/projects/{project_ID}/reshapes/{reshape_ID}/etlpublish"
         _path_keys = {

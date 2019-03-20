@@ -1,9 +1,11 @@
-from HyperAPI.hdp_api.routes import Resource, Route
-from HyperAPI.hdp_api.routes.base.version_management import available_since
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route
 
 
 class OptimProcess(Resource):
     name = "optimProcess"
+    available_since = "1.0"
+    removed_since = None
 
     class _getSandboxDataForControlChart(Route):
         name = "getSandboxDataForControlChart"
@@ -48,9 +50,9 @@ class OptimProcess(Resource):
             'controlChart_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since('3.3')
     class _publishControlChartToEtl(Route):
         name = "PublishControlChartToEtl"
+        available_since = '3.3'
         httpMethod = Route.POST
         path = "/optimProcess/projects/{project_ID}/controlCharts/{controlChart_ID}/etlpublish"
         _path_keys = {

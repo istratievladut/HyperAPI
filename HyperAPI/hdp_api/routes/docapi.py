@@ -1,8 +1,11 @@
-from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route
 
 
 class DocApi(Resource):
     name = "DocApi"
+    available_since = "1.0"
+    removed_since = None
 
     class _docApi(Route):
         name = "docApi"

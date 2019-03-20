@@ -1,9 +1,11 @@
-from HyperAPI.hdp_api.routes import Resource, Route
-from HyperAPI.hdp_api.routes.base.version_management import deprecated_since
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route
 
 
 class Projects(Resource):
     name = "Projects"
+    available_since = "1.0"
+    removed_since = None
 
     class _Projects(Route):
         name = "Projects"
@@ -23,10 +25,10 @@ class Projects(Resource):
         httpMethod = Route.POST
         path = "/projects"
 
-    @deprecated_since('3.6')
     class _Defaultproject(Route):
         name = "Default project"
         httpMethod = Route.POST
+        removed_since = "4.0"
         path = "/projects/{project_ID}/updateSelected"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
@@ -40,10 +42,10 @@ class Projects(Resource):
             'project_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @deprecated_since('3.6')
     class _renameProject(Route):
         name = "renameProject"
         httpMethod = Route.POST
+        removed_since = "4.0"
         path = "/projects/{project_ID}/rename"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
@@ -52,7 +54,17 @@ class Projects(Resource):
     class _updateShareUsers(Route):
         name = "updateShareUsers"
         httpMethod = Route.POST
+        removed_since = "4.0"
         path = "/projects/{project_ID}/updateShareUsers"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+        }
+
+    class _getShareUsers(Route):
+        name = "getShareUsers"
+        httpMethod = Route.GET
+        removed_since = "3.0"
+        path = "/projects/{project_ID}/getShareUsers"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
         }

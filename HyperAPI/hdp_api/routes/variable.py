@@ -1,9 +1,11 @@
-from HyperAPI.hdp_api.routes import Resource, Route
-from HyperAPI.hdp_api.routes.base.version_management import available_since
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route
 
 
 class Variable(Resource):
     name = "Variable"
+    available_since = "1.0"
+    removed_since = None
 
     class _Bins(Route):
         name = "Bins"
@@ -32,19 +34,19 @@ class Variable(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since("3.0")
     class _addVariableValidation(Route):
         name = "addVariableValidation"
         httpMethod = Route.POST
+        available_since = '3.6'
         path = "/projects/{project_ID}/datasets/{dataset_ID}/variables/validation"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since("3.2")
     class _getVariableValidation(Route):
         name = "getVariableValidation"
+        available_since = '3.2'
         httpMethod = Route.GET
         path = "/projects/{project_ID}/datasets/{dataset_ID}/variables/validation"
         _path_keys = {
@@ -52,9 +54,9 @@ class Variable(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since("3.6")
     class _getModalites(Route):
         name = "getModalities"
+        available_since = '3.6'
         httpMethod = Route.GET
         path = "/projects/{project_ID}/datasets/{dataset_ID}/modalities"
         _path_keys = {
@@ -62,10 +64,10 @@ class Variable(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since("3.0")
     class _deleteVariableValidation(Route):
         name = "removeVariableValidation"
         httpMethod = Route.POST
+        available_since = '3.6'
         path = "/projects/{project_ID}/datasets/{dataset_ID}/variables/validation/delete"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,

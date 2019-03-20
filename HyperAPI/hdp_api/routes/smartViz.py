@@ -1,9 +1,11 @@
-from HyperAPI.hdp_api.routes import Resource, Route
-from HyperAPI.hdp_api.routes.base.version_management import available_since
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route
 
 
 class SmartDataViz(Resource):
     name = "SmartDataViz"
+    available_since = "3.0"
+    removed_since = None
 
     class _getSmartDataViz(Route):
         name = "getSmartDataViz"
@@ -24,9 +26,9 @@ class SmartDataViz(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
-    @available_since('3.0')
     class _getSmartDataVizs(Route):
         name = "getSmartDataVizs"
+        available_since = '3.0'
         httpMethod = Route.GET
         path = "/projects/{project_ID}/smartDataViz/"
         _path_keys = {

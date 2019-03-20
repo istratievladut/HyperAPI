@@ -49,7 +49,14 @@ from HyperAPI.hdp_api.routes.monitoring import Monitoring
 from HyperAPI.hdp_api.routes.authentication import Authentication
 from HyperAPI.hdp_api.routes.thirdParties import ThirdParties
 from HyperAPI.hdp_api.routes.realTime import RealTime
+
+
 from HyperAPI.utils.timeoutSettings import TimeOutSettings
+from HyperAPI.utils.validation import compare_schema_resources, compare_schema_routes
+
+from collections import namedtuple
+
+SessionDetails = namedtuple('SessionDetails', ['url', 'name', 'product', 'version', 'build_date', 'hdp_version'])
 
 
 class Router(object):
@@ -110,15 +117,31 @@ class Router(object):
         try:
             # We must fetch the System version BEFORE creating route, so this call is hard coded
             _system_details = self.session.request('GET', System._About.path)
-            _version = _system_details.get('hdpVersion', 0)
+            self.session_details = SessionDetails(url=self.session.url,
+                                                  name=_system_details.get('name', 'N/A'),
+                                                  product=_system_details.get('product', 'N/A'),
+                                                  version=_system_details.get('version', 'N/A'),
+                                                  hdp_version=_system_details.get('hdpVersion', 0),
+                                                  build_date=_system_details.get('buildDate', 'N/A'),
+                                                  )
         except Exception:
-            _version = 0
-        self.session.version = Version(_version)
+            self.session_details = SessionDetails(url=url,
+                                                  name=None,
+                                                  product=None,
+                                                  version=None,
+                                                  hdp_version=None,
+                                                  build_date=None,
+                                                  )
+        self.session.version = Version(self.session_details.hdp_version)
 
         # Creating Resources
-        for resourceCls in self._resources:
-            self.__setattr__(resourceCls.__name__, resourceCls(self.session, watcher=watcher))
+        self._create_resources(self._resources, watcher=None)
         self._default_timeout_settings = TimeOutSettings()
+
+    def _create_resources(self, resources_list, watcher=None):
+        for resourceCls in resources_list:
+            if resourceCls.is_available(self.session.version):
+                self.__setattr__(resourceCls.__name__, resourceCls(self.session, watcher=watcher))
 
     def refresh_session(self, username=None, password=None, token=None):
         self.session.refresh(username, password, token)
@@ -147,7 +170,7 @@ class Router(object):
         else:
             raise ValueError('Missing conditions for works')
 
-        _works = self.Task.task.wait_until(project_ID=project_id, json=work_data, condition=lambda x: len(x) > 0)
+        _works = self.Task.task.wait_until(project_ID=project_id, json=work_data, condition=lambda x: len(x) > 0)  # noqa: E1101
         if not _works:
             # List empty, the work has not been created
             if work_id:
@@ -192,3 +215,30 @@ class Router(object):
 
             _work = next(iter(_works))
         return _work
+
+    # Work Management Specific Code ---------------------------------------------------------------------
+
+    @classmethod
+    def validate_schema(self, schema, version):
+        results = dict()
+
+        unexpected_resources, missing_resources, match_resources = compare_schema_resources(self._resources, schema.get('resources'), version)
+
+        results['unexpected_resources'] = unexpected_resources
+        results['missing_resources'] = missing_resources
+        results['different_resources'] = {}
+
+        for _resource in self._resources:
+            if _resource.name not in match_resources:
+                continue
+
+            _resource_schema = schema.get('resources').get(_resource.name, {}).get('methods', {})
+            _routes = list(_resource._iter_routes_classes(version))
+            unexpected_routes, missing_routes, match_routes = compare_schema_routes(_routes, _resource_schema, version)
+            if unexpected_routes or missing_routes:
+                results['different_resources'][_resource.name] = {
+                    'unexpected_routes': unexpected_routes,
+                    'missing_routes': missing_routes,
+                }
+
+        return results

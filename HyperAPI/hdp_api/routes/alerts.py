@@ -1,8 +1,11 @@
-from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route
 
 
 class Alerts(Resource):
     name = "alerts"
+    available_since = "3.0"
+    removed_since = None
 
     class _getAlerts(Route):
         name = "getAlerts"

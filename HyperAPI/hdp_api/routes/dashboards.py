@@ -1,9 +1,11 @@
-from HyperAPI.hdp_api.routes import Resource, Route
-from HyperAPI.hdp_api.routes.base.version_management import available_since
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route, SubRoute
 
 
 class Dashboards(Resource):
     name = "Dashboards"
+    available_since = "1.0"
+    removed_since = None
 
     class _Dashboards(Route):
         name = "getDashboards"
@@ -13,10 +15,10 @@ class Dashboards(Resource):
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID
         }
-    
-    @available_since('3.1')
+
     class _ProjectDashboards(Route):
         name = "getProjectDashboards"
+        available_since = '3.1'
         httpMethod = Route.GET
         path = "/projects/{project_ID}/dashboards"
         _path_keys = {
@@ -33,9 +35,9 @@ class Dashboards(Resource):
             'dashboard_ID': Route.VALIDATOR_OBJECTID
         }
 
-    @available_since('3.1')
     class _GetProjectDashboard(Route):
         name = "getProjectDashboard"
+        available_since = '3.1'
         httpMethod = Route.GET
         path = "/projects/{project_ID}/dashboards/{dashboard_ID}"
         _path_keys = {
@@ -52,9 +54,9 @@ class Dashboards(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID
         }
 
-    @available_since('3.1')
     class _addProjectDashboard(Route):
         name = "addProjectDashboard"
+        available_since = '3.1'
         httpMethod = Route.POST
         path = "/projects/{project_ID}/dashboards"
         _path_keys = {
@@ -63,6 +65,8 @@ class Dashboards(Resource):
 
     class _updateDashboard(Route):
         name = "updateDashboard"
+        available_since = "1.0"
+        removed_since = "3.0.2"
         httpMethod = Route.POST
         path = "/projects/{project_ID}/datasets/{dataset_ID}/dashboards/{dashboard_ID}"
         _path_keys = {
@@ -71,9 +75,20 @@ class Dashboards(Resource):
             'dashboard_ID': Route.VALIDATOR_OBJECTID
         }
 
-    @available_since('3.1')
+        class _updateDashboardAgain(SubRoute):
+            name = "updateDashboard"
+            available_since = "3.0.2"
+            httpMethod = Route.POST
+            path = "/projects/{project_ID}/datasets/{dataset_ID}/dashboards/{dashboard_ID}"
+            _path_keys = {
+                'project_ID': Route.VALIDATOR_OBJECTID,
+                'dataset_ID': Route.VALIDATOR_OBJECTID,
+                'dashboard_ID': Route.VALIDATOR_OBJECTID
+            }
+
     class _updateProjectDashboard(Route):
         name = "updateProjectDashboard"
+        available_since = '3.1'
         httpMethod = Route.POST
         path = "/projects/{project_ID}/dashboards/{dashboard_ID}"
         _path_keys = {
@@ -91,9 +106,9 @@ class Dashboards(Resource):
             'dashboard_ID': Route.VALIDATOR_OBJECTID
         }
 
-    @available_since('3.1')
     class _deleteProjectDashboard(Route):
         name = "deleteProjectDashboard"
+        available_since = '3.1'
         httpMethod = Route.POST
         path = "/projects/{project_ID}/dashboards/{dashboard_ID}/delete"
         _path_keys = {

@@ -1,8 +1,11 @@
-from HyperAPI.hdp_api.routes import Resource, Route
+from HyperAPI.hdp_api.base.resource import Resource
+from HyperAPI.hdp_api.base.route import Route
 
 
 class Query(Resource):
     name = "Query"
+    available_since = "1.0"
+    removed_since = None
 
     class _GetQuerybyqueryname(Route):
         name = "Get Query by query name"
