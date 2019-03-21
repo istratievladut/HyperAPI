@@ -2,6 +2,30 @@
 
 ## Version 6
 
+### 6.0.1
+
+- Added new router 'IoT' containing the routes listed below.
+
+- Adding Route `getAllStreams`
+    - Available since HDP 4.1
+    - GET `/etl/streams`
+
+- Adding Route `createStream`
+    - Available since HDP 4.1
+    - POST `/etl/streams/create` 
+
+- Adding Route `getStream`
+    - Available since HDP 4.1
+    - GET `/etl/streams/{stream_ID}` 
+
+- Adding Route `updateStream`
+    - Available since HDP 4.1
+    - POST `/etl/streams/{stream_ID}/update` 
+
+- Adding Route `deleteStream`
+    - Available since HDP 4.1
+    - POST `/etl/streams/{stream_ID}/delete`
+
 ### 6.0
 
 - Adding _README.md_ and _CHANGELOG.md_ files. 

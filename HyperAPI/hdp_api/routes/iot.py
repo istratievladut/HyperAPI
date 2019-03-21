@@ -2,39 +2,39 @@ from HyperAPI.hdp_api.base.resource import Resource
 from HyperAPI.hdp_api.base.route import Route
 
 
-class IoT(Resource):
+class IotEtlApi(Resource):
     name = "iotEtlApi"
     available_since = "4.1"
     removed_since = None
 
-    class _getAll(Route):
-        name = "getAll"
+    class _getAllStreams(Route):
+        name = "getAllStreams"
         httpMethod = Route.GET
         path = "/etl/streams"
 
-    class _details(Route):
-        name = "details"
+    class _getStream(Route):
+        name = "getStream"
         httpMethod = Route.GET
         path = "/etl/streams/{stream_ID}"
         _path_keys = {
             'stream_ID': Route.VALIDATOR_OBJECTID
         }
 
-    class _create(Route):
-        name = "create"
+    class _createStream(Route):
+        name = "createStream"
         httpMethod = Route.POST
         path = "/etl/streams/create"
 
-    class _update(Route):
-        name = "update"
+    class _updateStream(Route):
+        name = "updateStream"
         httpMethod = Route.POST
         path = "/etl/streams/{stream_ID}/update"
         _path_keys = {
             'stream_ID': Route.VALIDATOR_OBJECTID
         }
 
-    class _delete(Route):
-        name = "delete"
+    class _deleteStream(Route):
+        name = "deleteStream"
         httpMethod = Route.POST
         path = "/etl/streams/{stream_ID}/delete"
         _path_keys = {
