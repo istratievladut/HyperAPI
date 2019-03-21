@@ -49,6 +49,7 @@ from HyperAPI.hdp_api.routes.monitoring import Monitoring
 from HyperAPI.hdp_api.routes.authentication import Authentication
 from HyperAPI.hdp_api.routes.thirdParties import ThirdParties
 from HyperAPI.hdp_api.routes.realTime import RealTime
+from HyperAPI.hdp_api.routes.iot import IoT
 
 
 from HyperAPI.utils.timeoutSettings import TimeOutSettings
@@ -108,7 +109,8 @@ class Router(object):
         Settings,
         ThirdParties,
         RealTime,
-        Authentication
+        Authentication,
+        IoT
     ]
 
     def __init__(self, username=None, password=None, url=None, token=None, watcher=None):
