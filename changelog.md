@@ -30,15 +30,19 @@
 
 - Adding _README.md_ and _CHANGELOG.md_ files. 
 
-- Session details (coming from the _system/about_ route) are now stored in the `hdp_api.Router` instance. Display from the `hyper_api.Api` instance has been changed accordingly. 
+- Updated file hierarchy for `hdp_api` module : `Route`, `Resource`and `Router` base classes have been moved to the `hdp_api.base` module.
 
-- Added properties `available_since` and `removed_since` on `hdp_api.routes.Resource` so no resources are created on incompatible HDP versions. 
+- Session details (coming from the _system/about_ route) are now stored in the `hdp_api.base.Router` instance. Display from the `hyper_api.Api` instance has been changed accordingly. 
+
+- Added properties `available_since` and `removed_since` on `hdp_api.base.Resource` so no resources are created on incompatible HDP versions. 
 All resources files have been updated accordingly. 
 
-- Removed `available_since`, `deprecated_since` and `reroute` decorators for `hdp_api.routes.Route`. `available_since` is now handled as abstract properties on `hdp_api.routes.Route`.
-- Added `removed_since` property on `hdp_api.routes.Route`. Routes are not created if the HDP version is equal or above that version. This behaviour replaces the `deprecated_since` decorator. 
-- Routes compatiblity between HDP versions is no longer managed using the `reroute` decorator but uses the ``hdp_api.routes.Route.reroute_to` class method, which dynamically creates variants for the parent route. 
+- Removed `available_since`, `deprecated_since` and `reroute` decorators for `hdp_api.base.Route`. `available_since` is now handled as abstract properties on `hdp_api.routes.Route`.
+- Added `removed_since` property on `hdp_api.base.Route`. Routes are not created if the HDP version is equal or above that version. This behaviour replaces the `deprecated_since` decorator. 
+- Routes compatiblity between HDP versions is no longer managed using the `reroute` decorator but uses the ``hdp_api.base.Route.SubRoute` class which defines variants for the parent route. 
 All routes have been updated accordingly.
+
+- Add unittests files to test class methods and behaviour. 
 
 ## 5.2 - Refactoring of Projects and Datasets routes
 
