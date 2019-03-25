@@ -12,7 +12,7 @@
 
 - Adding Route `createStream`
     - Available since HDP 4.1
-    - POST `/etl/streams/create` 
+    - POST `/etl/streams` 
 
 - Adding Route `getStream`
     - Available since HDP 4.1
@@ -20,7 +20,7 @@
 
 - Adding Route `updateStream`
     - Available since HDP 4.1
-    - POST `/etl/streams/{stream_ID}/update` 
+    - POST `/etl/streams/{stream_ID}` 
 
 - Adding Route `deleteStream`
     - Available since HDP 4.1

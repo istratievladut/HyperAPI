@@ -23,12 +23,12 @@ class IotEtlApi(Resource):
     class _createStream(Route):
         name = "createStream"
         httpMethod = Route.POST
-        path = "/etl/streams/create"
+        path = "/etl/streams"
 
     class _updateStream(Route):
         name = "updateStream"
         httpMethod = Route.POST
-        path = "/etl/streams/{stream_ID}/update"
+        path = "/etl/streams/{stream_ID}"
         _path_keys = {
             'stream_ID': Route.VALIDATOR_OBJECTID
         }
