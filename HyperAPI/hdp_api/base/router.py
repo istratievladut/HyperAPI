@@ -150,7 +150,8 @@ class Router(object):
 
     def __iter__(self):
         for resourceCls in self._resources:
-            yield self.__getattribute__(resourceCls.__name__)
+            if resourceCls.is_available(self.session.version):
+                yield self.__getattribute__(resourceCls.__name__)
 
     # Work Management Specific Code ---------------------------------------------------------------------
 
