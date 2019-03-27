@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo "Running Linter"
+      - pip install flake8
+      - python -m flake8 --ignore E501,W503,W504 $CODEBUILD_SRC_DIR/docs/HyperAPI
+      - echo "Running Unit Tests"
+      - pip install -r $CODEBUILD_SRC_DIR/requirements.txt
+      - python -m unittest discover -s $CODEBUILD_SRC_DIR/tests -p "*_test.py" -v
+  build:
+    commands:
+      - export WHEEL_FILENAME="HyperAPI-$PACKAGE_VERSION-py3-none-any.whl"
+      - echo "Building HyperAPI Wheel"
+      - python setup.py sdist bdist_wheel
+      - echo "Installing HyperAPI's environment"
+      - pip install $CODEBUILD_SRC_DIR/dist/$WHEEL_FILENAME
+      - echo "Build Done"

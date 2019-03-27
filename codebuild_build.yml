@@ -16,12 +16,9 @@ phases:
       - echo "Running Unit Tests"
       - pip install pyjwt
       - python -m unittest discover -s $CODEBUILD_SRC_DIR/tests -p "*_test.py" -v
-      - echo "Running Linter"
-      - pip install flake8
-      - python -m flake8 --exit-zero --ignore E501,W503,W504 $CODEBUILD_SRC_DIR/docs/HyperAPI
       - echo "Logging into Amazon ECR..."
       - $(aws ecr get-login --no-include-email --region eu-central-1)
-      - echo "Setupping Twine"
+      - echo "Setup Twine"
       - aws s3 cp s3://ops.hcube.cool/pypi/password.txt ./password.txt && export TWINE_USERNAME=admin && export TWINE_PASSWORD=$(cat password.txt) && export TWINE_REPOSITORY_URL=https://pypi.hcube.cool/simple
   build:
     commands:
@@ -29,9 +26,9 @@ phases:
       - export WHEEL_FILENAME="HyperAPI-$PACKAGE_VERSION-py3-none-any.whl"
       - echo "Building HyperAPI Wheel"
       - python setup.py sdist bdist_wheel
-      - twine upload --skip-existing dist/$WHEEL_FILENAME
+      - twine upload $CODEBUILD_SRC_DIR/dist/$WHEEL_FILENAME
       - echo "Installing HyperAPI's environment"
-      - pip install dist/$WHEEL_FILENAME
+      - pip install -r build_requirements.txt
       - echo "Generating HyperAPI documentation sources"
       - cd $CODEBUILD_SRC_DIR/docs; chmod +x generate_doc.sh; ./generate_doc.sh $CODEBUILD_SRC_DIR/HyperAPI/hyper_api $DOCUUID
       - python $CODEBUILD_SRC_DIR/scripts/deploy.py -b hyperapi.hcube.cool -p $CODEBUILD_SRC_DIR/docs/$DOCUUID -r eu-central-1
@@ -40,3 +37,4 @@ phases:
       - docker build -t hyperapi . --build-arg hyperapiversion=$PACKAGE_VERSION
       - docker tag hyperapi:latest $ECR_TARGET:$GIT_SOURCE_VERSION
       - docker push $ECR_TARGET:$GIT_SOURCE_VERSION
+      - echo "Build Done"
