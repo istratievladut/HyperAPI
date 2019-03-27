@@ -2,6 +2,46 @@
 
 ## Version 6
 
+### 6.0.2
+
+- Fix resource iterator
+- Add correlations compatibility routes for HyperCube 4.3
+ - Adding Route `Correlations.NewCorrelation`
+    - Removed since HDP 3.0
+    - POST `/projects/{project_ID}/tasks/new`
+
+ - Adding Route `Correlations.GetNewJSONfile`
+    - Removed since HDP 3.0
+    - POST `/projects/{project_ID}/datasets/{dataset_ID}/correlations/{correlation_ID}`
+
+ - Adding Route `Correlations.GetJSONfile`
+    - Removed since HDP 3.0
+    - GET `/projects/{project_ID}/datasets/{dataset_ID}/correlation/{correlation_ID}`
+
+ - Adding Route `Correlations.GetNewCSVfile`
+    - Removed since HDP 3.0
+    - GET `/projects/{project_ID}/datasets/{dataset_ID}/correlations/{correlation_ID}/export`
+
+ - Adding Route `Correlations.GetCSVfile`
+    - Removed since HDP 3.0
+    - GET `/projects/{project_ID}/datasets/{dataset_ID}/correlations/{correlation_ID}/export`
+
+ - Adding Route `Correlations.InitListOfCorrelations`
+    - Removed since HDP 3.0
+    - GET `/projects/{project_ID}/correlations`
+
+ - Adding Route `Correlations.CreateNewCorrelation`
+    - Removed since HDP 3.0
+    - POST `/projects/{project_ID}/datasets/{dataset_ID}/correlations`
+
+ - Adding Route `Correlations.RenameNewCorrelation`
+    - Removed since HDP 3.0
+    - POST `/projects/{project_ID}/datasets/{dataset_ID}/correlations/{correlation_ID}/rename`
+
+ - Adding Route `Correlations.retrieveCorrelationsPreview`
+    - Removed since HDP 3.0
+    - GET `/projects/{project_ID}/correlations/previews`
+
 ### 6.0.1
 
 - Added new router 'IoT' containing the routes listed below.
