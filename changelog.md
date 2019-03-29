@@ -2,6 +2,24 @@
 
 ## Version 6
 
+### 6.0.3
+
+- Adding Route `addSharedUsers`
+    - Available since HDP 4.2
+    - POST `/projects/{project_ID}/shared/add`
+
+- Adding Route `removeSharedUsers`
+    - Available since HDP 4.2
+    - POST `/projects/{project_ID}/shared/remove`
+
+- Adding Route `clearSharedUsers`
+    - Available since HDP 4.2
+    - POST `/projects/{project_ID}/shared/clear`
+
+- Adding Route `getRelevantSharedUsers`
+    - Available since HDP 4.2
+    - GET `/projects/{project_ID}/shared/relevant`
+
 ### 6.0.2
 
 - Fix resource iterator
