@@ -76,3 +76,39 @@ class Projects(Resource):
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
         }
+
+    class _addSharedUsers(Route):
+        name = "Add shared users to project"
+        available_since = "4.2"
+        httpMethod = Route.POST
+        path = "/projects/{project_ID}/shared/add"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+        }
+
+    class _removeSharedUsers(Route):
+        name = "Remove shared users to project"
+        available_since = "4.2"
+        httpMethod = Route.POST
+        path = "/projects/{project_ID}/shared/remove"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+        }
+
+    class _clearSharedUsers(Route):
+        name = "Clear shared users of project"
+        available_since = "4.2"
+        httpMethod = Route.POST
+        path = "/projects/{project_ID}/shared/clear"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+        }
+
+    class _getRelevantSharedUsers(Route):
+        name = "Get relevant users"
+        available_since = "4.2"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/shared/relevant"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+        }
