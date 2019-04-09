@@ -139,6 +139,17 @@ class DatasetReshapes(Resource):
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
 
+    class _exportSteps(Route):
+        name = "exportsteps"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/datasets/{dataset_ID}/reshapes/exportsteps"
+        available_since = "3.6.1"
+        unavailable_on = ["4.0", "4.2"]
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID,
+        }
+
     class _applyReshape(Route):
         name = "applyReshape"
         httpMethod = Route.POST
