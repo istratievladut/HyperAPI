@@ -2,6 +2,16 @@
 
 ## Version 6
 
+### 6.0.5
+
+- Adding Route `getForecastTunesMetadata`
+    - Available since HDP 4.2.2
+    - GET `/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/metadata`
+
+- Adding Route `getForecastTunesModalities`
+    - Available since HDP 4.2.2
+    - POST `/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/tunes/modalities`
+
 ### 6.0.4
 
 - Adding Route `datasetReshapes.exportSteps`
