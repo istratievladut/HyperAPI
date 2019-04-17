@@ -2,6 +2,12 @@
 
 ## Version 6
 
+### 6.0.4
+
+- Adding Route `datasetReshapes.exportSteps`
+    - Available since HDP 3.6.1
+    - GET `/projects/{project_ID}/datasets/{dataset_ID}/reshapes/exportsteps`
+
 ### 6.0.3
 
 - Adding Route `addSharedUsers`

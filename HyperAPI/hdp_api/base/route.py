@@ -14,6 +14,7 @@ class Route(object):
 
     available_since = 0
     removed_since = None
+    unavailable_on = []
 
     _path_keys = {}
     _compatibility_routes = []
@@ -29,7 +30,7 @@ class Route(object):
     @classmethod
     def is_available(cls, version, compatiblity_mode=True):
         _check_version = Version(version)
-        if Version(cls.available_since) <= _check_version and Version(cls.removed_since) > _check_version:
+        if Version(cls.available_since) <= _check_version and Version(cls.removed_since) > _check_version and _check_version not in list(Version(_v) for _v in cls.unavailable_on):
             return True
 
         if not compatiblity_mode:
@@ -189,7 +190,7 @@ class SubRoute(Route):
     @classmethod
     def is_available(cls, version):
         _check_version = Version(version)
-        if Version(cls.available_since) <= _check_version and Version(cls.removed_since) > _check_version:
+        if Version(cls.available_since) <= _check_version and Version(cls.removed_since) > _check_version and _check_version not in list(Version(_v) for _v in cls.unavailable_on):
             return True
         return False
 
