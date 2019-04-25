@@ -77,7 +77,7 @@ class Session:
     def refresh(self, username=None, password=None, token=None):
         self.__login(username, password, token)
 
-    def request(self, method, url, params=None, json=None, data=None, affinity=None, streaming=False):
+    def request(self, method, url, params=None, json=None, data=None, affinity=None, streaming=False, raw_response=False):
         """Make a request to rest API and return response as json."""
         params = params or {}
         json = json or {}
@@ -104,6 +104,9 @@ class Session:
             resp = self.session.request(method, url, params=params, json=json, data=multi_data, headers=headers)
         else:
             resp = self.session.request(method, url, params=params, json=json, data=data, headers=headers)
+
+        if raw_response:
+            return resp
 
         if not resp.ok:
             raise requests.exceptions.HTTPError(

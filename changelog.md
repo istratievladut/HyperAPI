@@ -2,6 +2,11 @@
 
 ## Version 6
 
+### 6.0.6
+
+- Adding new parameter to api call signature to get the raw response
+    - api.System.about(raw_response=True)
+
 ### 6.0.5
 
 - Adding Route `getForecastTunesMetadata`
