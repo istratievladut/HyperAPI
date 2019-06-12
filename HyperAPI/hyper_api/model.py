@@ -892,7 +892,8 @@ class ClassifierModel(Model):
         except Exception as E:
             raise ApiException('Unable to export the model scores for ' + self.name, str(E))
 
-        outputFile = json_returned.get('workParams').get('outputFile').split("_")[1]
+        _split = json_returned.get('workParams').get('outputFile').split("_") 
+        outputFile = _split[len(_split)-1] # api get route requires file suffix
         data = {
             'outputFile': outputFile
         }
@@ -930,7 +931,8 @@ class ClassifierModel(Model):
         except Exception as E:
             raise ApiException('Unable to get the model scores for {}'.format(self.name), str(E))
 
-        outputFile = json_returned.get('workParams').get('outputFile').split("_")[1]
+        _split = json_returned.get('workParams').get('outputFile').split("_") 
+        outputFile = _split[len(_split)-1] # api get route requires file suffix
         data = {
             'outputFile': outputFile
         }
@@ -1218,7 +1220,8 @@ class RegressorModel(Model):
         except Exception as E:
             raise ApiException('Unable to export the model scores for ' + self.name, str(E))
 
-        outputFile = json_returned.get('workParams').get('outputFile').split("_")[1]
+        _split = json_returned.get('workParams').get('outputFile').split("_") 
+        outputFile = _split[len(_split)-1] # api get route requires file suffix
         data = {
             'outputFile': outputFile
         }
@@ -1256,7 +1259,8 @@ class RegressorModel(Model):
         except Exception as E:
             raise ApiException('Unable to get the model scores for {}'.format(self.name), str(E))
 
-        outputFile = json_returned.get('workParams').get('outputFile').split("_")[1]
+        _split = json_returned.get('workParams').get('outputFile').split("_") 
+        outputFile = _split[len(_split)-1] # api get route requires file suffix
         data = {
             'outputFile': outputFile
         }
