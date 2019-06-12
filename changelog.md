@@ -2,6 +2,16 @@
 
 ## Version 6
 
+### 6.0.7
+
+- Adding Route `getForecastMetadata`
+    - Available since HDP 4.2.3
+    - GET `/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/metadata`
+
+- Deprecated route `getForecastTunesMetadata`
+    - Starting from HDP 4.2.3
+    - Superseded by `getForecastMetadata`
+
 ### 6.0.6
 
 - Adding new parameter to api call signature to get the raw response
