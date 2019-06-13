@@ -2,6 +2,10 @@
 
 ## Version 6
 
+### 6.0.8
+
+- Fix export models
+
 ### 6.0.7
 
 - Adding Route `getForecastMetadata`
