@@ -799,6 +799,10 @@ class Model(Base):
             self._is_deleted = True
         return self
 
+    def __extract_exportfile_suffix(self, file_path):
+        return file_path.split("_")[len(file_path.split("_"))-1]
+
+
 
 class ClassifierModel(Model):
     """
@@ -870,9 +874,6 @@ class ClassifierModel(Model):
         df = pd.read_csv(StringIO(url.decode('utf-8')))
         applied_model.delete()
         return df
-
-    def __extract_exportfile_suffix(self, file_path):
-        return file_path.split("_")[len(file_path.split("_"))-1]
 
     @Helper.try_catch
     def export_scores(self, path, variables=None):
