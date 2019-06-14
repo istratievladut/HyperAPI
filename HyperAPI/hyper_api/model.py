@@ -799,7 +799,7 @@ class Model(Base):
             self._is_deleted = True
         return self
 
-    def __extract_exportfile_suffix(self, file_path):
+    def _extract_exportfile_suffix(self, file_path):
         return file_path.split("_")[len(file_path.split("_"))-1]
 
 
@@ -897,7 +897,7 @@ class ClassifierModel(Model):
             raise ApiException('Unable to export the model scores for ' + self.name, str(E))
 
         data = {
-            'outputFile': self.__extract_exportfile_suffix(json_returned.get('workParams').get('outputFile')) # api get route requires file suffix
+            'outputFile': super()._extract_exportfile_suffix(json_returned.get('workParams').get('outputFile')) # api get route requires file suffix
         }
         json = {'project_ID': self.project_id, 'model_ID': self.id, 'params': data}
         to_export = self.__api.Prediction.getexportscores(**json)
@@ -934,7 +934,7 @@ class ClassifierModel(Model):
             raise ApiException('Unable to get the model scores for {}'.format(self.name), str(E))
 
         data = {
-            'outputFile': self.__extract_exportfile_suffix(json_returned.get('workParams').get('outputFile')) # api get route requires file suffix
+            'outputFile': super()._extract_exportfile_suffix(json_returned.get('workParams').get('outputFile')) # api get route requires file suffix
         }
         json = {'project_ID': applied_model.project_id, 'model_ID': applied_model.id, 'params': data}
         scores = self.__api.Prediction.getexportscores(**json)
@@ -1221,7 +1221,7 @@ class RegressorModel(Model):
             raise ApiException('Unable to export the model scores for ' + self.name, str(E))
 
         data = {
-            'outputFile': self.__extract_exportfile_suffix(json_returned.get('workParams').get('outputFile')) # api get route requires file suffix
+            'outputFile': super()._extract_exportfile_suffix(json_returned.get('workParams').get('outputFile')) # api get route requires file suffix
         }
         json = {'project_ID': self.project_id, 'model_ID': self.id, 'params': data}
         to_export = self.__api.Prediction.getexportscores(**json)
@@ -1258,7 +1258,7 @@ class RegressorModel(Model):
             raise ApiException('Unable to get the model scores for {}'.format(self.name), str(E))
 
         data = {
-            'outputFile': self.__extract_exportfile_suffix(json_returned.get('workParams').get('outputFile')) # api get route requires file suffix
+            'outputFile': super()._extract_exportfile_suffix(json_returned.get('workParams').get('outputFile')) # api get route requires file suffix
         }
         json = {'project_ID': applied_model.project_id, 'model_ID': applied_model.id, 'params': data}
         scores = self.__api.Prediction.getexportscores(**json)
