@@ -2,6 +2,12 @@
 
 ## Version 6
 
+### 6.0.9
+
+- Adding Route `getAuxDataModalities`
+    - Available since HDP 4.2.4
+    - GET `/projects/{project_ID}/auxdata/modalities/query`
+
 ### 6.0.8
 
 - Fix export models

@@ -140,3 +140,11 @@ class AuxData(Resource):
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
         }
+
+    class _getAuxDataModalities(Route):
+        name = "getAuxDataModalities"
+        httpMethod = Route.GET
+        path = "/projects/{project_ID}/auxdata/modalities/query"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+        }
