@@ -144,6 +144,7 @@ class AuxData(Resource):
     class _getAuxDataModalities(Route):
         name = "getAuxDataModalities"
         httpMethod = Route.GET
+        available_since = "4.2.4"
         path = "/projects/{project_ID}/auxdata/modalities/query"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
