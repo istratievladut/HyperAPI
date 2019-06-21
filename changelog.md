@@ -8,6 +8,10 @@
     - Available since HDP 4.2.4
     - GET `/projects/{project_ID}/auxdata/modalities/query`
 
+- Adding Route `checkAuxDataTreeBranch`
+    - Available since HDP 4.2.4
+    - POST `/projects/{project_ID}/auxdata/checkTreeBranch`
+
 ### 6.0.8
 
 - Fix export models
