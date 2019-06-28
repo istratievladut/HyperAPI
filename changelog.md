@@ -2,6 +2,12 @@
 
 ## Version 6
 
+### 6.0.10
+
+- Adding Route `updateAuxDataModalities`
+    - Available since HDP 4.2.4
+    - GET `/projects/{project_ID}/auxdata/modalities/update`
+  
 ### 6.0.9
 
 - Adding Route `getAuxDataModalities`
