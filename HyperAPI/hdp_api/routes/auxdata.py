@@ -158,3 +158,12 @@ class AuxData(Resource):
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
         }
+
+    class _updateAuxDataModalities(Route):
+        name = "updateAuxDataModalities"
+        httpMethod = Route.POST
+        available_since = "4.2.4"
+        path = "/projects/{project_ID}/auxdata/modalities/update"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+        }
