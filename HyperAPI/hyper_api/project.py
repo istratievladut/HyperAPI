@@ -92,7 +92,7 @@ class ProjectFactory:
             Project
         """
         if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
-            defaultProjectId = self.__api.Settings._getusersettings().get('defaultProjectId')
+            defaultProjectId = self.__api.Settings.getusersettings().get('defaultProjectId')
         else:
             defaultProjectId = self.__api.Projects.projects().get('defaultProject')
 
@@ -214,7 +214,7 @@ class Project(Base):
         Returns a boolean indicating if this project is the default project.
         """
         if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
-            defaultProjectId = self.__api.Settings._getusersettings().get('defaultProjectId')
+            defaultProjectId = self.__api.Settings.getusersettings().get('defaultProjectId')
         else:
             defaultProjectId = self.__api.Projects.projects().get('defaultProject')
 
@@ -282,11 +282,11 @@ class Project(Base):
 
     @property
     def share_users(self):
-        return [u['username'] for u in self.__json_returned.get('shareUsers')]
+        return [u['username'] for u in self.__json_returned.get('shareUsers', [])]
 
     @property
     def share_users_ids(self):
-        return [u['_id'] for u in self.__json_returned.get('shareUsers')]
+        return [u['_id'] for u in self.__json_returned.get('shareUsers', [])]
 
     @property
     def description(self):
@@ -307,7 +307,7 @@ class Project(Base):
         """
         Creation date of this project.
         """
-        return self.str2date(self.__json_returned.get('createdOn'), '%Y-%m-%dT%H:%M:%S.%fZ')
+        return self.str2date(self.__json_returned.get('created'), '%Y-%m-%dT%H:%M:%S.%fZ')
 
     # Methods part
     @Helper.try_catch
@@ -328,7 +328,7 @@ class Project(Base):
         """
         if not self._is_deleted:
             self.__json_sent = {'project_ID': self.project_id}
-            self.__api.Projects.defaultproject(**self.__json_sent)
+            self.__api.Projects.updateproject(**self.__json_sent)
             self.__json_returned = ProjectFactory(self.__api).get_by_id(self.project_id).__json_returned
         return self
 
@@ -355,7 +355,8 @@ class Project(Base):
             'query': json.dumps(query),
             'limit': 1
         }
-        user = self.__api.Identities.getallusers(params=params).get('users')[0]
+        users = self.__api.Identities.getallusers(params=params).get('users')
+        user = users[0] if len(users) else None
         if user:
             print(user['_id'])
             share_ids = self.share_users_ids
