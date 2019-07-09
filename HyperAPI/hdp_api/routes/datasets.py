@@ -303,3 +303,13 @@ class Datasets(Resource):
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID,
         }
+
+    class _ExportFile(Route):
+        name = "ExportFile"
+        httpMethod = Route.GET
+        available_since = "4.2.4"
+        path = "/projects/{project_ID}/datasets/{dataset_ID}/exportFile"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID,
+        }

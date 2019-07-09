@@ -2,6 +2,12 @@
 
 ## Version 6
 
+### 6.0.11
+
+- Adding Route `ExportFile`
+    - Available since HDP 4.2.4
+    - GET `/projects/{project_ID}/datasets/{dataset_ID}/exportFile`
+  
 ### 6.0.10
 
 - Adding Route `updateAuxDataModalities`
