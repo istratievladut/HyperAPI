@@ -1,5 +1,19 @@
 # HyperAPI Changelog
 
+## Version 7
+
+### 7.0.1
+
+- Adding Route `getGroupWorksOverrides`
+    - Available since HDP 4.2.5
+    - GET `/admin/group/{group_ID}/overrides`
+    
+### 7.0
+
+- Adding Route `getUserWorksOverrides`
+    - Available since HDP 4.2.5
+    - GET `/admin/user/{user_ID}/overrides`
+
 ## Version 6
 
 ### 6.0.7

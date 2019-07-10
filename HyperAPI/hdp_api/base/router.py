@@ -50,6 +50,7 @@ from HyperAPI.hdp_api.routes.authentication import Authentication
 from HyperAPI.hdp_api.routes.thirdParties import ThirdParties
 from HyperAPI.hdp_api.routes.realTime import RealTime
 from HyperAPI.hdp_api.routes.iot import IotEtlApi
+from HyperAPI.hdp_api.routes.admin import Admin
 
 
 from HyperAPI.utils.timeoutSettings import TimeOutSettings
@@ -62,6 +63,7 @@ SessionDetails = namedtuple('SessionDetails', ['url', 'name', 'product', 'versio
 
 class Router(object):
     _resources = [
+        Admin,
         Alerts,
         Analytics,
         AuxData,
