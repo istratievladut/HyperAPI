@@ -334,7 +334,7 @@ class Target(KeyIndicator):
     def update(self, name):
         data = {'kpis': self.score_ids, 'newName': name}
         json = {'project_ID': self.__json_returned.get('projectId'), 'json': data}
-        self.__api.Kpi.updateKpi(**json)
+        self.__api.Kpi.updatekpi(**json)
         return self
 
 
@@ -375,5 +375,5 @@ class Description(KeyIndicator):
     def update(self, name):
         data = {'kpis': [self.score_id], 'newName': name}
         json = {'project_ID': self.__json_returned.get('projectId'), 'json': data}
-        self.__api.Kpi.updateKpi(**json)
+        self.__api.Kpi.updatekpi(**json)
         return self

@@ -455,7 +455,7 @@ class Dataset(Base):
 
     @property
     def created(self):
-        return self.str2date(self.__json_returned.get('createdOn'), '%Y-%m-%dT%H:%M:%S.%fZ')
+        return self.str2date(self.__json_returned.get('created'), '%Y-%m-%dT%H:%M:%S.%fZ')
 
     @property
     def modified(self):
@@ -513,7 +513,7 @@ class Dataset(Base):
         if not self._is_deleted:
             if self.__api.session.version >= self.__api.session.version.__class__('3.6'):
                 self.__json_sent = {'defaultDatasetId': self.dataset_id}
-                self.__api.Projects.update(project_ID=self.project_id, json=self.__json_sent)
+                self.__api.Projects.updateproject(project_ID=self.project_id, json=self.__json_sent)
             else:
                 self.__json_sent = {'project_ID': self.project_id, 'dataset_ID': self.dataset_id}
                 self.__api.Datasets.defaultdataset(**self.__json_sent)

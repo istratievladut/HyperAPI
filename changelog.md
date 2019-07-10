@@ -7,7 +7,12 @@
 - Adding Route `ExportFile`
     - Available since HDP 4.2.4
     - GET `/projects/{project_ID}/datasets/{dataset_ID}/exportFile`
-  
+
+ - Fix projectFactory method: getdefault in [project.py](HyperAPI/hyper_api/project.py)
+ - Fix project methods: isdefault, created, set_as_default, share_users, share_users_id, share_with_user in [project.py](HyperAPI/hyper_api/project.py)
+ - Fix dataset methods: created, set_as_default in [dataset.py](HyperAPI/hyper_api/dataset.py)
+ - Fix description method: update in [target.py](HyperAPI/hyper_api/target.py)
+
 ### 6.0.10
 
 - Adding Route `updateAuxDataModalities`
