@@ -1,7 +1,23 @@
 # HyperAPI Changelog
 
 ## Version 7
+### 7.0.2
+- Adding Route `getWorkspaces`
+    - Available since HDP 4.2.6
+    - GET `/anaplan/workspaces`
 
+- Adding Route `getModels`
+    - Available since HDP 4.2.6
+    - GET `/anaplan/models`
+
+- Adding Route `getFiles`
+    - Available since HDP 4.2.6
+    - GET `/anaplan/workspaces/{workspace_id}/model/{model_id}`
+
+- Adding Route `login`
+    - Available since HDP 4.2.6
+    - POST `/anaplan/group/login`
+    
 ### 7.0.1
 
 - Adding Route `getGroupWorksOverrides`

@@ -51,7 +51,7 @@ from HyperAPI.hdp_api.routes.thirdParties import ThirdParties
 from HyperAPI.hdp_api.routes.realTime import RealTime
 from HyperAPI.hdp_api.routes.iot import IotEtlApi
 from HyperAPI.hdp_api.routes.admin import Admin
-
+from HyperAPI.hdp_api.routes.anaplan import Anaplan
 
 from HyperAPI.utils.timeoutSettings import TimeOutSettings
 from HyperAPI.utils.validation import compare_schema_resources, compare_schema_routes
@@ -67,6 +67,7 @@ class Router(object):
         Alerts,
         Analytics,
         AuxData,
+        Anaplan,
         Color,
         Correlations,
         Dashboards,
