@@ -2,6 +2,17 @@
 
 ## Version 7
 
+### 7.0.3
+
+- Adding Route `getForecastIdMetadata`
+    - Available since HDP 4.2.8
+    - GET `/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/metadata`
+
+- Deprecated route `getForecastMetadata`
+    - Starting from HDP 4.2.8
+    - Superseded by `getForecastIdMetadata`
+
+
 ### 7.0.1
 
 - Adding Route `getGroupWorksOverrides`
