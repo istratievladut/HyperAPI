@@ -20,7 +20,7 @@ class Anaplan(Resource):
     class _getFiles(Route):
         name = "getFiles"
         httpMethod = Route.GET
-        path = "/anaplan/workspaces/{workspace_id}/model/{model_id}",
+        path = "/anaplan/workspaces/{workspace_id}/model/{model_id}"
         _path_keys = {
             'workspace_id': Route.VALIDATOR_OBJECTID,
             'model_id': Route.VALIDATOR_OBJECTID
