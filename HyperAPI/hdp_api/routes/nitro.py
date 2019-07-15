@@ -202,12 +202,24 @@ class Nitro(Resource):
     class _getForecastMetadata(Route):
         name = "getForecastMetadata"
         available_since = '4.2.3'
+        removed_since = '4.2.8'
         httpMethod = Route.GET
         path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/metadata"
         _path_keys = {
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dataset_ID': Route.VALIDATOR_OBJECTID
         }
+
+    class _getForecastIdMetadata(Route):
+        name = "getForecastIdMetadata"
+        available_since = '4.2.8'
+        httpMethod = Route.GET
+        path = "/nitro/projects/{project_ID}/datasets/{dataset_ID}/forecasts/{forecast_ID}/metadata"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'dataset_ID': Route.VALIDATOR_OBJECTID,
+            'forecast_ID': Route.VALIDATOR_OBJECTID
+        }        
 
     class _getForecastTunesModalities(Route):
         name = "getForecastTunesModalities"
