@@ -26,7 +26,7 @@ class Anaplan(Resource):
             'model_id': Route.VALIDATOR_OBJECTID
         }
         
-    class _login(Route):
-        name = "login"
+    class _anaplanLogin(Route):
+        name = "anaplanLogin"
         httpMethod = Route.POST
         path = "/anaplan/login"

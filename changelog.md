@@ -14,9 +14,9 @@
     - Available since HDP 4.2.6
     - GET `/anaplan/workspaces/{workspace_id}/model/{model_id}`
 
-- Adding Route `login`
+- Adding Route `anaplanLogin`
     - Available since HDP 4.2.6
-    - POST `/anaplan/group/login`
+    - POST `/anaplan/login`
     
 ### 7.0.1
 
