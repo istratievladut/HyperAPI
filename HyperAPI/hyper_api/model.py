@@ -18,8 +18,10 @@ class AlgoTypes:
     GRADIENTBOOSTINGREGRESSOR = 'GradientBoostingRegressor'
     XGBREGRESSOR = 'XGBRegressor'
     LASSO = 'Lasso'
+    PERCEPTRON = 'Perceptron'
     LIST = [HYPERCUBE, LOGISTICREGRESSION, DECISIONTREE, RANDOMFOREST,
-            GRADIENTBOOSTING, GRADIENTBOOSTINGREGRESSOR, XGBREGRESSOR, LASSO]
+            GRADIENTBOOSTING, GRADIENTBOOSTINGREGRESSOR, XGBREGRESSOR,
+            LASSO, PERCEPTRON]
     REGRESSORLIST = [GRADIENTBOOSTINGREGRESSOR, XGBREGRESSOR, LASSO]
 
 
@@ -725,6 +727,55 @@ class ModelFactory:
             'replaceMissingValues': replaceMissingValues,
             'paramsSk': dumps(hyperParameters),
             'algoType': AlgoTypes.LASSO,
+            'modelName': name,
+            'enable_custom_discretizations': enable_custom_discretizations,
+            'discretizations': discretizations,
+        }
+        return self.__create_skModel(dataset, target, params)
+
+    @Helper.try_catch
+    def create_Perceptron(self, dataset, name, target, penalty=None, alpha=1e-4,fit_intercept=True, max_iter=1000, tol=1e-3,
+                            class_weight='balanced', method='isotonic', split_ratio=0.7, enable_custom_discretizations=True,
+                            nbMaxModality=50, nbMinObservation=10, replaceMissingValues='Median'):
+        """
+        Create a Perceptron classifier model
+
+        Args:
+            dataset (Dataset): Dataset the model is fitted on
+            name (str): Name of the new model
+            target (Target): Target used to generate the model
+            penalty (str): The penalty (aka regularization term) to be used. Defaults to None.
+            alpha (float): Constant that multiplies the regularization term if regularization is used. Defaults to 0.0001
+            fit_intercept (boolean): Whether the intercept should be estimated or not. If False, the data is assumed to be already centered.
+                Defaults to True.
+            max_iter (int): The maximum number of passes over the training data (aka epochs). Defaults to 1000
+            tol (float): The stopping criterion. Defaults to 0.001
+            class_weight (str): The “balanced” mode uses the values of y to automatically adjust weights inversely proportional to class frequencies 
+                in the input data, if None, all classes are supposed to have weight one. Defaults to "balanced"
+            method (str): The method to use for calibration. Can be ‘sigmoid’ which corresponds to Platt’s method or ‘isotonic’ which is a non-parametric 
+                approach. It is not advised to use isotonic calibration with too few calibration samples (<<1000) since it tends to overfit. Use sigmoids 
+                (Platt’s calibration) in this case. Defaults to 'isotonic'
+            split_ratio (float): the first step in the model generation is the random split of the original dataset into a learning (or train) dataset
+                representing by default 70% of the original dataset, and a validation (or test) dataset containing the remaining 30%. Default is 0.7
+            enable_custom_discretizations (boolean): when ticked use the custom discretization(s) link to the selected dataset. Default is True
+            nbMaxModality (int): Maximum number of modalities per variable. Default is 50
+            nbMinObservation (int): Modalities with a number of observations lower will be ignored. Default is 10
+            replaceMissingValues (str): Method to replace missing values. Available methods are 'Median', 'Mean' and 'Delete'. Default is 'Median'
+        Returns:
+            the created model
+        """
+        hyperParameters = {'penalty': penalty, 'alpha': alpha, 'max_iter': max_iter, 'tol': tol, 'class_weight': class_weight, 
+                            'fit_intercept': fit_intercept, 'method': method}
+
+        discretizations = {}
+        if enable_custom_discretizations is True:
+            discretizations = dataset._discretizations
+        params = {
+            'nbMaxModality': nbMaxModality,
+            'nbMinObservation': nbMinObservation,
+            'replaceMissingValues': replaceMissingValues,
+            'paramsSk': dumps(hyperParameters),
+            'algoType': AlgoTypes.PERCEPTRON,
             'modelName': name,
             'enable_custom_discretizations': enable_custom_discretizations,
             'discretizations': discretizations,

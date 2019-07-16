@@ -1,6 +1,10 @@
 # HyperAPI Changelog
 
 ## Version 7
+
+### 7.0.4
+- Adding Perceptron Model
+
 ### 7.0.2
 - Adding Route `getWorkspaces`
     - Available since HDP 4.2.6
