@@ -102,3 +102,46 @@ class OptimProcess(Resource):
             'project_ID': Route.VALIDATOR_OBJECTID,
             'dashboard_ID': Route.VALIDATOR_OBJECTID,
         }
+
+    class _getAllRealtimeViz(Route):
+        name = "getAllRealtimeViz"
+        httpMethod = Route.GET
+        path = "/optimProcess/projects/{project_ID}/realtimeViz"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID
+        }
+
+    class _getOneRealtimeViz(Route):
+        name = "getOneRealtimeViz"
+        httpMethod = Route.GET
+        path = "/optimProcess/projects/{project_ID}/realtimeViz/{realtimeViz_ID}"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'realtimeViz_ID': Route.VALIDATOR_OBJECTID
+        }
+
+    class _postRealtimeViz(Route):
+        name = "postRealtimeViz"
+        httpMethod = Route.POST
+        path = "/optimProcess/projects/{project_ID}/realtimeViz"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID
+        }
+
+    class _renameRealtimeViz(Route):
+        name = "renameRealtimeViz"
+        httpMethod = Route.POST
+        path = "/optimProcess/projects/{project_ID}/realtimeViz/{realtimeViz_ID}/rename"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'realtimeViz_ID': Route.VALIDATOR_OBJECTID
+        }
+
+    class _deleteRealtimeViz(Route):
+        name = "deleteRealtimeViz"
+        httpMethod = Route.POST
+        path = "/optimProcess/projects/{project_ID}/realtimeViz/{realtimeViz_ID}/delete"
+        _path_keys = {
+            'project_ID': Route.VALIDATOR_OBJECTID,
+            'realtimeViz_ID': Route.VALIDATOR_OBJECTID
+        }
