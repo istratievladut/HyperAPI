@@ -2,6 +2,27 @@
 
 ## Version 7
 
+### 7.0.5
+- Adding Route `getAllRealtimeViz`
+    - Available since HDP 4.2.7
+    - GET `/optimProcess/projects/{project_ID}/realtimeViz`
+
+- Adding Route `getOneRealtimeViz`
+    - Available since HDP 4.2.7
+    - GET `/optimProcess/projects/{project_ID}/realtimeViz/{realtimeViz_ID}`
+
+- Adding Route `postRealtimeViz`
+    - Available since HDP 4.2.7
+    - POST `/optimProcess/projects/{project_ID}/realtimeViz`
+
+- Adding Route `renameRealtimeViz`
+    - Available since HDP 4.2.7
+    - POST `/optimProcess/projects/{project_ID}/realtimeViz/{realtimeViz_ID}/rename`
+
+- Adding Route `deleteRealtimeViz`
+    - Available since HDP 4.2.7
+    - POST `/optimProcess/projects/{project_ID}/realtimeViz/{realtimeViz_ID}/delete`
+
 ### 7.0.4
 - Adding Perceptron Model
 
